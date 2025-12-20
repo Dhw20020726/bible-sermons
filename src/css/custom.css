@@ -1,0 +1,14 @@
+:root {
+  --ifm-color-primary: #5a6b5c;
+  --ifm-color-primary-dark: #4f5f51;
+  --ifm-color-primary-darker: #485748;
+  --ifm-color-primary-darkest: #3b463c;
+  --ifm-color-primary-light: #667566;
+  --ifm-color-primary-lighter: #708170;
+  --ifm-color-primary-lightest: #8c9c8b;
+  --ifm-font-family-base: "Noto Serif SC", "Source Han Serif SC", "PingFang SC", "Microsoft YaHei", serif;
+}
+
+main {
+  background: #faf9f6;
+}
