@@ -52,7 +52,7 @@ const config = {
         },
       },
       footer: {
-        style: 'light',
+        style: 'dark',
         copyright: `© ${new Date().getFullYear()} 圣经讲道与灵修分享`,
       },
       prism: {
