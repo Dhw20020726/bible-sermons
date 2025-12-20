@@ -1,68 +1,35 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
+import {useAllDocsData} from '@docusaurus/plugin-content-docs/client';
 
 export default function Home() {
-  const [lastRead, setLastRead] = useState(null);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-    const savedPath = window.localStorage.getItem('lastReadDocPath');
-    const savedTitle = window.localStorage.getItem('lastReadDocTitle');
-    if (savedPath) {
-      setLastRead({
-        path: savedPath,
-        title: savedTitle || '继续上次阅读',
-      });
-    }
-  }, []);
-
-  const articles = [
-    {
-      title: '在信心中持续前行',
-      excerpt: '从创世记到启示录，我们一步步学习信心的脚踪与盼望。',
-      meta: '更新于最近一次讲道',
-    },
-    {
-      title: '旧约中的恩典线索',
-      excerpt: '透过律法、历史与诗歌，看到神持守的救赎计划。',
-      meta: '旧约专题',
-    },
-    {
-      title: '福音光照日常',
-      excerpt: '灵修分享帮助我们在日常中操练祷告与顺服。',
-      meta: '灵修分享',
-    },
-  ];
-
-  const resources = [
-    {
-      title: '讲道资源',
-      description: '整理主日讲道与专题系列，按主题浏览。',
-    },
-    {
-      title: '阅读计划',
-      description: '按卷书阅读路径，帮助系统性阅读。',
-    },
-    {
-      title: '音频与讲义',
-      description: '收听与下载内容，随时继续学习。',
-    },
-  ];
+  const allDocsData = useAllDocsData();
+  const recentArticles = Object.values(allDocsData)
+    .flatMap((docData) => docData.versions)
+    .flatMap((version) => version.docs)
+    .map((doc) => {
+      const updatedAt = doc.frontMatter?.updated
+        ? Date.parse(doc.frontMatter.updated)
+        : doc.lastUpdatedAt || 0;
+      return {
+        permalink: doc.permalink,
+        cover: doc.frontMatter?.cover,
+        scripture: doc.frontMatter?.scripture,
+        title: doc.frontMatter?.sermonTitle || doc.title,
+        summary: doc.frontMatter?.summary || doc.description,
+        updatedAt,
+      };
+    })
+    .filter((article) => article.cover && article.scripture && article.summary)
+    .sort((a, b) => b.updatedAt - a.updatedAt)
+    .slice(0, 3);
 
   return (
     <Layout title="圣经讲道与灵修分享" description="按卷书系统性分享神的话语与教会讲道">
       <main className="homeLayout">
         <section className="homeHero">
           <div className="homeHeroContent">
-            <div className="homeHeroTop">
-              <Link className="homeBackButton" to="/">
-                回到主页
-              </Link>
-              <span>按卷书阅读神的话语</span>
-            </div>
             <div>
               <h1>圣经讲道与灵修分享</h1>
               <p>
@@ -70,14 +37,9 @@ export default function Home() {
               </p>
             </div>
             <div className="homeHeroActions">
-              <Link className="button homePrimaryButton" to="/docs">
-                按卷书阅读神的话语
+              <Link className="button homePrimaryButton" to="/docs/old-testament/创世记/introduction">
+                从创世记开始阅读
               </Link>
-              {lastRead && (
-                <Link className="button homeSecondaryButton" to={lastRead.path}>
-                  继续上次阅读 · {lastRead.title}
-                </Link>
-              )}
             </div>
           </div>
         </section>
@@ -85,23 +47,14 @@ export default function Home() {
         <section className="homeSection">
           <h2>文章</h2>
           <div className="homeCardGrid">
-            {articles.map((article) => (
-              <div className="homeCard" key={article.title}>
-                <strong>{article.title}</strong>
-                <span className="homeCardMeta">{article.meta}</span>
-                <p>{article.excerpt}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="homeSection">
-          <h2>资源</h2>
-          <div className="homeResourceStrip">
-            {resources.map((resource) => (
-              <div className="homeResourceItem" key={resource.title}>
-                <strong>{resource.title}</strong>
-                <p>{resource.description}</p>
+            {recentArticles.map((article) => (
+              <div className="homeCard" key={article.permalink}>
+                <Link className="homeCardLink" to={article.permalink}>
+                  <img className="homeCardImage" src={article.cover} alt={article.title} />
+                  <span className="homeCardScripture">{article.scripture}</span>
+                  <h3 className="homeCardTitle">{article.title}</h3>
+                  <p className="homeCardDescription">{article.summary}</p>
+                </Link>
               </div>
             ))}
           </div>
