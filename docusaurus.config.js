@@ -1,6 +1,5 @@
 const {themes} = require('prism-react-renderer');
 
-const githubUsername = process.env.GITHUB_USERNAME || 'your-github-username';
 const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.dracula;
 
@@ -8,12 +7,12 @@ const darkCodeTheme = themes.dracula;
 const config = {
   title: '圣经讲道与灵修分享',
   tagline: '按卷书系统性分享神的话语与教会讲道',
-  url: `https://${githubUsername}.github.io`,
+  url: 'https://<GITHUB_USERNAME>.github.io',
   baseUrl: '/bible-sermons/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
-  organizationName: githubUsername,
+  organizationName: '<GITHUB_USERNAME>',
   projectName: 'bible-sermons',
 
   i18n: {
