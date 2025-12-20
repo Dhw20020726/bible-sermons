@@ -34,15 +34,36 @@ main {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
 }
 
 .homeHeroActions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  justify-content: center;
+  justify-content: flex-start;
+}
+
+.homeHeroVerse {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 680px;
+  line-height: 1.8;
+}
+
+.homeHeroVerse h1,
+.homeHeroVerse h2 {
+  margin-bottom: 0.5rem;
+}
+
+.homeHeroVerse h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.homeHeroVerse p {
+  margin: 0;
 }
 
 .homePrimaryButton {
