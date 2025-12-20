@@ -23,6 +23,17 @@ export default function Home() {
     };
   }, []);
 
+  const resolveSummary = useMemo(() => {
+    return (doc) => {
+      return (
+        doc.description ||
+        doc.frontMatter?.summary ||
+        doc.frontMatter?.description ||
+        '讲道摘要更新中。'
+      );
+    };
+  }, []);
+
   const recentArticles = Object.values(allDocsData)
     .flatMap((docData) => docData.versions)
     .flatMap((version) => version.docs)
@@ -34,7 +45,7 @@ export default function Home() {
         cover: doc.frontMatter?.cover || defaultCover,
         scripture: doc.frontMatter?.scripture || '圣经章节更新中',
         title: doc.frontMatter?.sermonTitle || doc.title,
-        summary: doc.frontMatter?.summary || doc.description || '讲道摘要更新中。',
+        summary: resolveSummary(doc),
         updatedAt,
       };
     })

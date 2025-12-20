@@ -29,7 +29,7 @@ main {
 }
 
 .homeHeroContent {
-  max-width: 1080px;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -79,7 +79,7 @@ main {
 }
 
 .homeSection {
-  max-width: 1080px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 3rem 1.5rem;
 }
@@ -91,7 +91,7 @@ main {
 
 .homeCardGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(3, minmax(240px, 1fr));
   gap: 1.5rem;
 }
 
@@ -103,6 +103,7 @@ main {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-height: 320px;
 }
 
 .homeCardLink {
@@ -137,6 +138,11 @@ main {
   margin: 0;
   color: #4b5563;
   line-height: 1.6;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .homeAbout {
@@ -146,10 +152,22 @@ main {
 }
 
 .homeAboutInner {
-  max-width: 1080px;
+  max-width: 1200px;
   margin: 0 auto;
   display: grid;
   gap: 1.5rem;
+}
+
+@media (max-width: 996px) {
+  .homeCardGrid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .homeCardGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 html[data-theme='dark'] main,
