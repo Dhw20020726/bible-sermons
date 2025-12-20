@@ -12,3 +12,156 @@
 main {
   background: #faf9f6;
 }
+
+.homeLayout {
+  background: #faf9f6;
+  color: #1f2937;
+}
+
+.homeHero {
+  position: relative;
+  min-height: 420px;
+  padding: 2.5rem 1.5rem 3rem;
+  background-image: url('/img/home-hero.svg');
+  background-size: cover;
+  background-position: center;
+  color: #f8fafc;
+}
+
+.homeHeroContent {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.homeHeroTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.homeBackButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(248, 250, 252, 0.5);
+  color: #f8fafc;
+  font-size: 0.85rem;
+  text-decoration: none;
+  background: rgba(15, 23, 42, 0.35);
+}
+
+.homeHeroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.homePrimaryButton {
+  background: #d9f99d;
+  color: #1f2937;
+  border: none;
+}
+
+.homeSecondaryButton {
+  background: rgba(248, 250, 252, 0.15);
+  border: 1px solid rgba(248, 250, 252, 0.6);
+  color: #f8fafc;
+}
+
+.homeSection {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.homeSection h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.homeCardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.homeCard {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.homeCardMeta {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.homeResourceStrip {
+  background: #f1f5f9;
+  border-radius: 18px;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  align-items: center;
+}
+
+.homeResourceItem {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1.25rem;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.homeAbout {
+  background: #111827;
+  color: #e5e7eb;
+  padding: 3rem 1.5rem;
+}
+
+.homeAboutInner {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  gap: 1.5rem;
+}
+
+html[data-theme='dark'] main,
+html[data-theme='dark'] .homeLayout {
+  background: #0b0f1a;
+  color: #e5e7eb;
+}
+
+html[data-theme='dark'] .homeCard {
+  background: #111827;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme='dark'] .homeCardMeta {
+  color: #9ca3af;
+}
+
+html[data-theme='dark'] .homeResourceStrip {
+  background: #111827;
+}
+
+html[data-theme='dark'] .homeResourceItem {
+  background: #0f172a;
+}
+
+html[data-theme='dark'] .homeAbout {
+  background: #0b0f1a;
+}
