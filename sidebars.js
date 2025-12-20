@@ -112,12 +112,25 @@ const buildTestamentItems = (testamentDir) => {
   const bookOrder = BOOK_ORDER[testamentDir] || [];
   return bookOrder
     .filter((book) => fs.existsSync(path.join(DOCS_DIR, testamentDir, book)))
-    .map((book) => ({
-      type: 'category',
-      label: book,
-      collapsed: true,
-      items: getDocIdsForDir(path.posix.join(testamentDir, book)),
-    }));
+    .map((book) => {
+      const items = getDocIdsForDir(path.posix.join(testamentDir, book));
+      const category = {
+        type: 'category',
+        label: book,
+        collapsed: true,
+        items,
+      };
+
+      if (items.length === 0) {
+        category.link = {
+          type: 'generated-index',
+          title: book,
+          description: `${book} 暂无内容`,
+        };
+      }
+
+      return category;
+    });
 };
 
 module.exports = {
@@ -126,12 +139,22 @@ module.exports = {
       type: 'category',
       label: '旧约',
       collapsed: true,
+      link: {
+        type: 'generated-index',
+        title: '旧约',
+        description: '旧约暂时没有内容。',
+      },
       items: buildTestamentItems('old-testament'),
     },
     {
       type: 'category',
       label: '新约',
       collapsed: true,
+      link: {
+        type: 'generated-index',
+        title: '新约',
+        description: '新约暂时没有内容。',
+      },
       items: buildTestamentItems('new-testament'),
     },
   ],
