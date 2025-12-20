@@ -19,35 +19,35 @@ main {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - var(--ifm-navbar-height, 0px));
-  padding: clamp(2rem, 5vw, 3.5rem) 1.5rem clamp(3rem, 6vw, 4.5rem);
+  padding: 0;
 }
 
 .homeHero {
   position: relative;
-  min-height: clamp(420px, 55vh, 620px);
-  padding: clamp(2.5rem, 4vw, 3.5rem) clamp(1.5rem, 3vw, 3rem);
+  min-height: clamp(360px, 48vh, 520px);
+  padding: clamp(2.25rem, 4vw, 3.25rem) clamp(1.5rem, 4vw, 4rem);
   background-image: url('../../public/img/home_hero.png');
   background-size: cover;
   background-position: center;
   color: #f8fafc;
   display: flex;
   flex: 0 0 auto;
-  width: min(1100px, 100%);
-  margin: 0 auto;
-  border-radius: 28px;
+  width: 100%;
+  margin: 0;
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+  box-shadow: none;
 }
 
 .homeHeroContent {
-  max-width: 900px;
-  margin: 0 auto;
+  max-width: 960px;
+  margin: 0;
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
   justify-content: center;
   padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 3vw, 2.5rem);
 }
@@ -56,13 +56,13 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .homeHeroVerse {
   display: grid;
   gap: 1.25rem;
-  max-width: 680px;
+  max-width: 720px;
   line-height: 1.8;
 }
 
