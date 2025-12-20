@@ -22,7 +22,7 @@ main {
   position: relative;
   min-height: 420px;
   padding: 2.5rem 1.5rem 3rem;
-  background-image: url('../../public/img/home-hero.svg');
+  background-image: url('../../public/img/home_hero.png');
   background-size: cover;
   background-position: center;
   color: #f8fafc;

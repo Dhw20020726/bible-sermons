@@ -62,15 +62,10 @@ export default function Home() {
           <div className="homeHeroContent">
             <div className="homeHeroVerse">
               <div>
-                <h1>约翰福音 1:1</h1>
-                <p>太初有道，道与　神同在，道就是　神。</p>
-              </div>
-              <div>
-                <h2>约翰福音 1:14</h2>
-                <p>
-                  道成了肉身，住在我们中间，满有恩典和真理。我们见过他的荣光，
-                  正是从父而来的独生子的荣光。
-                </p>
+                <h1>约翰福音 1:18</h1>
+                <h2>
+                  从来没有人看见　神，只有在父怀里的独生子将他表明出来。
+                </h2>
               </div>
             </div>
             <div className="homeHeroActions">
