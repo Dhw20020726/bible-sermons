@@ -11,25 +11,14 @@ export default function Home() {
   const [lastReadTitle, setLastReadTitle] = useState('继续上次阅读');
 
   const extractIntroContent = useMemo(() => {
-    return (doc) => {
-      const quote =
-        doc.frontMatter?.quote ||
-        doc.frontMatter?.excerpt ||
-        doc.frontMatter?.verse ||
-        '';
-      const reflection =
-        doc.frontMatter?.reflection || doc.frontMatter?.meditation || '';
-      return {
-        scripture: doc.frontMatter?.scripture || '圣经章节更新中',
-        title: doc.frontMatter?.sermonTitle || doc.title,
-        summary:
-          reflection ||
-          doc.frontMatter?.summary ||
-          doc.description ||
-          '讲道摘要更新中。',
-        quote,
-      };
-    };
+    return (doc) => ({
+      scripture: doc.frontMatter?.scripture || '圣经章节更新中',
+      title: doc.frontMatter?.sermonTitle || doc.title,
+      summary:
+        doc.frontMatter?.summary ||
+        doc.description ||
+        '讲道摘要更新中。',
+    });
   }, []);
 
   const johnIntro = Object.values(allDocsData)
@@ -41,21 +30,9 @@ export default function Home() {
   const articleCards = introContent
     ? [
         {
-          key: 'scripture',
-          label: '圣经章节',
+          key: 'john-intro',
+          label: introContent.scripture,
           title: introContent.title,
-          description: introContent.scripture,
-        },
-        {
-          key: 'quote',
-          label: '经文摘录',
-          title: '经文摘录',
-          description: introContent.quote || '经文摘录更新中。',
-        },
-        {
-          key: 'reflection',
-          label: '默想与讲道示例',
-          title: '默想与讲道示例',
           description: introContent.summary,
         },
       ]
