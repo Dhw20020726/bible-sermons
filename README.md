@@ -22,14 +22,10 @@ title: 讲道标题
 内容正文...
 ```
 
-4. 新增文件后，请在 `sidebars.js` 中为对应卷书添加页面条目，确保左侧导航与目录一致。
-
 ## 使用 Docusaurus + GitHub Pages 部署
 
 - 本站点使用 Docusaurus（JavaScript）构建
-- 部署路径：`https://<GITHUB_USERNAME>.github.io/bible-sermons`
-  - 提示：请在本地运行前设置环境变量 `GITHUB_USERNAME`（例如 `GITHUB_USERNAME=yourname`），
-    以便生成正确的 `url` 与 `organizationName` 配置。
+- 部署路径：`https://Dhw20020726.github.io/bible-sermons`
 
 常用命令：
 
