@@ -1,5 +1,10 @@
 ---
 title: 卷书简介
+sermonTitle: 起初的呼召
+scripture: 创世记 1:1-5
+summary: 当我们回到起初，重新聆听神创造与拣选的呼召，学习在日常中以信心回应祂的带领。
+cover: /img/sermon-light.svg
+updated: 2025-03-01
 ---
 
 **经文摘录：**

@@ -1,5 +1,10 @@
 ---
 title: 卷书简介
+sermonTitle: 因信称义的恩典之路
+scripture: 罗马书 5:1-5
+summary: 因信进入神所赐的和平，学习在患难中持守盼望，让恩典塑造我们的生命节奏。
+cover: /img/sermon-hope.svg
+updated: 2025-02-18
 ---
 
 **经文摘录：**

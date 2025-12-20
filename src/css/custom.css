@@ -36,25 +36,6 @@ main {
   gap: 1.5rem;
 }
 
-.homeHeroTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.homeBackButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.9rem;
-  border-radius: 999px;
-  border: 1px solid rgba(248, 250, 252, 0.5);
-  color: #f8fafc;
-  font-size: 0.85rem;
-  text-decoration: none;
-  background: rgba(15, 23, 42, 0.35);
-}
-
 .homeHeroActions {
   display: flex;
   flex-wrap: wrap;
@@ -65,12 +46,6 @@ main {
   background: #d9f99d;
   color: #1f2937;
   border: none;
-}
-
-.homeSecondaryButton {
-  background: rgba(248, 250, 252, 0.15);
-  border: 1px solid rgba(248, 250, 252, 0.6);
-  color: #f8fafc;
 }
 
 .homeSection {
@@ -93,37 +68,45 @@ main {
 .homeCard {
   background: #ffffff;
   border-radius: 16px;
-  padding: 1.5rem;
+  padding: 1.25rem;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-}
-
-.homeCardMeta {
-  font-size: 0.85rem;
-  color: #6b7280;
-}
-
-.homeResourceStrip {
-  background: #f1f5f9;
-  border-radius: 18px;
-  padding: 1.5rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
-  align-items: center;
 }
 
-.homeResourceItem {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 1.25rem;
-  min-height: 120px;
+.homeCardLink {
+  color: inherit;
+  text-decoration: none;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  justify-content: center;
+  gap: 0.75rem;
+  height: 100%;
+}
+
+.homeCardImage {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.homeCardScripture {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  letter-spacing: 0.02em;
+}
+
+.homeCardTitle {
+  font-size: 1.1rem;
+  margin: 0;
+  color: #111827;
+}
+
+.homeCardDescription {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.6;
 }
 
 .homeAbout {
@@ -150,16 +133,16 @@ html[data-theme='dark'] .homeCard {
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
 }
 
-html[data-theme='dark'] .homeCardMeta {
-  color: #9ca3af;
+html[data-theme='dark'] .homeCardTitle {
+  color: #f8fafc;
 }
 
-html[data-theme='dark'] .homeResourceStrip {
-  background: #111827;
+html[data-theme='dark'] .homeCardDescription {
+  color: #cbd5f5;
 }
 
-html[data-theme='dark'] .homeResourceItem {
-  background: #0f172a;
+html[data-theme='dark'] .homeCardScripture {
+  color: #94a3b8;
 }
 
 html[data-theme='dark'] .homeAbout {
