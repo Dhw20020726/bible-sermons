@@ -7,12 +7,12 @@ const darkCodeTheme = themes.dracula;
 const config = {
   title: '圣经讲道与灵修分享',
   tagline: '按卷书系统性分享神的话语与教会讲道',
-  url: 'https://<GITHUB_USERNAME>.github.io',
+  url: 'https://Dhw20020726.github.io',
   baseUrl: '/bible-sermons/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
-  organizationName: '<GITHUB_USERNAME>',
+  organizationName: 'Dhw20020726',
   projectName: 'bible-sermons',
 
   i18n: {

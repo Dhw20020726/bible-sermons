@@ -4,7 +4,7 @@ sermonTitle: 耶稣如何成为世界的光？1
 scripture: 约翰福音 1:1-14
 summary: 在道成肉身的光中，我们看见父的荣耀，也被呼召在黑暗中活出见证与盼望。
 cover: /img/sermon-grace.svg
-updated: 2025-02-24
+updated: 2025-12-20
 ---
 
 **经文摘录：**
