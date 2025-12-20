@@ -1,42 +1,10 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
-import useBaseUrl from '@docusaurus/useBaseUrl';
-import {useAllDocsData} from '@docusaurus/plugin-content-docs/client';
 
 export default function Home() {
-  const allDocsData = useAllDocsData();
-  const defaultCover = '/img/sermon-light.svg';
   const [lastReadPath, setLastReadPath] = useState('/docs');
   const [lastReadTitle, setLastReadTitle] = useState('继续上次阅读');
-
-  const extractIntroContent = useMemo(() => {
-    return (doc) => ({
-      scripture: doc.frontMatter?.scripture || '圣经章节更新中',
-      title: doc.frontMatter?.sermonTitle || doc.title,
-      summary:
-        doc.frontMatter?.summary ||
-        doc.description ||
-        '讲道摘要更新中。',
-    });
-  }, []);
-
-  const johnIntro = Object.values(allDocsData)
-    .flatMap((docData) => docData.versions)
-    .flatMap((version) => version.docs)
-    .find((doc) => doc.unversionedId === 'new-testament/约翰福音/introduction');
-
-  const introContent = johnIntro ? extractIntroContent(johnIntro) : null;
-  const articleCards = introContent
-    ? [
-        {
-          key: 'john-intro',
-          label: introContent.scripture,
-          title: introContent.title,
-          description: introContent.summary,
-        },
-      ]
-    : [];
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -73,29 +41,6 @@ export default function Home() {
                 {lastReadTitle}
               </Link>
             </div>
-          </div>
-        </section>
-
-        <section className="homeSection">
-          <h2>文章</h2>
-          <div className="homeCardGrid">
-            {articleCards.map((article) => (
-              <div className="homeCard" key={article.key}>
-                <Link
-                  className="homeCardLink"
-                  to={johnIntro?.permalink || '/docs/new-testament/约翰福音/introduction'}
-                >
-                  <img
-                    className="homeCardImage"
-                    src={useBaseUrl(johnIntro?.frontMatter?.cover || defaultCover)}
-                    alt={article.title}
-                  />
-                  <span className="homeCardScripture">{article.label}</span>
-                  <h3 className="homeCardTitle">{article.title}</h3>
-                  <p className="homeCardDescription">{article.description}</p>
-                </Link>
-              </div>
-            ))}
           </div>
         </section>
 
