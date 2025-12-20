@@ -3,6 +3,7 @@ module.exports = {
     {
       "type": "category",
       "label": "旧约",
+      "collapsed": true,
       "items": [
         {
           "type": "category",
@@ -282,6 +283,7 @@ module.exports = {
     {
       "type": "category",
       "label": "新约",
+      "collapsed": true,
       "items": [
         {
           "type": "category",

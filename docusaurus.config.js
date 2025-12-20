@@ -48,9 +48,15 @@ const config = {
             type: 'docSidebar',
             sidebarId: 'docsSidebar',
             position: 'left',
-            label: '按卷书阅读',
+            label: '按卷书阅读神的话语',
           },
         ],
+      },
+      docs: {
+        sidebar: {
+          hideable: true,
+          autoCollapseCategories: true,
+        },
       },
       footer: {
         style: 'light',
