@@ -43,14 +43,7 @@ const config = {
     ({
       navbar: {
         title: '圣经讲道与灵修分享',
-        items: [
-          {
-            type: 'docSidebar',
-            sidebarId: 'docsSidebar',
-            position: 'left',
-            label: '按卷书阅读神的话语',
-          },
-        ],
+        items: [],
       },
       docs: {
         sidebar: {

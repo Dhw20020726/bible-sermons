@@ -1,10 +1,12 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import {useAllDocsData} from '@docusaurus/plugin-content-docs/client';
 
 export default function Home() {
   const allDocsData = useAllDocsData();
+  const defaultCover = '/img/sermon-light.svg';
   const recentArticles = Object.values(allDocsData)
     .flatMap((docData) => docData.versions)
     .flatMap((version) => version.docs)
@@ -14,14 +16,13 @@ export default function Home() {
         : doc.lastUpdatedAt || 0;
       return {
         permalink: doc.permalink,
-        cover: doc.frontMatter?.cover,
-        scripture: doc.frontMatter?.scripture,
+        cover: doc.frontMatter?.cover || defaultCover,
+        scripture: doc.frontMatter?.scripture || '圣经章节更新中',
         title: doc.frontMatter?.sermonTitle || doc.title,
-        summary: doc.frontMatter?.summary || doc.description,
+        summary: doc.frontMatter?.summary || doc.description || '讲道摘要更新中。',
         updatedAt,
       };
     })
-    .filter((article) => article.cover && article.scripture && article.summary)
     .sort((a, b) => b.updatedAt - a.updatedAt)
     .slice(0, 3);
 
@@ -40,6 +41,9 @@ export default function Home() {
               <Link className="button homePrimaryButton" to="/docs/old-testament/创世记/introduction">
                 从创世记开始阅读
               </Link>
+              <Link className="button homeSecondaryButton" to="/docs">
+                继续上次阅读
+              </Link>
             </div>
           </div>
         </section>
@@ -50,7 +54,11 @@ export default function Home() {
             {recentArticles.map((article) => (
               <div className="homeCard" key={article.permalink}>
                 <Link className="homeCardLink" to={article.permalink}>
-                  <img className="homeCardImage" src={article.cover} alt={article.title} />
+                  <img
+                    className="homeCardImage"
+                    src={useBaseUrl(article.cover)}
+                    alt={article.title}
+                  />
                   <span className="homeCardScripture">{article.scripture}</span>
                   <h3 className="homeCardTitle">{article.title}</h3>
                   <p className="homeCardDescription">{article.summary}</p>
