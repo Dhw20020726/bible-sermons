@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import DocItem from '@theme-original/DocItem';
-import {useDoc} from '@docusaurus/theme-common/internal';
+import {useDoc} from '@docusaurus/plugin-content-docs/client';
 import {useLocation} from '@docusaurus/router';
 
 export default function DocItemWrapper(props) {
