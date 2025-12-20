@@ -9,6 +9,15 @@ function getNavbarHeight() {
   return navbar ? navbar.clientHeight : 0;
 }
 
+function scrollToHeading(heading) {
+  if (!heading) {
+    return;
+  }
+  const offset = getNavbarHeight() + 16;
+  const top = heading.getBoundingClientRect().top + window.scrollY - offset;
+  window.scrollTo({top, behavior: 'smooth'});
+}
+
 function getActiveHeading(headings, anchorTopOffset) {
   const nextVisibleHeading = headings.find((heading) => {
     const rect = heading.getBoundingClientRect();
@@ -82,13 +91,24 @@ export default function DocItemTOCDropdown({className}) {
     const nextId = event.target.value;
     setActiveId(nextId);
     const heading = document.getElementById(nextId);
-    if (heading) {
-      heading.scrollIntoView({behavior: 'smooth', block: 'start'});
-    }
+    scrollToHeading(heading);
     if (typeof window !== 'undefined') {
       window.history.replaceState(null, '', `#${nextId}`);
     }
   };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const hash = window.location.hash?.slice(1);
+    if (!hash) {
+      return;
+    }
+    if (tocItems.some((item) => item.id === hash)) {
+      setActiveId(hash);
+    }
+  }, [tocItems]);
 
   if (!tocItems.length) {
     return null;

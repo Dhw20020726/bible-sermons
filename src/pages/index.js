@@ -10,47 +10,56 @@ export default function Home() {
   const [lastReadPath, setLastReadPath] = useState('/docs');
   const [lastReadTitle, setLastReadTitle] = useState('继续上次阅读');
 
-  const parseUpdatedAt = useMemo(() => {
-    return (value) => {
-      if (!value) {
-        return null;
-      }
-      if (value instanceof Date) {
-        return value.getTime();
-      }
-      const parsed = new Date(value).getTime();
-      return Number.isNaN(parsed) ? null : parsed;
-    };
-  }, []);
-
-  const resolveSummary = useMemo(() => {
+  const extractIntroContent = useMemo(() => {
     return (doc) => {
-      return (
-        doc.description ||
-        doc.frontMatter?.summary ||
-        doc.frontMatter?.description ||
-        '讲道摘要更新中。'
-      );
-    };
-  }, []);
-
-  const recentArticles = Object.values(allDocsData)
-    .flatMap((docData) => docData.versions)
-    .flatMap((version) => version.docs)
-    .map((doc) => {
-      const updatedAt =
-        parseUpdatedAt(doc.frontMatter?.updated) ?? doc.lastUpdatedAt ?? 0;
+      const quote =
+        doc.frontMatter?.quote ||
+        doc.frontMatter?.excerpt ||
+        doc.frontMatter?.verse ||
+        '';
+      const reflection =
+        doc.frontMatter?.reflection || doc.frontMatter?.meditation || '';
       return {
-        permalink: doc.permalink,
-        cover: doc.frontMatter?.cover || defaultCover,
         scripture: doc.frontMatter?.scripture || '圣经章节更新中',
         title: doc.frontMatter?.sermonTitle || doc.title,
-        summary: resolveSummary(doc),
-        updatedAt,
+        summary:
+          reflection ||
+          doc.frontMatter?.summary ||
+          doc.description ||
+          '讲道摘要更新中。',
+        quote,
       };
-    })
-    .sort((a, b) => b.updatedAt - a.updatedAt)
-    .slice(0, 3);
+    };
+  }, []);
+
+  const johnIntro = Object.values(allDocsData)
+    .flatMap((docData) => docData.versions)
+    .flatMap((version) => version.docs)
+    .find((doc) => doc.unversionedId === 'new-testament/约翰福音/introduction');
+
+  const introContent = johnIntro ? extractIntroContent(johnIntro) : null;
+  const articleCards = introContent
+    ? [
+        {
+          key: 'scripture',
+          label: '圣经章节',
+          title: introContent.title,
+          description: introContent.scripture,
+        },
+        {
+          key: 'quote',
+          label: '经文摘录',
+          title: '经文摘录',
+          description: introContent.quote || '经文摘录更新中。',
+        },
+        {
+          key: 'reflection',
+          label: '默想与讲道示例',
+          title: '默想与讲道示例',
+          description: introContent.summary,
+        },
+      ]
+    : [];
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -93,17 +102,20 @@ export default function Home() {
         <section className="homeSection">
           <h2>文章</h2>
           <div className="homeCardGrid">
-            {recentArticles.map((article) => (
-              <div className="homeCard" key={article.permalink}>
-                <Link className="homeCardLink" to={article.permalink}>
+            {articleCards.map((article) => (
+              <div className="homeCard" key={article.key}>
+                <Link
+                  className="homeCardLink"
+                  to={johnIntro?.permalink || '/docs/new-testament/约翰福音/introduction'}
+                >
                   <img
                     className="homeCardImage"
-                    src={useBaseUrl(article.cover)}
+                    src={useBaseUrl(johnIntro?.frontMatter?.cover || defaultCover)}
                     alt={article.title}
                   />
-                  <span className="homeCardScripture">{article.scripture}</span>
+                  <span className="homeCardScripture">{article.label}</span>
                   <h3 className="homeCardTitle">{article.title}</h3>
-                  <p className="homeCardDescription">{article.summary}</p>
+                  <p className="homeCardDescription">{article.description}</p>
                 </Link>
               </div>
             ))}
