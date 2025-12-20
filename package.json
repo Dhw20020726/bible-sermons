@@ -2,6 +2,7 @@
   "name": "bible-sermons",
   "version": "1.0.0",
   "private": true,
+  "homepage": "https://Dhw20020726.github.io/bible-sermons",
   "description": "按圣经卷书系统性分享神的话语与教会讲道",
   "scripts": {
     "start": "docusaurus start",
