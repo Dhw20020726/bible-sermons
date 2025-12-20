@@ -52,7 +52,6 @@ export default function Home() {
               在生活中经历主的恩典。
             </p>
             <p>如需联系或获取更多资源，请访问各卷书内容或相关资料区。</p>
-            <div className="homeFooter">© 2025 圣经讲道与灵修分享</div>
           </div>
         </section>
       </main>
