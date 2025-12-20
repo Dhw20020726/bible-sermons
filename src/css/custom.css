@@ -27,8 +27,9 @@ main {
   min-height: clamp(360px, 48vh, 520px);
   padding: clamp(2.25rem, 4vw, 3.25rem) clamp(1.5rem, 4vw, 4rem);
   background-image: url('../../public/img/home_hero.png');
-  background-size: cover;
-  background-position: center;
+  background-size: contain;
+  background-position: top center;
+  background-repeat: no-repeat;
   color: #f8fafc;
   display: flex;
   flex: 0 0 auto;
@@ -46,10 +47,10 @@ main {
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  align-items: flex-start;
-  text-align: left;
-  justify-content: center;
-  padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 3vw, 2.5rem);
+  align-items: center;
+  text-align: center;
+  justify-content: flex-start;
+  padding: clamp(1.25rem, 5vh, 3.5rem) clamp(1.5rem, 3vw, 2.5rem);
 }
 
 .homeHeroActions {
