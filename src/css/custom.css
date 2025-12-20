@@ -36,6 +36,7 @@ main {
   gap: 1.5rem;
   align-items: flex-start;
   text-align: left;
+  padding-top: 1.5rem;
 }
 
 .homeHeroActions {
