@@ -31,10 +31,10 @@ export default function Home() {
     }
     hasRequestedHero.current = true;
     const image = new Image();
-    image.src = heroImageUrl;
     image.onload = () => {
       setHeroLoaded(true);
     };
+    image.src = heroImageUrl;
   }, [heroImageUrl]);
 
   useEffect(() => {
