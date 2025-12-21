@@ -1,5 +1,5 @@
 ---
-title: 【YYYY.MM.DD】.【核心经文段落 ':'写作'.'】
+title: 【核心经文段落】
 sermonTitle: 【讲道主题（默认与scripture相同）】
 scripture: 【核心经文段落】
 summary: 【讲道概述（默认与scripture相同）】
