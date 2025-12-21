@@ -1,10 +1,15 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 
 export default function Home() {
   const [lastReadPath, setLastReadPath] = useState('/docs');
   const [lastReadTitle, setLastReadTitle] = useState('继续上次阅读');
+  const [heroLoaded, setHeroLoaded] = useState(false);
+  const heroRef = useRef(null);
+  const heroImageUrl = useBaseUrl('/img/home_hero.webp');
+  const hasRequestedHero = useRef(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -20,10 +25,60 @@ export default function Home() {
     }
   }, []);
 
+  const loadHeroImage = useCallback(() => {
+    if (hasRequestedHero.current) {
+      return;
+    }
+    hasRequestedHero.current = true;
+    const image = new Image();
+    image.src = heroImageUrl;
+    image.onload = () => {
+      setHeroLoaded(true);
+    };
+  }, [heroImageUrl]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+    if (!heroRef.current) {
+      return undefined;
+    }
+    let observer;
+    if ('IntersectionObserver' in window) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            loadHeroImage();
+            observer.disconnect();
+          }
+        },
+        {rootMargin: '200px'},
+      );
+      observer.observe(heroRef.current);
+    } else {
+      window.addEventListener('load', loadHeroImage, {once: true});
+    }
+
+    return () => {
+      if (observer) {
+        observer.disconnect();
+      }
+      window.removeEventListener('load', loadHeroImage);
+    };
+  }, [loadHeroImage]);
+
+  const heroStyle = heroLoaded
+    ? {
+        '--home-hero-image': `url("${heroImageUrl}")`,
+        '--home-hero-opacity': 1,
+      }
+    : undefined;
+
   return (
     <Layout title="圣经讲道与灵修分享" description="按卷书系统性分享神的话语与教会讲道">
       <main className="homeLayout">
-        <section className="homeHero">
+        <section className="homeHero" ref={heroRef} style={heroStyle}>
           <div className="homeHeroContent">
             <div className="homeHeroVerse">
               <div>
