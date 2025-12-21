@@ -9,6 +9,15 @@
   --ifm-font-family-base: "Noto Serif SC", "Source Han Serif SC", "PingFang SC", "Microsoft YaHei", serif;
 }
 
+html {
+  scroll-padding-top: calc(var(--ifm-navbar-height, 0px) + 1rem);
+}
+
+.markdown :is(h1, h2, h3, h4, h5, h6),
+.markdown :is([id]) {
+  scroll-margin-top: calc(var(--ifm-navbar-height, 0px) + 1rem);
+}
+
 main {
   background: #faf9f6;
 }
