@@ -8,7 +8,6 @@ import DocVersionBadge from '@theme/DocVersionBadge';
 import DocItemFooter from '@theme/DocItem/Footer';
 import DocItemTOCMobile from '@theme/DocItem/TOC/Mobile';
 import DocItemTOCDesktop from '@theme/DocItem/TOC/Desktop';
-import DocItemTOCDropdown from '@theme/DocItem/TOCDropdown';
 import DocItemContent from '@theme/DocItem/Content';
 import DocBreadcrumbs from '@theme/DocBreadcrumbs';
 import ContentVisibility from '@theme/ContentVisibility';
@@ -20,7 +19,6 @@ function useDocTOC() {
   const hidden = frontMatter.hide_table_of_contents;
   const canRender = !hidden && toc.length > 0;
   const mobile = canRender ? <DocItemTOCMobile /> : undefined;
-  const dropdown = canRender ? <DocItemTOCDropdown /> : undefined;
   const desktop =
     canRender && (windowSize === 'desktop' || windowSize === 'ssr') ? (
       <DocItemTOCDesktop />
@@ -28,7 +26,6 @@ function useDocTOC() {
   return {
     hidden,
     mobile,
-    dropdown,
     desktop,
   };
 }
@@ -45,7 +42,6 @@ export default function DocItemLayout({children}) {
           <article>
             <DocBreadcrumbs />
             <DocVersionBadge />
-            {docTOC.dropdown}
             {docTOC.mobile}
             <DocItemContent>{children}</DocItemContent>
             <DocItemFooter />

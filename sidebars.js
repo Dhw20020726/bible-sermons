@@ -108,6 +108,20 @@ const getDocIdsForDir = (relativeDir) => {
   return docIds;
 };
 
+const formatBookDescription = (book, docCount) => {
+  if (docCount === 0) {
+    return `${book} 暂无内容`;
+  }
+  return `${book} 共 ${docCount} 篇讲道`;
+};
+
+const formatTestamentDescription = (testamentLabel, bookCount, docCount) => {
+  if (docCount === 0) {
+    return `${testamentLabel} 共 ${bookCount} 卷书，暂无讲道内容`;
+  }
+  return `${testamentLabel} 共 ${bookCount} 卷书，${docCount} 篇讲道`;
+};
+
 const buildTestamentItems = (testamentDir) => {
   const bookOrder = BOOK_ORDER[testamentDir] || [];
   return bookOrder
@@ -119,19 +133,32 @@ const buildTestamentItems = (testamentDir) => {
         label: book,
         collapsed: true,
         items,
-      };
-
-      if (items.length === 0) {
-        category.link = {
+        link: {
           type: 'generated-index',
           title: book,
-          description: `${book} 暂无内容`,
-        };
-      }
+          description: formatBookDescription(book, items.length),
+        },
+      };
 
       return category;
     });
 };
+
+const buildTestamentMeta = (testamentDir, label) => {
+  const bookOrder = BOOK_ORDER[testamentDir] || [];
+  const books = bookOrder.filter((book) =>
+    fs.existsSync(path.join(DOCS_DIR, testamentDir, book)),
+  );
+  const docCount = getDocIdsForDir(testamentDir).length;
+  return {
+    books,
+    docCount,
+    description: formatTestamentDescription(label, books.length, docCount),
+  };
+};
+
+const oldTestamentMeta = buildTestamentMeta('old-testament', '旧约');
+const newTestamentMeta = buildTestamentMeta('new-testament', '新约');
 
 module.exports = {
   docsSidebar: [
@@ -142,7 +169,7 @@ module.exports = {
       link: {
         type: 'generated-index',
         title: '旧约',
-        description: '旧约暂时没有内容。',
+        description: oldTestamentMeta.description,
       },
       items: buildTestamentItems('old-testament'),
     },
@@ -153,7 +180,7 @@ module.exports = {
       link: {
         type: 'generated-index',
         title: '新约',
-        description: '新约暂时没有内容。',
+        description: newTestamentMeta.description,
       },
       items: buildTestamentItems('new-testament'),
     },
