@@ -1,8 +1,8 @@
 ---
-title: 【YYYY.MM.DD】.主日讲道
-sermonTitle: 【讲道主题】
-scripture: 【核心经文（可为多个）】
-summary: 【一句到两句总结讲道中心】
+title: 【YYYY.MM.DD】.【核心经文段落 ':'写作'.'】
+sermonTitle: 【讲道主题（默认与scripture相同）】
+scripture: 【核心经文段落】
+summary: 【讲道概述（默认与scripture相同）】
 updated: 【YYYY-MM-DD】
 ---
 
