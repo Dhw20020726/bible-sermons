@@ -35,3 +35,8 @@ npm run start
 npm run build
 npm run deploy
 ```
+
+## 圣经经文资源
+
+- 《圣经·新标点和合本（简体中文）》PDF 下载  
+  https://ebible.org/pdf/cmn-cu89s/
