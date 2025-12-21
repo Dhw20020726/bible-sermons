@@ -9,7 +9,8 @@ updated: 【YYYY.MM.DD】
 ## 经文摘录
 
 <a id="excerpt-讲道段落一-经文组合"></a>
-### 【讲道段落一 · 经文组合】 [跳转到原文](#sermon-讲道段落一-经文组合)
+### 【讲道段落一 · 经文组合】
+<a href="#sermon-讲道段落一-经文组合" style="display:inline-block;margin:0.25rem 0 0.75rem;padding:0.1rem 0.5rem;border:1px solid #c7c7c7;border-radius:4px;font-size:0.85em;color:inherit;text-decoration:none;">→ 讲道</a>
 **【经文 A】**  
 【经文 A 原文（新标点和合本·神版）】
 
@@ -22,7 +23,8 @@ updated: 【YYYY.MM.DD】
 ---
 
 <a id="excerpt-讲道段落二-经文组合"></a>
-### 【讲道段落二 · 经文组合】 [跳转到原文](#sermon-讲道段落二-经文组合)
+### 【讲道段落二 · 经文组合】
+<a href="#sermon-讲道段落二-经文组合" style="display:inline-block;margin:0.25rem 0 0.75rem;padding:0.1rem 0.5rem;border:1px solid #c7c7c7;border-radius:4px;font-size:0.85em;color:inherit;text-decoration:none;">→ 讲道</a>
 **【经文 A】**  
 【经文 A 原文】
 
@@ -40,7 +42,8 @@ updated: 【YYYY.MM.DD】
 【引文内容】
 
 <a id="sermon-讲道段落一-经文组合"></a>
-### 【讲道段落一 · 经文组合】 [跳转到原文](#excerpt-讲道段落一-经文组合)
+### 【讲道段落一 · 经文组合】
+<a href="#excerpt-讲道段落一-经文组合" style="display:inline-block;margin:0.25rem 0 0.75rem;padding:0.1rem 0.5rem;border:1px solid #c7c7c7;border-radius:4px;font-size:0.85em;color:inherit;text-decoration:none;">→ 经文</a>
 【讲道正文内容】
 <br />
 
@@ -48,12 +51,14 @@ updated: 【YYYY.MM.DD】
 <br /><br />
 
 <a id="sermon-讲道段落二-经文组合"></a>
-### 【讲道段落二 · 经文组合】 [跳转到原文](#excerpt-讲道段落二-经文组合)
+### 【讲道段落二 · 经文组合】
+<a href="#excerpt-讲道段落二-经文组合" style="display:inline-block;margin:0.25rem 0 0.75rem;padding:0.1rem 0.5rem;border:1px solid #c7c7c7;border-radius:4px;font-size:0.85em;color:inherit;text-decoration:none;">→ 经文</a>
 【讲道正文内容】
 <br />
 
 <a id="sermon-讲道段落三-经文组合"></a>
-### 【讲道段落三 · 经文组合】 [跳转到原文](#excerpt-讲道段落三-经文组合)
+### 【讲道段落三 · 经文组合】
+<a href="#excerpt-讲道段落三-经文组合" style="display:inline-block;margin:0.25rem 0 0.75rem;padding:0.1rem 0.5rem;border:1px solid #c7c7c7;border-radius:4px;font-size:0.85em;color:inherit;text-decoration:none;">→ 经文</a>
 【讲道正文内容】
 <br />
 
