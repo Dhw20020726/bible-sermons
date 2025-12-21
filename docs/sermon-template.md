@@ -8,9 +8,8 @@ updated: 【YYYY.MM.DD】
 
 ## 经文摘录
 
-### 【讲道段落一 · 经文组合】
+### 【讲道段落一 · 经文组合】<a href="#sermon-讲道段落一-经文组合" className="sermon-link">→ 讲道</a>
 <a id="excerpt-讲道段落一-经文组合"></a>
-<a href="#sermon-讲道段落一-经文组合" className="sermon-link">→ 讲道</a>
 **【经文 A】**  
 【经文 A 原文（新标点和合本·神版）】
 
@@ -22,9 +21,8 @@ updated: 【YYYY.MM.DD】
 
 ---
 
-### 【讲道段落二 · 经文组合】
+### 【讲道段落二 · 经文组合】<a href="#sermon-讲道段落二-经文组合" className="sermon-link">→ 讲道</a>
 <a id="excerpt-讲道段落二-经文组合"></a>
-<a href="#sermon-讲道段落二-经文组合" className="sermon-link">→ 讲道</a>
 **【经文 A】**  
 【经文 A 原文】
 
@@ -41,24 +39,21 @@ updated: 【YYYY.MM.DD】
 
 【引文内容】
 
-### 【讲道段落一 · 经文组合】
+### 【讲道段落一 · 经文组合】<a href="#excerpt-讲道段落一-经文组合" className="sermon-link">→ 经文</a>
 <a id="sermon-讲道段落一-经文组合"></a>
-<a href="#excerpt-讲道段落一-经文组合" className="sermon-link">→ 经文</a>
 【讲道正文内容】
 <br />
 
 【同一段落下的延伸讲论】
 <br /><br />
 
-### 【讲道段落二 · 经文组合】
+### 【讲道段落二 · 经文组合】<a href="#excerpt-讲道段落二-经文组合" className="sermon-link">→ 经文</a>
 <a id="sermon-讲道段落二-经文组合"></a>
-<a href="#excerpt-讲道段落二-经文组合" className="sermon-link">→ 经文</a>
 【讲道正文内容】
 <br />
 
-### 【讲道段落三 · 经文组合】
+### 【讲道段落三 · 经文组合】<a href="#excerpt-讲道段落三-经文组合" className="sermon-link">→ 经文</a>
 <a id="sermon-讲道段落三-经文组合"></a>
-<a href="#excerpt-讲道段落三-经文组合" className="sermon-link">→ 经文</a>
 【讲道正文内容】
 <br />
 
