@@ -41,6 +41,20 @@ main {
   min-height: calc(100vh - var(--ifm-navbar-height, 0px));
 }
 
+@media (max-width: 996px) {
+  body.home-page {
+    --ifm-navbar-height: 0px;
+  }
+
+  body.home-page .navbar {
+    display: none;
+  }
+
+  body.home-page .main-wrapper {
+    padding-top: 0;
+  }
+}
+
 .homeHero {
   position: relative;
   min-height: 70vh;

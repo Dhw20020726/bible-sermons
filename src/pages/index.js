@@ -16,6 +16,16 @@ export default function Home() {
     if (typeof window === 'undefined') {
       return;
     }
+    document.body.classList.add('home-page');
+    return () => {
+      document.body.classList.remove('home-page');
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
     const savedPath = window.localStorage.getItem('lastReadDocPath');
     const savedTitle = window.localStorage.getItem('lastReadDocTitle');
     if (savedPath) {
