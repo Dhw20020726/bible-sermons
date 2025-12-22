@@ -83,6 +83,7 @@ export default function SearchBar() {
   const [isFocused, setIsFocused] = useState(false);
   const containerRef = useRef(null);
   const inputRef = useRef(null);
+  const scrollLockRef = useRef({overflow: '', paddingRight: ''});
 
   const resetSearch = useCallback(() => {
     setOpen(false);
@@ -124,6 +125,34 @@ export default function SearchBar() {
 
   useOutsideClick(containerRef, resetSearch);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+    const body = document.body;
+    if (!body) {
+      return undefined;
+    }
+    if (isFocused) {
+      scrollLockRef.current = {
+        overflow: body.style.overflow,
+        paddingRight: body.style.paddingRight,
+      };
+      const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+      body.style.overflow = 'hidden';
+      if (scrollBarWidth > 0) {
+        body.style.paddingRight = `${scrollBarWidth}px`;
+      }
+    } else {
+      body.style.overflow = scrollLockRef.current.overflow;
+      body.style.paddingRight = scrollLockRef.current.paddingRight;
+    }
+    return () => {
+      body.style.overflow = scrollLockRef.current.overflow;
+      body.style.paddingRight = scrollLockRef.current.paddingRight;
+    };
+  }, [isFocused]);
+
   return (
     <div className={styles.searchContainer} ref={containerRef}>
       <input
@@ -140,8 +169,8 @@ export default function SearchBar() {
           setOpen(Boolean(value));
         }}
         onKeyDown={(event) => {
+          event.stopPropagation();
           if (event.key === 'Backspace') {
-            event.stopPropagation();
             if (!query) {
               event.preventDefault();
             }

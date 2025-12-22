@@ -6,6 +6,7 @@ import Link from '@docusaurus/Link';
 export default function Home() {
   const [lastReadPath, setLastReadPath] = useState('/docs');
   const [lastReadTitle, setLastReadTitle] = useState('继续上次阅读');
+  const [hasLastRead, setHasLastRead] = useState(false);
   const [heroLoaded, setHeroLoaded] = useState(false);
   const heroRef = useRef(null);
   const heroImageUrl = useBaseUrl('/img/home_hero.webp');
@@ -19,6 +20,7 @@ export default function Home() {
     const savedTitle = window.localStorage.getItem('lastReadDocTitle');
     if (savedPath) {
       setLastReadPath(savedPath);
+      setHasLastRead(true);
     }
     if (savedTitle) {
       setLastReadTitle(`继续阅读：${savedTitle}`);
@@ -96,9 +98,11 @@ export default function Home() {
               <Link className="button homePrimaryButton" to="/docs/old-testament/创世记/introduction">
                 从创世记开始阅读
               </Link>
-              <Link className="button homeSecondaryButton" to={lastReadPath}>
-                {lastReadTitle}
-              </Link>
+              {hasLastRead && (
+                <Link className="button homeSecondaryButton" to={lastReadPath}>
+                  {lastReadTitle}
+                </Link>
+              )}
             </div>
           </div>
         </section>
