@@ -5,6 +5,7 @@ import styles from './styles.module.css';
 
 const CHINESE_REGEX = /[\u4e00-\u9fff]/g;
 const WORD_REGEX = /[\p{L}\p{N}]+/gu;
+const HTML_TAG_REGEX = /<[^>]+>/g;
 
 function tokenize(text) {
   if (!text) {
@@ -17,6 +18,13 @@ function tokenize(text) {
   const chineseChars = text.match(CHINESE_REGEX) ?? [];
   chineseChars.forEach((char) => tokens.add(char));
   return Array.from(tokens);
+}
+
+function stripHtml(content) {
+  if (!content) {
+    return '';
+  }
+  return content.replace(HTML_TAG_REGEX, ' ').replace(/\s+/g, ' ').trim();
 }
 
 function extractMatchingSentence(content, tokens) {
@@ -37,11 +45,12 @@ function extractMatchingSentence(content, tokens) {
   return sentences[0].trim();
 }
 
-function buildSnippet(content, tokens, maxLength = 120) {
+function buildSnippet(content, tokens, maxLength = 80) {
   if (!content) {
     return '';
   }
-  const sentence = extractMatchingSentence(content, tokens);
+  const sanitizedContent = stripHtml(content);
+  const sentence = extractMatchingSentence(sanitizedContent, tokens);
   if (!sentence) {
     return '';
   }
@@ -71,6 +80,7 @@ export default function SearchBar() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [open, setOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const containerRef = useRef(null);
 
   const tokens = useMemo(() => tokenize(query), [query]);
@@ -107,7 +117,7 @@ export default function SearchBar() {
   return (
     <div className={styles.searchContainer} ref={containerRef}>
       <input
-        className={styles.searchInput}
+        className={`${styles.searchInput} ${!query && !isFocused ? styles.searchInputCollapsed : ''}`}
         type="search"
         placeholder="搜索讲道内容"
         value={query}
@@ -116,7 +126,11 @@ export default function SearchBar() {
           setQuery(value);
           setOpen(Boolean(value));
         }}
-        onFocus={() => setOpen(Boolean(query))}
+        onFocus={() => {
+          setIsFocused(true);
+          setOpen(Boolean(query));
+        }}
+        onBlur={() => setIsFocused(false)}
         aria-label="搜索讲道内容"
       />
       {open && (
