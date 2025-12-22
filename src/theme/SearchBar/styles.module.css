@@ -12,7 +12,7 @@
   background: #ffffff;
   color: #1f2937;
   font-size: 0.9rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, width 0.2s ease;
 }
 
 .searchInput:focus {
@@ -90,4 +90,19 @@ html[data-theme='dark'] .searchResultSection,
 html[data-theme='dark'] .searchResultSnippet,
 html[data-theme='dark'] .searchEmpty {
   color: rgba(226, 232, 240, 0.8);
+}
+
+@media (max-width: 640px) {
+  .searchInput {
+    width: 180px;
+    max-width: 70vw;
+  }
+
+  .searchInput:placeholder-shown {
+    width: 110px;
+  }
+
+  .searchInput:focus {
+    width: 180px;
+  }
 }

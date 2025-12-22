@@ -19,25 +19,36 @@ function tokenize(text) {
   return Array.from(tokens);
 }
 
+function extractMatchingSentence(content, tokens) {
+  if (!content) {
+    return '';
+  }
+  const sentences = content.match(/[^。！？!?\.]+[。！？!?\.]?/g) || [];
+  if (!sentences.length) {
+    return content.trim();
+  }
+  const lowerTokens = tokens.map((token) => token.toLowerCase());
+  for (const sentence of sentences) {
+    const lowerSentence = sentence.toLowerCase();
+    if (lowerTokens.some((token) => lowerSentence.includes(token))) {
+      return sentence.trim();
+    }
+  }
+  return sentences[0].trim();
+}
+
 function buildSnippet(content, tokens, maxLength = 120) {
   if (!content) {
     return '';
   }
-  const lower = content.toLowerCase();
-  let index = -1;
-  for (const token of tokens) {
-    const candidate = lower.indexOf(token.toLowerCase());
-    if (candidate !== -1) {
-      index = candidate;
-      break;
-    }
+  const sentence = extractMatchingSentence(content, tokens);
+  if (!sentence) {
+    return '';
   }
-  if (index === -1) {
-    return content.slice(0, maxLength);
+  if (sentence.length <= maxLength) {
+    return sentence;
   }
-  const start = Math.max(index - 20, 0);
-  const end = Math.min(start + maxLength, content.length);
-  return `${start > 0 ? '…' : ''}${content.slice(start, end)}${end < content.length ? '…' : ''}`;
+  return `${sentence.slice(0, maxLength)}…`;
 }
 
 function useOutsideClick(ref, handler) {
