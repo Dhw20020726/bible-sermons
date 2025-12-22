@@ -56,7 +56,11 @@ const config = {
     ({
       navbar: {
         title: '圣经讲道与灵修分享',
-        items: [{type: 'search', position: 'right'}],
+        items: [
+          {to: '/', label: '首页', position: 'left'},
+          {to: '/docs', label: '目录', position: 'left'},
+          {type: 'search', position: 'right'},
+        ],
       },
       docs: {
         sidebar: {
