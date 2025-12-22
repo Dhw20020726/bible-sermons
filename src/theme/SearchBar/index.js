@@ -131,7 +131,6 @@ export default function SearchBar() {
         type="text"
         inputMode="search"
         enterKeyHint="search"
-        placeholder="搜索讲道内容"
         value={query}
         ref={inputRef}
         onChange={(event) => {
