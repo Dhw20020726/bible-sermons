@@ -12,7 +12,8 @@ export default function Footer() {
           <p>
             我们致力于以圣经为中心的讲道与灵修分享，盼望你能在这里认识神，认识那位又真又活的主。
           </p>
-          <p><a href="https://ebible.org/pdf/cmn-cu89s/" 
+          <p><a className="linkButton linkButton--external"
+                href="https://ebible.org/pdf/cmn-cu89s/"
                 target="_blank"
                 rel="noopener noreferrer">圣经资源下载</a>
           </p>

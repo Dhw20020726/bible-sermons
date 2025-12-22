@@ -180,3 +180,34 @@ html[data-theme='dark'] .homeSecondaryButton {
 .footer__copyright {
   font-size: 0.9rem;
 }
+
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 0.45rem;
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  background: rgba(31, 41, 55, 0.6);
+  color: #f9fafb;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.linkButton:hover {
+  background: rgba(55, 65, 81, 0.9);
+  border-color: rgba(249, 250, 251, 0.6);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.linkButton--external::after {
+  content: '';
+  width: 0.9rem;
+  height: 0.9rem;
+  background-color: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath d='M11 3a1 1 0 100 2h2.586l-4.95 4.95a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V3a1 1 0 00-1-1h-6z'/%3E%3Cpath d='M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 100-2H5z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
