@@ -18,6 +18,69 @@ html {
   scroll-margin-top: calc(var(--ifm-navbar-height, 0px) + 1rem);
 }
 
+.theme-doc-markdown {
+  font-size: 1.05rem;
+  line-height: 1.95;
+  color: #111827;
+}
+
+.theme-doc-markdown header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.theme-doc-markdown header h1 {
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  margin-bottom: 0.6rem;
+  letter-spacing: 0.02em;
+}
+
+.theme-doc-markdown header p {
+  color: #6b7280;
+  margin-bottom: 0;
+}
+
+.theme-doc-markdown > p:first-of-type {
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-left: 4px solid var(--ifm-color-primary);
+  border-radius: 16px;
+  padding: 1.35rem 1.5rem;
+  margin-top: 1.8rem;
+  margin-bottom: 2.5rem;
+  font-size: 1.1rem;
+  box-shadow: 0 18px 40px -32px rgba(15, 23, 42, 0.35);
+}
+
+.theme-doc-markdown > p:first-of-type em {
+  font-style: normal;
+}
+
+.theme-doc-markdown hr {
+  margin: 2.5rem 0;
+  border: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(148, 163, 184, 0.1),
+    rgba(148, 163, 184, 0.6),
+    rgba(148, 163, 184, 0.1)
+  );
+}
+
+.theme-doc-markdown img {
+  border-radius: 18px;
+  box-shadow: 0 24px 50px -40px rgba(15, 23, 42, 0.45);
+}
+
+.theme-doc-markdown blockquote {
+  border-left: 4px solid rgba(90, 107, 92, 0.5);
+  background: rgba(90, 107, 92, 0.08);
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  color: #1f2937;
+}
+
 main {
   background: #faf9f6;
 }
@@ -114,6 +177,34 @@ html[data-theme='dark'] main,
 html[data-theme='dark'] .homeLayout {
   background: #0b0f1a;
   color: #e5e7eb;
+}
+
+html[data-theme='dark'] .theme-doc-markdown {
+  color: #e5e7eb;
+}
+
+html[data-theme='dark'] .theme-doc-markdown header p {
+  color: #94a3b8;
+}
+
+html[data-theme='dark'] .theme-doc-markdown > p:first-of-type {
+  background: rgba(15, 23, 42, 0.65);
+  border-color: rgba(148, 163, 184, 0.3);
+  box-shadow: 0 18px 50px -40px rgba(0, 0, 0, 0.7);
+}
+
+html[data-theme='dark'] .theme-doc-markdown hr {
+  background: linear-gradient(
+    90deg,
+    rgba(148, 163, 184, 0),
+    rgba(148, 163, 184, 0.5),
+    rgba(148, 163, 184, 0)
+  );
+}
+
+html[data-theme='dark'] .theme-doc-markdown blockquote {
+  background: rgba(90, 107, 92, 0.2);
+  color: #e2e8f0;
 }
 
 html[data-theme='dark'] .homeHero {
