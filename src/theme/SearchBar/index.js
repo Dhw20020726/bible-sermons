@@ -83,7 +83,15 @@ export default function SearchBar() {
   const [isFocused, setIsFocused] = useState(false);
   const containerRef = useRef(null);
   const inputRef = useRef(null);
-  const scrollLockRef = useRef({overflow: '', paddingRight: ''});
+  const scrollLockRef = useRef({
+    overflow: '',
+    paddingRight: '',
+    position: '',
+    top: '',
+    width: '',
+    rootOverflow: '',
+    scrollY: 0,
+  });
 
   const resetSearch = useCallback(() => {
     setOpen(false);
@@ -130,26 +138,51 @@ export default function SearchBar() {
       return undefined;
     }
     const body = document.body;
-    if (!body) {
+    const root = document.documentElement;
+    if (!body || !root) {
       return undefined;
     }
     if (isFocused) {
+      const scrollY = window.scrollY;
       scrollLockRef.current = {
         overflow: body.style.overflow,
         paddingRight: body.style.paddingRight,
+        position: body.style.position,
+        top: body.style.top,
+        width: body.style.width,
+        rootOverflow: root.style.overflow,
+        scrollY,
       };
       const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
       body.style.overflow = 'hidden';
+      root.style.overflow = 'hidden';
+      body.style.position = 'fixed';
+      body.style.top = `-${scrollY}px`;
+      body.style.width = '100%';
       if (scrollBarWidth > 0) {
         body.style.paddingRight = `${scrollBarWidth}px`;
       }
     } else {
       body.style.overflow = scrollLockRef.current.overflow;
       body.style.paddingRight = scrollLockRef.current.paddingRight;
+      body.style.position = scrollLockRef.current.position;
+      body.style.top = scrollLockRef.current.top;
+      body.style.width = scrollLockRef.current.width;
+      root.style.overflow = scrollLockRef.current.rootOverflow;
+      if (scrollLockRef.current.scrollY) {
+        window.scrollTo(0, scrollLockRef.current.scrollY);
+      }
     }
     return () => {
       body.style.overflow = scrollLockRef.current.overflow;
       body.style.paddingRight = scrollLockRef.current.paddingRight;
+      body.style.position = scrollLockRef.current.position;
+      body.style.top = scrollLockRef.current.top;
+      body.style.width = scrollLockRef.current.width;
+      root.style.overflow = scrollLockRef.current.rootOverflow;
+      if (scrollLockRef.current.scrollY) {
+        window.scrollTo(0, scrollLockRef.current.scrollY);
+      }
     };
   }, [isFocused]);
 
