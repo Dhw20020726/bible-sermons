@@ -22,17 +22,6 @@ main {
   background: #faf9f6;
 }
 
-.sermon-link {
-  display: inline-block;
-  margin: 0.25rem 0 0.75rem;
-  padding: 0.1rem 0.5rem;
-  border: 1px solid #c7c7c7;
-  border-radius: 4px;
-  font-size: 0.85em;
-  color: inherit;
-  text-decoration: none;
-}
-
 .homeLayout {
   background: #faf9f6;
   color: #1f2937;
