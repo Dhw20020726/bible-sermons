@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import Link from '@docusaurus/Link';
 import {usePluginData} from '@docusaurus/useGlobalData';
 import styles from './styles.module.css';
@@ -68,9 +68,9 @@ function useOutsideClick(ref, handler) {
       }
       handler();
     };
-    document.addEventListener('mousedown', listener);
+    document.addEventListener('pointerdown', listener);
     return () => {
-      document.removeEventListener('mousedown', listener);
+      document.removeEventListener('pointerdown', listener);
     };
   }, [handler, ref]);
 }
@@ -82,6 +82,16 @@ export default function SearchBar() {
   const [open, setOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const containerRef = useRef(null);
+  const inputRef = useRef(null);
+
+  const resetSearch = useCallback(() => {
+    setOpen(false);
+    setQuery('');
+    setIsFocused(false);
+    if (inputRef.current) {
+      inputRef.current.blur();
+    }
+  }, []);
 
   const tokens = useMemo(() => tokenize(query), [query]);
 
@@ -112,19 +122,30 @@ export default function SearchBar() {
     setResults(nextResults);
   }, [entries, invertedIndex, tokens]);
 
-  useOutsideClick(containerRef, () => setOpen(false));
+  useOutsideClick(containerRef, resetSearch);
 
   return (
     <div className={styles.searchContainer} ref={containerRef}>
       <input
         className={`${styles.searchInput} ${!query && !isFocused ? styles.searchInputCollapsed : ''}`}
-        type="search"
+        type="text"
+        inputMode="search"
+        enterKeyHint="search"
         placeholder="搜索讲道内容"
         value={query}
+        ref={inputRef}
         onChange={(event) => {
           const value = event.target.value;
           setQuery(value);
           setOpen(Boolean(value));
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Backspace') {
+            event.stopPropagation();
+            if (!query) {
+              event.preventDefault();
+            }
+          }
         }}
         onFocus={() => {
           setIsFocused(true);
