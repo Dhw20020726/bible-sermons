@@ -39,7 +39,7 @@ const config = {
   ],
   plugins: [
     [
-      require.resolve('docusaurus-search-local'),
+      require.resolve('@easyops-cn/docusaurus-search-local'),
       {
         indexDocs: true,
         indexBlog: false,
