@@ -42,16 +42,16 @@ main {
 }
 
 @media (max-width: 996px) {
-  body.home-page {
-    --ifm-navbar-height: 0px;
-  }
-
   body.home-page .navbar {
     display: none;
   }
 
   body.home-page .main-wrapper {
     padding-top: 0;
+  }
+
+  body.home-page .homeLayout {
+    min-height: 100vh;
   }
 }
 
