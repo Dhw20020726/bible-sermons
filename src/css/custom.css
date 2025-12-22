@@ -179,6 +179,7 @@ html[data-theme='dark'] .homeSecondaryButton {
 
 .footer__copyright {
   font-size: 0.9rem;
+  text-align: center;
 }
 
 .linkButton {

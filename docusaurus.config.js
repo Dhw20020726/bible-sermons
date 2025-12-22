@@ -37,13 +37,25 @@ const config = {
       }),
     ],
   ],
+  plugins: [
+    [
+      require.resolve('docusaurus-search-local'),
+      {
+        indexDocs: true,
+        indexBlog: false,
+        indexPages: false,
+        searchIndex: 'flexsearch',
+        language: ['zh'],
+      },
+    ],
+  ],
 
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
         title: '圣经讲道与灵修分享',
-        items: [],
+        items: [{type: 'search', position: 'right'}],
       },
       docs: {
         sidebar: {
