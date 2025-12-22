@@ -22,6 +22,10 @@ main {
   background: #faf9f6;
 }
 
+.navbar--home .navbar__toggle {
+  display: none;
+}
+
 .sermon-link {
   display: inline-block;
   margin: 0.25rem 0 0.75rem;
