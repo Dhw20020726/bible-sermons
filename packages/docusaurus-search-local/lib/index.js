@@ -20,6 +20,7 @@ const WORD_REGEX = /[\p{L}\p{N}]+/gu;
 
 function stripMarkdown(raw) {
   return raw
+    .replace(/<a[^>]*class(?:Name)?=["']sermon-link["'][^>]*>[\s\S]*?<\/a>/gi, ' ')
     .replace(/```[\s\S]*?```/g, ' ')
     .replace(/`[^`]*`/g, ' ')
     .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
