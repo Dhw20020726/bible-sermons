@@ -76,7 +76,11 @@ export default function Home() {
     : undefined;
 
   return (
-    <Layout title="圣经讲道与灵修分享" description="按卷书系统性分享神的话语与教会讲道">
+    <Layout
+      title="圣经讲道与灵修分享"
+      description="按卷书系统性分享神的话语与教会讲道"
+      wrapperClassName="navbar--home"
+    >
       <main className="homeLayout">
         <section className="homeHero" ref={heroRef} style={heroStyle}>
           <div className="homeHeroContent">
