@@ -46,6 +46,7 @@ const config = {
         indexPages: false,
         searchIndex: 'flexsearch',
         language: ['zh'],
+        docsRouteBasePath: 'docs',
       },
     ],
   ],
