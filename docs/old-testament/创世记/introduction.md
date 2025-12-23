@@ -3,7 +3,7 @@ title: 创世纪 2:7-17
 sermonTitle: 创世纪 2:7-17
 scripture: 创世纪 2:7-17
 summary: 创世纪 2:7-17
-updated: 【2025.12.21】
+updated: 2025.12.21
 ---
 *以下内容整理自创世纪 2:7-17 的讲道。*
 
