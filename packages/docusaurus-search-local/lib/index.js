@@ -17,6 +17,8 @@ const DEFAULT_OPTIONS = {
 
 const CHINESE_SEGMENT_REGEX = /[\u4e00-\u9fff]+/g;
 const WORD_REGEX = /[\p{L}\p{N}]+/gu;
+const MIN_WORD_LENGTH = 2;
+const CHINESE_CHAR_REGEX = /[\u4e00-\u9fff]/;
 
 function stripMarkdown(raw) {
   return raw
@@ -36,6 +38,13 @@ function stripMarkdown(raw) {
     .trim();
 }
 
+function shouldKeepWord(word) {
+  const isSingleLatinChar =
+    word.length === 1 && !CHINESE_CHAR_REGEX.test(word) && /[a-z]/.test(word);
+  const isNumber = /^\d+$/.test(word);
+  return !isSingleLatinChar && (!isNumber || word.length >= MIN_WORD_LENGTH);
+}
+
 function tokenize(text) {
   if (!text) {
     return [];
@@ -43,12 +52,14 @@ function tokenize(text) {
   const tokens = new Set();
   const lower = text.toLowerCase();
   const words = lower.match(WORD_REGEX) ?? [];
-  words.forEach((word) => tokens.add(word));
+  words
+    .filter((word) => word.length >= MIN_WORD_LENGTH || shouldKeepWord(word))
+    .forEach((word) => tokens.add(word));
   const chineseSegments = text.match(CHINESE_SEGMENT_REGEX) ?? [];
   chineseSegments.forEach((segment) => {
     const chars = Array.from(segment);
     chars.forEach((char) => tokens.add(char));
-    const maxGramLength = Math.min(segment.length, 4);
+    const maxGramLength = Math.min(segment.length, 3);
     for (let size = 2; size <= maxGramLength; size += 1) {
       for (let start = 0; start <= segment.length - size; start += 1) {
         tokens.add(segment.slice(start, start + size));
@@ -56,6 +67,27 @@ function tokenize(text) {
     }
   });
   return Array.from(tokens);
+}
+
+function tokenizeFields({ title, heading, content }) {
+  return {
+    title: tokenize(title),
+    heading: tokenize(heading),
+    content: tokenize(content),
+  };
+}
+
+function addTokensToIndex(tokens, field, entryId, invertedIndex) {
+  tokens.forEach((token) => {
+    if (!invertedIndex[token]) {
+      invertedIndex[token] = {
+        title: [],
+        heading: [],
+        content: [],
+      };
+    }
+    invertedIndex[token][field].push(entryId);
+  });
 }
 
 function buildPermalink({ baseUrl, routeBasePath, docId, slug }) {
@@ -157,13 +189,14 @@ async function loadDocsIndex({ docsDir, baseUrl, routeBasePath }) {
         permalink: entryPermalink,
       };
       entries.push(entry);
-      const tokens = tokenize(`${title} ${paragraph.heading ?? ''} ${paragraph.text}`);
-      tokens.forEach((token) => {
-        if (!invertedIndex[token]) {
-          invertedIndex[token] = [];
-        }
-        invertedIndex[token].push(entryId);
+      const fieldTokens = tokenizeFields({
+        title,
+        heading: paragraph.heading ?? '',
+        content: paragraph.text,
       });
+      addTokensToIndex(fieldTokens.title, 'title', entryId, invertedIndex);
+      addTokensToIndex(fieldTokens.heading, 'heading', entryId, invertedIndex);
+      addTokensToIndex(fieldTokens.content, 'content', entryId, invertedIndex);
     });
   }
 
@@ -196,3 +229,4 @@ module.exports = function searchLocalPlugin(context, options) {
 };
 
 module.exports.tokenize = tokenize;
+module.exports.tokenizeFields = tokenizeFields;
