@@ -143,6 +143,11 @@ html[data-theme='dark'] .searchEmpty {
   color: rgba(226, 232, 240, 0.8);
 }
 
+html[data-theme='dark'] .searchHighlight {
+  background: #bbf7d0;
+  color: #0f172a;
+}
+
 @media (max-width: 640px) {
   .searchInput {
     width: 180px;
