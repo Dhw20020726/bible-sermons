@@ -39,7 +39,7 @@ export async function loadIndex(indexUrl) {
       indexMetadata = payload.metadata;
       const options = buildOptions(payload.options);
       searchOptionsSnapshot = options.searchOptions || searchOptionsSnapshot;
-      return MiniSearch.loadJSON(payload.index, options);
+      return MiniSearch.loadJS(payload.index, options);
     });
   return miniSearchPromise;
 }

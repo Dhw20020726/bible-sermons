@@ -68,7 +68,9 @@ export default function SearchBar() {
         })
         .catch((err) => {
           if (cancelled) return;
-          setError(err.message || '搜索失败');
+          const fallbackMessage =
+            (err && err.message) || (typeof err === 'string' ? err : '搜索失败');
+          setError(fallbackMessage);
           setResults([]);
         })
         .finally(() => {
@@ -85,18 +87,8 @@ export default function SearchBar() {
     loadIndex(indexUrl).catch(() => {});
   }, [indexUrl]);
 
-  const renderEmpty = () => {
-    if (loading) {
-      return <div className={styles.searchEmpty}>正在搜索…</div>;
-    }
-    if (error) {
-      return <div className={styles.searchEmpty}>搜索出现问题：{error}</div>;
-    }
-    if (query.trim()) {
-      return <div className={styles.searchEmpty}>没有找到匹配结果</div>;
-    }
-    return <div className={styles.searchEmpty}>输入标题、关键词或经文进行搜索</div>;
-  };
+  const trimmedQuery = query.trim();
+  const shouldShowDropdown = focused && trimmedQuery && results.length > 0;
 
   return (
     <div className={styles.searchContainer} ref={containerRef}>
@@ -114,36 +106,32 @@ export default function SearchBar() {
         onChange={(event) => setQuery(event.target.value)}
         aria-label="搜索文档"
       />
-      {focused && (
+      {shouldShowDropdown && (
         <div className={styles.searchDropdown}>
-          {results.length === 0 ? (
-            renderEmpty()
-          ) : (
-            results.map((result) => {
-              const url = resolveUrl(basePath, result.url);
-              const breadcrumb = result.breadcrumb?.join(' › ');
-              const fieldLabel = FIELD_LABEL[result.field] || result.field;
-              return (
-                <Link
-                  key={result.id}
-                  to={url}
-                  className={styles.searchResult}
-                  onClick={() => setFocused(false)}
-                >
-                  <div className={styles.searchResultTitle}>
-                    {result.title || breadcrumb || result.docId}
-                  </div>
-                  <div className={styles.searchResultSection}>
-                    {[fieldLabel, breadcrumb].filter(Boolean).join(' ｜ ')}
-                  </div>
-                  <div
-                    className={styles.searchResultSnippet}
-                    dangerouslySetInnerHTML={{__html: result.snippet.html}}
-                  />
-                </Link>
-              );
-            })
-          )}
+          {results.map((result) => {
+            const url = resolveUrl(basePath, result.url);
+            const breadcrumb = result.breadcrumb?.join(' › ');
+            const fieldLabel = FIELD_LABEL[result.field] || result.field;
+            return (
+              <Link
+                key={result.id}
+                to={url}
+                className={styles.searchResult}
+                onClick={() => setFocused(false)}
+              >
+                <div className={styles.searchResultTitle}>
+                  {result.title || breadcrumb || result.docId}
+                </div>
+                <div className={styles.searchResultSection}>
+                  {[fieldLabel, breadcrumb].filter(Boolean).join(' ｜ ')}
+                </div>
+                <div
+                  className={styles.searchResultSnippet}
+                  dangerouslySetInnerHTML={{__html: result.snippet.html}}
+                />
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>
