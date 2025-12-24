@@ -21,6 +21,15 @@ const FIELD_WEIGHTS = {
   heading: 2,
   content: 1,
 };
+const SEARCH_FIELDS = ['title', 'heading', 'content'];
+const STORE_FIELDS = ['id', 'title', 'heading', 'section', 'content', 'permalink'];
+const DEFAULT_SEARCH_OPTIONS = {
+  boost: FIELD_WEIGHTS,
+  prefix: true,
+  fuzzy: false,
+  combineWith: 'AND',
+};
+const MIN_FUZZY_TOKEN_LENGTH = 3;
 
 function shouldKeepWord(word) {
   const isSingleLatinChar =
@@ -124,6 +133,38 @@ function highlightText(text, tokens) {
   });
 }
 
+function normalizeEntries(entries) {
+  return entries.map((entry) => ({
+    ...entry,
+    heading: entry.heading ?? entry.section ?? '',
+    section: entry.section ?? entry.heading ?? '',
+  }));
+}
+
+function buildSearchOptions(tokens) {
+  const allowFuzzy = tokens.some(
+    (token) => token.length >= MIN_FUZZY_TOKEN_LENGTH && !CHINESE_CHAR_REGEX.test(token),
+  );
+  return {
+    ...DEFAULT_SEARCH_OPTIONS,
+    fuzzy: allowFuzzy ? 0.2 : false,
+  };
+}
+
+function extractMatchedTokens(result, fallbackTokens) {
+  const matchedFromResult = result?.match ? Object.keys(result.match) : [];
+  if (matchedFromResult.length) {
+    return matchedFromResult;
+  }
+  if (Array.isArray(result?.queryTerms) && result.queryTerms.length) {
+    return result.queryTerms;
+  }
+  if (Array.isArray(result?.terms) && result.terms.length) {
+    return result.terms;
+  }
+  return fallbackTokens ?? [];
+}
+
 function useOutsideClick(ref, handler) {
   useEffect(() => {
     const listener = (event) => {
@@ -205,22 +246,13 @@ export default function SearchBar() {
     }
     const engine = new MiniSearch({
       idField: 'id',
-      fields: ['title', 'heading', 'content'],
-      storeFields: ['id', 'title', 'heading', 'section', 'content', 'permalink'],
+      fields: SEARCH_FIELDS,
+      storeFields: STORE_FIELDS,
       tokenize,
       processTerm: (term) => term,
-      searchOptions: {
-        boost: FIELD_WEIGHTS,
-        prefix: true,
-        fuzzy: 0.2,
-      },
+      searchOptions: DEFAULT_SEARCH_OPTIONS,
     });
-    const normalizedEntries = entries.map((entry) => ({
-      ...entry,
-      heading: entry.heading ?? entry.section ?? '',
-      section: entry.section ?? entry.heading ?? '',
-    }));
-    engine.addAll(normalizedEntries);
+    engine.addAll(normalizeEntries(entries));
     return engine;
   }, [entries]);
 
@@ -256,16 +288,9 @@ export default function SearchBar() {
       setResults([]);
       return;
     }
-    const searchResults = miniSearch.search(query, {
-      boost: FIELD_WEIGHTS,
-      prefix: true,
-      fuzzy: 0.2,
-    });
+    const searchResults = miniSearch.search(query, buildSearchOptions(tokens));
     const nextResults = searchResults.slice(0, 12).map((result) => {
-      const matchedTokens =
-        (result.terms && result.terms.length ? result.terms : null) ??
-        (result.queryTerms && result.queryTerms.length ? result.queryTerms : null) ??
-        tokens;
+      const matchedTokens = extractMatchedTokens(result, tokens);
       return {
         ...result,
         matchedTokens,
