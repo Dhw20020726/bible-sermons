@@ -1,4 +1,11 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import Link from '@docusaurus/Link';
 import {usePluginData} from '@docusaurus/useGlobalData';
 import styles from './styles.module.css';
@@ -125,15 +132,29 @@ export default function SearchBar() {
   const inputRef = useRef(null);
   const scrollPositionRef = useRef(0);
 
+  const restoreScrollPosition = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const targetScrollY = scrollPositionRef.current;
+    let attempts = 0;
+    const applyScroll = () => {
+      attempts += 1;
+      window.scrollTo({top: targetScrollY});
+      if (attempts < 3) {
+        requestAnimationFrame(applyScroll);
+      }
+    };
+    requestAnimationFrame(applyScroll);
+  }, []);
+
   const preserveScrollPosition = useCallback(() => {
     if (typeof window === 'undefined') {
       return;
     }
     scrollPositionRef.current = window.scrollY;
-    requestAnimationFrame(() => {
-      window.scrollTo({top: scrollPositionRef.current});
-    });
-  }, []);
+    restoreScrollPosition();
+  }, [restoreScrollPosition]);
 
   const handleInputPointerDown = useCallback(
     (event) => {
@@ -181,6 +202,13 @@ export default function SearchBar() {
     window.addEventListener('scroll', handleScroll, {passive: true});
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isFocused]);
+
+  useLayoutEffect(() => {
+    if (!isFocused || typeof window === 'undefined') {
+      return;
+    }
+    restoreScrollPosition();
+  }, [query, open, isFocused, restoreScrollPosition]);
 
   useEffect(() => {
     if (!tokens.length) {
