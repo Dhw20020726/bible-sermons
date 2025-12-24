@@ -38,17 +38,7 @@ const config = {
     ],
   ],
   plugins: [
-    [
-      require.resolve('@easyops-cn/docusaurus-search-local'),
-      {
-        indexDocs: true,
-        indexBlog: false,
-        indexPages: false,
-        searchIndex: 'flexsearch',
-        language: ['zh'],
-        docsRouteBasePath: 'docs',
-      },
-    ],
+    require.resolve('./plugins/bilingual-search'),
   ],
 
   themeConfig:
