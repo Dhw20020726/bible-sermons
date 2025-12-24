@@ -15,7 +15,7 @@ const DEFAULT_OPTIONS = {
   docsRouteBasePath: 'docs',
 };
 
-const CHINESE_REGEX = /[\u4e00-\u9fff]/g;
+const CHINESE_SEGMENT_REGEX = /[\u4e00-\u9fff]+/g;
 const WORD_REGEX = /[\p{L}\p{N}]+/gu;
 
 function stripMarkdown(raw) {
@@ -44,8 +44,17 @@ function tokenize(text) {
   const lower = text.toLowerCase();
   const words = lower.match(WORD_REGEX) ?? [];
   words.forEach((word) => tokens.add(word));
-  const chineseChars = text.match(CHINESE_REGEX) ?? [];
-  chineseChars.forEach((char) => tokens.add(char));
+  const chineseSegments = text.match(CHINESE_SEGMENT_REGEX) ?? [];
+  chineseSegments.forEach((segment) => {
+    const chars = Array.from(segment);
+    chars.forEach((char) => tokens.add(char));
+    const maxGramLength = Math.min(segment.length, 4);
+    for (let size = 2; size <= maxGramLength; size += 1) {
+      for (let start = 0; start <= segment.length - size; start += 1) {
+        tokens.add(segment.slice(start, start + size));
+      }
+    }
+  });
   return Array.from(tokens);
 }
 
