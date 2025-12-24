@@ -11,8 +11,23 @@ import {usePluginData} from '@docusaurus/useGlobalData';
 import styles from './styles.module.css';
 
 const CHINESE_SEGMENT_REGEX = /[\u4e00-\u9fff]+/g;
+const CHINESE_CHAR_REGEX = /[\u4e00-\u9fff]/;
 const WORD_REGEX = /[\p{L}\p{N}]+/gu;
 const HTML_TAG_REGEX = /<[^>]+>/g;
+const MIN_WORD_LENGTH = 2;
+const FIELD_WEIGHTS = {
+  title: 3,
+  heading: 2,
+  content: 1,
+};
+const INDEX_FIELDS = Object.keys(FIELD_WEIGHTS);
+
+function shouldKeepWord(word) {
+  const isSingleLatinChar =
+    word.length === 1 && !CHINESE_CHAR_REGEX.test(word) && /[a-z]/.test(word);
+  const isNumber = /^\d+$/.test(word);
+  return !isSingleLatinChar && (!isNumber || word.length >= MIN_WORD_LENGTH);
+}
 
 function tokenize(text) {
   if (!text) {
@@ -21,12 +36,14 @@ function tokenize(text) {
   const tokens = new Set();
   const lower = text.toLowerCase();
   const words = lower.match(WORD_REGEX) ?? [];
-  words.forEach((word) => tokens.add(word));
+  words
+    .filter((word) => word.length >= MIN_WORD_LENGTH || shouldKeepWord(word))
+    .forEach((word) => tokens.add(word));
   const chineseSegments = text.match(CHINESE_SEGMENT_REGEX) ?? [];
   chineseSegments.forEach((segment) => {
     const chars = Array.from(segment);
     chars.forEach((char) => tokens.add(char));
-    const maxGramLength = Math.min(segment.length, 4);
+    const maxGramLength = Math.min(segment.length, 3);
     for (let size = 2; size <= maxGramLength; size += 1) {
       for (let start = 0; start <= segment.length - size; start += 1) {
         tokens.add(segment.slice(start, start + size));
@@ -217,15 +234,30 @@ export default function SearchBar() {
     }
     const matchedTokensByEntry = new Map();
     tokens.forEach((token) => {
-      const ids = invertedIndex[token];
-      if (!ids) {
+      const bucket = invertedIndex[token];
+      if (!bucket) {
         return;
       }
-      ids.forEach((id) => {
-        if (!matchedTokensByEntry.has(id)) {
-          matchedTokensByEntry.set(id, new Set());
-        }
-        matchedTokensByEntry.get(id).add(token);
+      const fieldBuckets = Array.isArray(bucket)
+        ? {title: bucket, heading: [], content: []}
+        : bucket;
+      INDEX_FIELDS.forEach((field) => {
+        const ids = fieldBuckets[field] || [];
+        ids.forEach((id) => {
+          if (!matchedTokensByEntry.has(id)) {
+            matchedTokensByEntry.set(id, {
+              matchedTokens: new Set(),
+              fieldMatches: {
+                title: new Set(),
+                heading: new Set(),
+                content: new Set(),
+              },
+            });
+          }
+          const entryMatch = matchedTokensByEntry.get(id);
+          entryMatch.matchedTokens.add(token);
+          entryMatch.fieldMatches[field].add(token);
+        });
       });
     });
 
@@ -234,21 +266,44 @@ export default function SearchBar() {
       return;
     }
 
-    const scored = Array.from(matchedTokensByEntry.entries()).map(([id, matchedSet]) => {
-      const matchedTokens = Array.from(matchedSet);
-      const coverage = matchedTokens.length / tokens.length;
-      const lengthScore = matchedTokens.reduce(
-        (sum, token) => sum + Math.max(token.length, 1),
-        0,
-      );
-      const longestToken = matchedTokens.reduce(
-        (max, token) => Math.max(max, token.length),
-        0,
-      );
-      return {id, matchedTokens, coverage, lengthScore, longestToken};
-    });
+    const scored = Array.from(matchedTokensByEntry.entries()).map(
+      ([id, {matchedTokens, fieldMatches}]) => {
+        const matchedTokenList = Array.from(matchedTokens);
+        const coverage = matchedTokenList.length / tokens.length;
+        const lengthScore = matchedTokenList.reduce(
+          (sum, token) => sum + Math.max(token.length, 1),
+          0,
+        );
+        const longestToken = matchedTokenList.reduce(
+          (max, token) => Math.max(max, token.length),
+          0,
+        );
+        const weightedFieldScore = INDEX_FIELDS.reduce((sum, field) => {
+          const tokensInField = Array.from(fieldMatches[field]);
+          if (!tokensInField.length) {
+            return sum;
+          }
+          const tokenLengthScore = tokensInField.reduce(
+            (fieldSum, token) => fieldSum + Math.max(token.length, 1),
+            0,
+          );
+          return sum + tokenLengthScore * FIELD_WEIGHTS[field];
+        }, 0);
+        return {
+          id,
+          matchedTokens: matchedTokenList,
+          coverage,
+          lengthScore,
+          longestToken,
+          weightedFieldScore,
+        };
+      },
+    );
 
     scored.sort((a, b) => {
+      if (b.weightedFieldScore !== a.weightedFieldScore) {
+        return b.weightedFieldScore - a.weightedFieldScore;
+      }
       if (b.coverage !== a.coverage) {
         return b.coverage - a.coverage;
       }
