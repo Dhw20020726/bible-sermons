@@ -23,6 +23,7 @@ const CHINESE_CHAR_REGEX = /[\u4e00-\u9fff]/;
 function stripMarkdown(raw) {
   return raw
     .replace(/<a[^>]*class(?:Name)?=["']sermon-link["'][^>]*>[\s\S]*?<\/a>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
     .replace(/```[\s\S]*?```/g, ' ')
     .replace(/`[^`]*`/g, ' ')
     .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
