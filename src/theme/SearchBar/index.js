@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import Link from '@docusaurus/Link';
 import {usePluginData} from '@docusaurus/useGlobalData';
+import MiniSearch from './minisearch/index.js';
 import styles from './styles.module.css';
 
 const CHINESE_SEGMENT_REGEX = /[\u4e00-\u9fff]+/g;
@@ -20,7 +21,6 @@ const FIELD_WEIGHTS = {
   heading: 2,
   content: 1,
 };
-const INDEX_FIELDS = Object.keys(FIELD_WEIGHTS);
 
 function shouldKeepWord(word) {
   const isSingleLatinChar =
@@ -140,7 +140,7 @@ function useOutsideClick(ref, handler) {
 }
 
 export default function SearchBar() {
-  const {entries = [], invertedIndex = {}} = usePluginData('local-search') || {};
+  const {entries = []} = usePluginData('local-search') || {};
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [open, setOpen] = useState(false);
@@ -199,6 +199,30 @@ export default function SearchBar() {
   }, []);
 
   const tokens = useMemo(() => tokenize(query), [query]);
+  const miniSearch = useMemo(() => {
+    if (!entries.length) {
+      return null;
+    }
+    const engine = new MiniSearch({
+      idField: 'id',
+      fields: ['title', 'heading', 'content'],
+      storeFields: ['id', 'title', 'heading', 'section', 'content', 'permalink'],
+      tokenize,
+      processTerm: (term) => term,
+      searchOptions: {
+        boost: FIELD_WEIGHTS,
+        prefix: true,
+        fuzzy: 0.2,
+      },
+    });
+    const normalizedEntries = entries.map((entry) => ({
+      ...entry,
+      heading: entry.heading ?? entry.section ?? '',
+      section: entry.section ?? entry.heading ?? '',
+    }));
+    engine.addAll(normalizedEntries);
+    return engine;
+  }, [entries]);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -228,107 +252,29 @@ export default function SearchBar() {
   }, [query, open, isFocused, restoreScrollPosition]);
 
   useEffect(() => {
-    if (!tokens.length) {
+    if (!miniSearch || !query.trim()) {
       setResults([]);
       return;
     }
-    const matchedTokensByEntry = new Map();
-    tokens.forEach((token) => {
-      const bucket = invertedIndex[token];
-      if (!bucket) {
-        return;
-      }
-      const fieldBuckets = Array.isArray(bucket)
-        ? {title: bucket, heading: [], content: []}
-        : bucket;
-      INDEX_FIELDS.forEach((field) => {
-        const ids = fieldBuckets[field] || [];
-        ids.forEach((id) => {
-          if (!matchedTokensByEntry.has(id)) {
-            matchedTokensByEntry.set(id, {
-              matchedTokens: new Set(),
-              fieldMatches: {
-                title: new Set(),
-                heading: new Set(),
-                content: new Set(),
-              },
-            });
-          }
-          const entryMatch = matchedTokensByEntry.get(id);
-          entryMatch.matchedTokens.add(token);
-          entryMatch.fieldMatches[field].add(token);
-        });
-      });
+    const searchResults = miniSearch.search(query, {
+      boost: FIELD_WEIGHTS,
+      prefix: true,
+      fuzzy: 0.2,
     });
-
-    if (!matchedTokensByEntry.size) {
-      setResults([]);
-      return;
-    }
-
-    const scored = Array.from(matchedTokensByEntry.entries()).map(
-      ([id, {matchedTokens, fieldMatches}]) => {
-        const matchedTokenList = Array.from(matchedTokens);
-        const coverage = matchedTokenList.length / tokens.length;
-        const lengthScore = matchedTokenList.reduce(
-          (sum, token) => sum + Math.max(token.length, 1),
-          0,
-        );
-        const longestToken = matchedTokenList.reduce(
-          (max, token) => Math.max(max, token.length),
-          0,
-        );
-        const weightedFieldScore = INDEX_FIELDS.reduce((sum, field) => {
-          const tokensInField = Array.from(fieldMatches[field]);
-          if (!tokensInField.length) {
-            return sum;
-          }
-          const tokenLengthScore = tokensInField.reduce(
-            (fieldSum, token) => fieldSum + Math.max(token.length, 1),
-            0,
-          );
-          return sum + tokenLengthScore * FIELD_WEIGHTS[field];
-        }, 0);
-        return {
-          id,
-          matchedTokens: matchedTokenList,
-          coverage,
-          lengthScore,
-          longestToken,
-          weightedFieldScore,
-        };
-      },
-    );
-
-    scored.sort((a, b) => {
-      if (b.weightedFieldScore !== a.weightedFieldScore) {
-        return b.weightedFieldScore - a.weightedFieldScore;
-      }
-      if (b.coverage !== a.coverage) {
-        return b.coverage - a.coverage;
-      }
-      if (b.longestToken !== a.longestToken) {
-        return b.longestToken - a.longestToken;
-      }
-      if (b.lengthScore !== a.lengthScore) {
-        return b.lengthScore - a.lengthScore;
-      }
-      return a.id - b.id;
+    const nextResults = searchResults.slice(0, 12).map((result) => {
+      const matchedTokens =
+        (result.terms && result.terms.length ? result.terms : null) ??
+        (result.queryTerms && result.queryTerms.length ? result.queryTerms : null) ??
+        tokens;
+      return {
+        ...result,
+        matchedTokens,
+        heading: result.heading ?? result.section ?? '',
+        section: result.section ?? result.heading ?? '',
+      };
     });
-
-    const nextResults = scored
-      .slice(0, 12)
-      .map(({id, matchedTokens}) => {
-        const entry = entries[id];
-        if (!entry) {
-          return null;
-        }
-        return {...entry, matchedTokens};
-      })
-      .filter(Boolean);
-
     setResults(nextResults);
-  }, [entries, invertedIndex, tokens, isFocused]);
+  }, [miniSearch, query, tokens]);
 
   useOutsideClick(containerRef, resetSearch);
 

@@ -149,7 +149,6 @@ function splitParagraphs(markdownContent) {
 async function loadDocsIndex({ docsDir, baseUrl, routeBasePath }) {
   const filePaths = await Globby(['**/*.{md,mdx}'], { cwd: docsDir });
   const entries = [];
-  const invertedIndex = {};
 
   for (const filePath of filePaths) {
     const absolutePath = path.join(docsDir, filePath);
@@ -181,26 +180,20 @@ async function loadDocsIndex({ docsDir, baseUrl, routeBasePath }) {
       const entryPermalink = paragraph.anchor
         ? `${permalink}#${paragraph.anchor}`
         : permalink;
+      const heading = paragraph.heading ?? '';
       const entry = {
         id: entryId,
         title,
-        section: paragraph.heading,
+        heading,
+        section: heading,
         content: paragraph.text,
         permalink: entryPermalink,
       };
       entries.push(entry);
-      const fieldTokens = tokenizeFields({
-        title,
-        heading: paragraph.heading ?? '',
-        content: paragraph.text,
-      });
-      addTokensToIndex(fieldTokens.title, 'title', entryId, invertedIndex);
-      addTokensToIndex(fieldTokens.heading, 'heading', entryId, invertedIndex);
-      addTokensToIndex(fieldTokens.content, 'content', entryId, invertedIndex);
     });
   }
 
-  return { entries, invertedIndex };
+  return { entries, invertedIndex: {} };
 }
 
 module.exports = function searchLocalPlugin(context, options) {
