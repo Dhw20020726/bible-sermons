@@ -23,6 +23,9 @@ function createSlugger() {
   return (value) => {
     const base = String(value || '')
       .normalize('NFKC')
+      // 保留数字之间的分隔符（空格或冒号）以便经文节次更清晰
+      .replace(/(\d)\s+(\d)/g, '$1-$2')
+      .replace(/:/g, '-')
       .replace(/[\u201c\u201d\u2018\u2019]/g, '')
       .replace(/[^a-z0-9\u4e00-\u9fff\s-]/giu, '')
       .trim()
