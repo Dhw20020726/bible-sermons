@@ -38,37 +38,30 @@ main {
 }
 
 .bible-text {
-  padding: 0.75rem 1rem;
-  background: #f6f6f2;
-  border-left: 4px solid #a9b89c;
-  border-radius: 4px;
-  margin: 0.75rem 0;
-  line-height: 1.7;
+  padding: 0;
+  margin: 0.5rem 0;
+  background: transparent;
+  border: none;
+  line-height: 1.75;
 }
 
 .bible-text .verse {
   display: block;
-}
-
-.bible-text .verse + .verse {
-  margin-top: 0.35rem;
+  margin: 0 0 0.35rem 0;
 }
 
 .bible-text .verse-number {
-  display: inline-block;
-  min-width: 1.6em;
-  font-weight: 600;
-  color: #4b5563;
+  font-weight: 500;
+  color: inherit;
 }
 
 .bible-text .verse-text {
-  margin-left: 0.35rem;
+  margin-left: 0.25rem;
 }
 
 .bible-text--error {
-  border-left-color: #d14343;
   color: #8b1e1e;
-  background: #fff5f5;
+  background: transparent;
 }
 
 .homeLayout {
