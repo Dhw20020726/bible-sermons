@@ -18,6 +18,16 @@ function getText(node) {
   return '';
 }
 
+function setAttr(node, name, value) {
+  if (!node.attributes) node.attributes = [];
+  const existing = node.attributes.find((attr) => attr.name === name);
+  if (existing) {
+    existing.value = value;
+  } else {
+    node.attributes.push({type: 'mdxJsxAttribute', name, value});
+  }
+}
+
 function createSlugger() {
   return (value) => {
     return (
@@ -35,14 +45,25 @@ function createSlugger() {
   };
 }
 
-function setAttr(node, name, value) {
-  if (!node.attributes) node.attributes = [];
-  const existing = node.attributes.find((attr) => attr.name === name);
-  if (existing) {
-    existing.value = value;
-  } else {
-    node.attributes.push({type: 'mdxJsxAttribute', name, value});
-  }
+function isAnchorNode(node) {
+  return (
+    node &&
+    (node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') &&
+    (node.name || '') === 'AnchorAuto'
+  );
+}
+
+function createAnchorAutoNode({slug, mode, label}) {
+  return {
+    type: 'mdxJsxFlowElement',
+    name: 'AnchorAuto',
+    attributes: [
+      {type: 'mdxJsxAttribute', name: 'slug', value: slug},
+      {type: 'mdxJsxAttribute', name: 'mode', value: mode},
+      ...(label ? [{type: 'mdxJsxAttribute', name: 'label', value: label}] : []),
+    ],
+    children: [],
+  };
 }
 
 function toAnchorJump({node, mode, slug, label}) {
@@ -50,6 +71,7 @@ function toAnchorJump({node, mode, slug, label}) {
   const toPrefix = mode === 'sermon' ? 'excerpt' : 'sermon';
   const targetSlug = slug || 'fallback';
 
+  node.type = 'mdxJsxFlowElement';
   node.name = 'AnchorJump';
   setAttr(node, 'id', `${idPrefix}-${targetSlug}`);
   setAttr(node, 'to', `${toPrefix}-${targetSlug}`);
@@ -61,18 +83,55 @@ function toAnchorJump({node, mode, slug, label}) {
   node.children = [{type: 'text', value: label}];
 }
 
+function normalizeParagraphAnchors(root) {
+  function normalize(node) {
+    const {children} = node || {};
+    if (!Array.isArray(children)) return;
+
+    for (let i = 0; i < children.length; i += 1) {
+      const child = children[i];
+      if (child.type === 'paragraph') {
+        const segments = [];
+        let buffer = [];
+        (child.children || []).forEach((grandChild) => {
+          if (isAnchorNode(grandChild)) {
+            if (buffer.length) {
+              segments.push({type: 'paragraph', children: buffer});
+              buffer = [];
+            }
+            segments.push({...grandChild, type: 'mdxJsxFlowElement'});
+          } else {
+            buffer.push(grandChild);
+          }
+        });
+        if (buffer.length) {
+          segments.push({type: 'paragraph', children: buffer});
+        }
+        if (segments.length > 1 || (segments[0] && segments[0] !== child)) {
+          children.splice(i, 1, ...segments);
+          i += segments.length - 1;
+          continue;
+        }
+      }
+      normalize(child);
+    }
+  }
+
+  normalize(root);
+}
+
 module.exports = function anchorAutoPlugin() {
   return (tree) => {
     const slugger = createSlugger();
-    let currentSection = '';
-    let currentSlug = '';
-
     const autoModeBySection = {
       经文摘录: {mode: 'excerpt', label: '→ 讲道'},
       讲道正文: {mode: 'sermon', label: '→ 经文'},
     };
 
-    walk(tree, (node, _index, _parent) => {
+    let currentSection = '';
+    let currentSlug = '';
+
+    walk(tree, (node, index, parent) => {
       if (node.type === 'heading') {
         const text = getText(node).trim();
         const slug = slugger(text);
@@ -94,14 +153,54 @@ module.exports = function anchorAutoPlugin() {
             return;
           }
         }
+
+        if (node.depth === 3 && parent && Array.isArray(parent.children)) {
+          const sectionInfo = autoModeBySection[currentSection] || {mode: 'excerpt', label: '→ 讲道'};
+          const next = parent.children[index + 1];
+          if (!isAnchorNode(next)) {
+            parent.children.splice(
+              index + 1,
+              0,
+              createAnchorAutoNode({
+                slug,
+                mode: sectionInfo.mode,
+                label: sectionInfo.label,
+              }),
+            );
+          }
+        }
+
+        currentSlug = slug;
+        return;
+      }
+    });
+
+    normalizeParagraphAnchors(tree);
+
+    currentSection = '';
+    currentSlug = '';
+
+    walk(tree, (node) => {
+      if (node.type === 'heading') {
+        const text = getText(node).trim();
+        const slug = slugger(text);
+
+        if (node.depth === 2) {
+          currentSection = text;
+          if (text === '经文摘录') {
+            currentSlug = 'fallback';
+            return;
+          }
+          if (text === '讲道正文') {
+            currentSlug = 'fallback';
+            return;
+          }
+        }
         currentSlug = slug;
         return;
       }
 
-      if (
-        (node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') &&
-        (node.name || '') === 'AnchorAuto'
-      ) {
+      if (isAnchorNode(node)) {
         const props = {};
         (node.attributes || []).forEach((attr) => {
           if (attr && attr.name) {
