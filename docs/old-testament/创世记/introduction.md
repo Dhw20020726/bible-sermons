@@ -10,16 +10,16 @@ updated: 2025.12.21
 ## 经文摘录
 
 ### 创世纪 2:7
-[[bible passage="创世记 2:7"]]
+[[bible passage="创世纪 2:7"]]
 
 ### 创世纪 2:8-9
-[[bible passage="创世记 2:8-9"]]
+[[bible passage="创世纪 2:8-9"]]
 
 ### 创世纪 2:10
-[[bible passage="创世记 2:10"]]
+[[bible passage="创世纪 2:10"]]
 
 ### 创世纪 2:11-14
-[[bible passage="创世记 2:11-14"]]
+[[bible passage="创世纪 2:11-14"]]
 
 ---
 
