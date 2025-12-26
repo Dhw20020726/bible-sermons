@@ -79,7 +79,6 @@ function isAnchorAuto(node) {
 module.exports = function anchorAutoPlugin() {
   return (tree) => {
     const slugger = createSlugger();
-    const headingCountsBySection = new Map(); // sectionKey -> Map<base, count>
     let currentSection = '';
     let currentSlug = '';
 
@@ -91,14 +90,8 @@ module.exports = function anchorAutoPlugin() {
     walk(tree, (node, _index, _parent) => {
       if (node.type === 'heading') {
         const text = getText(node).trim();
-        const isSectionHeading = node.depth === 2;
-        const sectionKey = isSectionHeading ? text : currentSection || '__global__';
-        const counters = headingCountsBySection.get(sectionKey) || new Map();
         const base = slugger(text);
-        const count = counters.get(base) || 0;
-        const finalSlug = count === 0 ? base : `${base}-${count}`;
-        counters.set(base, count + 1);
-        headingCountsBySection.set(sectionKey, counters);
+        const finalSlug = base;
 
         node.data = node.data || {};
         node.data.hProperties = node.data.hProperties || {};
