@@ -53,16 +53,11 @@ function toAnchorJump({node, mode, slug, label}) {
   node.name = 'AnchorJump';
   setAttr(node, 'id', `${idPrefix}-${targetSlug}`);
   setAttr(node, 'to', `${toPrefix}-${targetSlug}`);
+  setAttr(node, 'label', label);
   node.attributes = node.attributes.filter(
     (attr) => attr.name !== 'mode' && attr.name !== 'slug' && attr.name !== 'label',
   );
-  node.children = [
-    {
-      type: 'mdxTextExpression',
-      value: JSON.stringify(label),
-      data: {estree: null},
-    },
-  ];
+  node.children = [];
 }
 
 module.exports = function anchorAutoPlugin() {
