@@ -53,6 +53,7 @@ function toAnchorJump({node, mode, slug, label}) {
   node.name = 'AnchorJump';
   setAttr(node, 'id', `${idPrefix}-${targetSlug}`);
   setAttr(node, 'to', `${toPrefix}-${targetSlug}`);
+  setAttr(node, 'section', mode === 'sermon' ? '讲道正文' : '经文摘录');
   setAttr(node, 'label', label);
   node.attributes = node.attributes.filter(
     (attr) => attr.name !== 'mode' && attr.name !== 'slug' && attr.name !== 'label',
