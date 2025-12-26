@@ -1,15 +1,10 @@
-function visit(node, type, callback, index = null, parent = null) {
+function walk(node, visitor, index = null, parent = null) {
   if (!node) return;
-  if (node.type === type) {
-    const result = callback(node, index, parent);
-    if (typeof result === 'number') {
-      return;
-    }
-  }
+  visitor(node, index, parent);
   const {children} = node;
   if (Array.isArray(children)) {
     for (let i = 0; i < children.length; i += 1) {
-      visit(children[i], type, callback, i, node);
+      walk(children[i], visitor, i, node);
     }
   }
 }
@@ -72,6 +67,12 @@ function toAnchorJump({node, mode, slug, label}) {
   ];
 }
 
+function isAnchorAuto(node) {
+  if (!node) return false;
+  const name = node.name || '';
+  return name === 'AnchorAuto';
+}
+
 module.exports = function anchorAutoPlugin() {
   return (tree) => {
     const slugger = createSlugger();
@@ -79,64 +80,60 @@ module.exports = function anchorAutoPlugin() {
     let currentSection = '';
     let currentSlug = '';
 
-    // 记录标题并打 id
-    visit(tree, 'heading', (node) => {
-      const text = getText(node).trim();
-      const base = slugger(text);
-      const count = headingCounts.get(base) || 0;
-      const finalSlug = count === 0 ? base : `${base}-${count}`;
-      headingCounts.set(base, count + 1);
-
-      node.data = node.data || {};
-      node.data.hProperties = node.data.hProperties || {};
-      node.data.hProperties.id = finalSlug;
-
-      if (node.depth === 2) {
-        currentSection = text;
-        if (text === '经文摘录') {
-          node.data.hProperties.id = 'excerpt-fallback';
-          currentSlug = 'fallback';
-          return;
-        }
-        if (text === '讲道正文') {
-          node.data.hProperties.id = 'sermon-fallback';
-          currentSlug = 'fallback';
-          return;
-        }
-      }
-      currentSlug = finalSlug;
-      return undefined;
-    });
-
     const autoModeBySection = {
       经文摘录: {mode: 'excerpt', label: '→ 讲道'},
       讲道正文: {mode: 'sermon', label: '→ 经文'},
     };
 
-    const handler = (node) => {
-      const nodeName = node.name || '';
-      if (nodeName !== 'AnchorAuto') return;
+    walk(tree, (node, _index, _parent) => {
+      if (node.type === 'heading') {
+        const text = getText(node).trim();
+        const base = slugger(text);
+        const count = headingCounts.get(base) || 0;
+        const finalSlug = count === 0 ? base : `${base}-${count}`;
+        headingCounts.set(base, count + 1);
 
-      const props = {};
-      (node.attributes || []).forEach((attr) => {
-        if (attr && attr.name) {
-          props[attr.name] = attr.value;
+        node.data = node.data || {};
+        node.data.hProperties = node.data.hProperties || {};
+        node.data.hProperties.id = finalSlug;
+
+        if (node.depth === 2) {
+          currentSection = text;
+          if (text === '经文摘录') {
+            node.data.hProperties.id = 'excerpt-fallback';
+            currentSlug = 'fallback';
+            return;
+          }
+          if (text === '讲道正文') {
+            node.data.hProperties.id = 'sermon-fallback';
+            currentSlug = 'fallback';
+            return;
+          }
         }
-      });
+        currentSlug = finalSlug;
+        return;
+      }
 
-      const sectionInfo = autoModeBySection[currentSection] || null;
-      const mode = props.mode || (sectionInfo && sectionInfo.mode) || 'excerpt';
-      const label =
-        props.label ||
-        (sectionInfo && sectionInfo.label) ||
-        (mode === 'sermon' ? '→ 经文' : '→ 讲道');
+      if (
+        (node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') &&
+        isAnchorAuto(node)
+      ) {
+        const props = {};
+        (node.attributes || []).forEach((attr) => {
+          if (attr && attr.name) {
+            props[attr.name] = attr.value;
+          }
+        });
 
-      const slug = props.slug || currentSlug || 'fallback';
-      toAnchorJump({node, mode, slug, label});
-      return undefined;
-    };
-
-    visit(tree, 'mdxJsxFlowElement', (node, index, parent) => handler(node, index, parent));
-    visit(tree, 'mdxJsxTextElement', (node, index, parent) => handler(node, index, parent));
+        const sectionInfo = autoModeBySection[currentSection] || null;
+        const mode = props.mode || (sectionInfo && sectionInfo.mode) || 'excerpt';
+        const label =
+          props.label ||
+          (sectionInfo && sectionInfo.label) ||
+          (mode === 'sermon' ? '→ 经文' : '→ 讲道');
+        const slug = props.slug || currentSlug || 'fallback';
+        toAnchorJump({node, mode, slug, label});
+      }
+    });
   };
 };
