@@ -33,6 +33,37 @@ main {
   text-decoration: none;
 }
 
+.anchor-jump {
+  display: inline-block;
+}
+
+.bible-text {
+  padding: 0;
+  margin: 0.5rem 0;
+  background: transparent;
+  border: none;
+  line-height: 1.75;
+}
+
+.bible-text .verse {
+  display: block;
+  margin: 0 0 0.35rem 0;
+}
+
+.bible-text .verse-number {
+  font-weight: 500;
+  color: inherit;
+}
+
+.bible-text .verse-text {
+  margin-left: 0.25rem;
+}
+
+.bible-text--error {
+  color: #8b1e1e;
+  background: transparent;
+}
+
 .homeLayout {
   background: #faf9f6;
   color: #1f2937;
