@@ -25,6 +25,16 @@ function getText(node) {
   return '';
 }
 
+
+function createAnchorAutoNode(slug) {
+  return {
+    type: "mdxJsxFlowElement",
+    name: "AnchorAuto",
+    attributes: slug ? [{type: "mdxJsxAttribute", name: "slug", value: slug}] : [],
+    children: [],
+  };
+}
+
 function createSlugger() {
   const seen = new Map();
   return (value) => {
@@ -80,8 +90,9 @@ module.exports = function anchorAutoPlugin() {
     const headingCounts = new Map();
     let currentSection = '';
     let currentSlug = '';
+    let inExcerptSection = false;
 
-    visit(tree, 'heading', (node) => {
+    visit(tree, 'heading', (node, index, parent) => {
       const text = getText(node).trim();
       const slug = slugger(text);
       const count = headingCounts.get(slug) || 0;
@@ -94,6 +105,7 @@ module.exports = function anchorAutoPlugin() {
 
       if (node.depth === 2) {
         currentSection = text;
+        inExcerptSection = text === '经文摘录';
         if (text === '经文摘录') {
           node.data.hProperties.id = 'excerpt-fallback';
           currentSlug = 'fallback';
@@ -106,6 +118,19 @@ module.exports = function anchorAutoPlugin() {
         }
       }
       currentSlug = finalSlug;
+
+      if (inExcerptSection && node.depth === 3 && parent && Array.isArray(parent.children)) {
+        const nextIndex = index + 1;
+        const nextNode = parent.children[nextIndex];
+        const isAnchorAuto =
+          nextNode &&
+          (nextNode.name === 'AnchorAuto' ||
+            (nextNode.type === 'mdxJsxFlowElement' && nextNode.name === 'AnchorAuto') ||
+            (nextNode.type === 'mdxJsxTextElement' && nextNode.name === 'AnchorAuto'));
+        if (!isAnchorAuto) {
+          parent.children.splice(nextIndex, 0, createAnchorAutoNode(finalSlug));
+        }
+      }
       return undefined;
     });
 
