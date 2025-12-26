@@ -91,7 +91,8 @@ module.exports = function anchorAutoPlugin() {
     walk(tree, (node, _index, _parent) => {
       if (node.type === 'heading') {
         const text = getText(node).trim();
-        const sectionKey = currentSection || '__global__';
+        const isSectionHeading = node.depth === 2;
+        const sectionKey = isSectionHeading ? text : currentSection || '__global__';
         const counters = headingCountsBySection.get(sectionKey) || new Map();
         const base = slugger(text);
         const count = counters.get(base) || 0;
