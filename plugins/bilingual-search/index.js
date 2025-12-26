@@ -1,11 +1,12 @@
 const fs = require('fs');
 const path = require('path');
+const {pathToFileURL} = require('url');
 let cachedPipeline;
 
 async function loadPipeline(siteDir) {
   if (!cachedPipeline) {
     const modulePath = path.join(siteDir, 'src/search/pipeline.js');
-    cachedPipeline = import(modulePath);
+    cachedPipeline = import(pathToFileURL(modulePath).href);
   }
   return cachedPipeline;
 }
@@ -167,8 +168,7 @@ async function createMiniSearch(siteDir, utils) {
     siteDir,
     'packages/search-engine/minisearch/index.js',
   );
-  // eslint-disable-next-line import/no-dynamic-require, global-require
-  const MiniSearchModule = await import(modulePath);
+  const MiniSearchModule = await import(pathToFileURL(modulePath).href);
   const MiniSearch = MiniSearchModule.default || MiniSearchModule.MiniSearch;
   return new MiniSearch({
     ...utils.defaultSearchOptions,

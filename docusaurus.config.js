@@ -10,7 +10,11 @@ const config = {
   url: 'https://Dhw20020726.github.io',
   baseUrl: '/bible-sermons/',
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
   favicon: 'img/favicon.ico',
   organizationName: 'Dhw20020726',
   projectName: 'bible-sermons',
@@ -29,6 +33,7 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           routeBasePath: '/docs',
           editUrl: undefined,
+          remarkPlugins: [require('./plugins/anchor-auto'), require('./plugins/bible-embed')],
         },
         blog: false,
         theme: {
