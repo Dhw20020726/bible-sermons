@@ -19,23 +19,19 @@ function getText(node) {
 }
 
 function createSlugger() {
-  const seen = new Map();
   return (value) => {
-    const base = String(value || '')
-      .normalize('NFKC')
-      .replace(/(\d)\s+(\d)/g, '$1-$2')
-      .replace(/[:：]/g, '-')
-      .replace(/[\u201c\u201d\u2018\u2019]/g, '')
-      .replace(/[^a-z0-9\u4e00-\u9fff\s-]/giu, '')
-      .trim()
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .toLowerCase();
-    const safeBase = base || 'section';
-    const count = seen.get(safeBase) || 0;
-    const next = count === 0 ? safeBase : `${safeBase}-${count}`;
-    seen.set(safeBase, count + 1);
-    return next;
+    return (
+      String(value || '')
+        .normalize('NFKC')
+        .replace(/(\d)\s+(\d)/g, '$1-$2')
+        .replace(/[:：]/g, '-')
+        .replace(/[\u201c\u201d\u2018\u2019]/g, '')
+        .replace(/[^a-z0-9\u4e00-\u9fff\s-]/giu, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .toLowerCase() || 'section'
+    );
   };
 }
 
