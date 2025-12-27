@@ -54,16 +54,17 @@ function buildBookIndex(baseDir, version) {
   const byBook = new Map();
   for (const file of files) {
     const match = file.match(
-      /^(?<prefix>[a-z0-9-]+)_(?<seq>\d{3})_(?<abbr>[A-Z0-9]{3})_(?<chapter>\d{2})_read\.txt$/i,
+      /^(?<prefix>[a-z0-9-]+)_(?<seq>\d{3})_(?<abbr>[A-Z0-9]{3})_(?<chapter>\d{2,3})_read\.txt$/i,
     );
     if (!match) continue;
-    const {prefix, seq, abbr} = match.groups;
+    const {prefix, seq, abbr, chapter} = match.groups;
+    if (seq === '000' && abbr === '000') continue;
     const fullPath = path.join(versionDir, file);
     const firstLine = fs.readFileSync(fullPath, 'utf8').split(/\r?\n/)[0];
     const bookName = normalizeBookName(firstLine);
     if (!bookName) continue;
     if (!byBook.has(bookName)) {
-      byBook.set(bookName, {seq, abbr, prefix});
+      byBook.set(bookName, {seq, abbr, prefix, chapterDigits: chapter.length});
     }
   }
 
@@ -125,7 +126,7 @@ function loadChapterLines(baseDir, version, mapping, book, chapter) {
   if (!info) {
     throw new Error(`未找到卷书 “${book}” 的映射`);
   }
-  const chapterStr = String(chapter).padStart(2, '0');
+  const chapterStr = String(chapter).padStart(info.chapterDigits || 2, '0');
   const filename = `${info.prefix}_${info.seq}_${info.abbr}_${chapterStr}_read.txt`;
   const fullPath = path.join(baseDir, version, filename);
   if (!fs.existsSync(fullPath)) {
@@ -248,3 +249,6 @@ module.exports = function bibleEmbedPlugin(userOptions = {}) {
     });
   };
 };
+
+module.exports.buildBookIndex = buildBookIndex;
+module.exports.loadChapterLines = loadChapterLines;
