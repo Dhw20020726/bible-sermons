@@ -3,7 +3,7 @@ import Layout from '@theme/Layout';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 export default function DocsIndex() {
-  const defaultDocPath = useBaseUrl('/docs/old-testament/创世记/introduction');
+  const defaultDocPath = useBaseUrl('/docs/category/创世记');
 
   useEffect(() => {
     if (typeof window === 'undefined') {

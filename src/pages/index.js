@@ -105,7 +105,7 @@ export default function Home() {
               </div>
             </div>
             <div className="homeHeroActions">
-              <Link className="button homePrimaryButton" to="/docs/old-testament/创世记/introduction">
+              <Link className="button homePrimaryButton" to="/docs/category/创世记">
                 从创世记开始阅读
               </Link>
               {hasLastRead && (
