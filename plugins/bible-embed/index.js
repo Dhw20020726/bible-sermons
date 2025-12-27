@@ -58,6 +58,7 @@ function buildBookIndex(baseDir, version) {
     );
     if (!match) continue;
     const {prefix, seq, abbr, chapter} = match.groups;
+    if (seq === '000' && abbr === '000') continue;
     const fullPath = path.join(versionDir, file);
     const firstLine = fs.readFileSync(fullPath, 'utf8').split(/\r?\n/)[0];
     const bookName = normalizeBookName(firstLine);
@@ -248,3 +249,6 @@ module.exports = function bibleEmbedPlugin(userOptions = {}) {
     });
   };
 };
+
+module.exports.buildBookIndex = buildBookIndex;
+module.exports.loadChapterLines = loadChapterLines;
