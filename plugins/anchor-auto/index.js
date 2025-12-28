@@ -94,7 +94,10 @@ function toAnchorJump({node, mode, slug, label}) {
   setAttr(node, 'section', mode === 'sermon' ? '讲道正文' : '经文摘录');
   setAttr(node, 'label', label);
   node.attributes = node.attributes.filter((attr) => attr.name !== 'mode' && attr.name !== 'slug');
-  node.children = [{type: 'text', value: label}];
+  const hasChildren = Array.isArray(node.children) && node.children.length > 0;
+  if (!hasChildren) {
+    node.children = label ? [{type: 'text', value: label}] : [];
+  }
 }
 
 function normalizeParagraphAnchors(root) {

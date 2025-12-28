@@ -11,7 +11,7 @@ export default function AnchorJump({id, to, children, className, label, section}
       : section === '讲道正文'
         ? '→ 经文'
         : '→ 跳转';
-  const content = label ?? children ?? sectionDefault;
+  const content = label !== undefined ? label : children ?? sectionDefault;
 
   return (
     <span id={id} className={clsx('anchor-jump', className)}>
