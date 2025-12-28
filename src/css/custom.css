@@ -38,15 +38,15 @@ main {
 }
 
 .anchor-target-highlight {
-  animation: anchor-target-flash 900ms ease;
+  animation: anchor-target-flash 750ms ease;
 }
 
 @keyframes anchor-target-flash {
   0% {
-    background-color: rgba(217, 249, 157, 0.6);
+    background-color: rgba(255, 241, 150, 0.9);
   }
-  50% {
-    background-color: rgba(180, 220, 255, 0.3);
+  60% {
+    background-color: rgba(255, 241, 150, 0.75);
   }
   100% {
     background-color: transparent;
