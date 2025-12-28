@@ -70,6 +70,14 @@ function containsAnchorJump(node) {
 }
 
 function isSkipAnchorAutoNode(node) {
+  const matchesCommentValue = (value) => {
+    if (typeof value !== 'string') return false;
+    return (
+      /<!--\s*AnchorAutoSkip\s*-->/m.test(value) ||
+      /\/\*\s*AnchorAutoSkip\s*\*\//m.test(value)
+    );
+  };
+
   if (!node) return false;
   if (
     (node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') &&
@@ -77,9 +85,13 @@ function isSkipAnchorAutoNode(node) {
   ) {
     return true;
   }
-  return node.type === 'html' && typeof node.value === 'string'
-    ? /^<!--\s*AnchorAutoSkip\s*-->$/.test(node.value.trim())
-    : false;
+  if (node.type === 'html' || node.type === 'comment') {
+    return matchesCommentValue(node.value);
+  }
+  if (node.type === 'mdxFlowExpression' || node.type === 'mdxTextExpression') {
+    return matchesCommentValue(node.value);
+  }
+  return false;
 }
 
 function createAnchorAutoNode({slug, mode, label}) {
