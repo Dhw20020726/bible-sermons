@@ -12,10 +12,8 @@ updated: 【YYYY.MM.DD】
 [[bible passage="【经文段落一 】"]]
 
 ### 【经文段落二 】、【经文段落三 】
-[→ 讲道]<br/>
 **【经文段落二 】**  
 [[bible passage="【经文段落二 】"]]
-
 **【经文段落三 】**  
 [[bible passage="【经文段落三 】"]]
 
