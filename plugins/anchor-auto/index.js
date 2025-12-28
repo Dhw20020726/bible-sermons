@@ -69,6 +69,16 @@ function isSkipAnchorAutoNode(node) {
   );
 }
 
+function isHtmlSkipNode(node) {
+  if (!node || node.type !== 'html' || typeof node.value !== 'string') return false;
+  const value = node.value.trim();
+  return (
+    /^<!--\s*AnchorAutoSkip\s*-->$/i.test(value) ||
+    /^<AnchorAutoSkip\s*\/?>$/i.test(value) ||
+    /^<AnchorAutoSkip><\/AnchorAutoSkip>$/i.test(value)
+  );
+}
+
 function createAnchorAutoNode({slug, mode, label}) {
   return {
     type: 'mdxJsxFlowElement',
@@ -173,15 +183,28 @@ module.exports = function anchorAutoPlugin() {
 
         if (node.depth === 3 && parent && Array.isArray(parent.children)) {
           const sectionInfo = autoModeBySection[currentSection] || {mode: 'excerpt', label: '→ 讲道'};
-          const next = parent.children[index + 1];
-          if (isSkipAnchorAutoNode(next)) {
-            parent.children.splice(index + 1, 1);
-            currentSlug = slug;
-            return;
+          let skipAuto = false;
+          let insertionIndex = index + 1;
+          for (let i = index + 1; i < parent.children.length; i += 1) {
+            const sibling = parent.children[i];
+            if (sibling.type === 'heading' && sibling.depth <= node.depth) {
+              break;
+            }
+            if (isSkipAnchorAutoNode(sibling) || isHtmlSkipNode(sibling)) {
+              parent.children.splice(i, 1);
+              skipAuto = true;
+              break;
+            }
+            if (isAnchorNode(sibling) || isAnchorJumpNode(sibling)) {
+              skipAuto = true;
+              break;
+            }
+            insertionIndex = i + 1;
           }
-          if (!isAnchorNode(next) && !isAnchorJumpNode(next)) {
+
+          if (!skipAuto) {
             parent.children.splice(
-              index + 1,
+              insertionIndex,
               0,
               createAnchorAutoNode({
                 slug,
