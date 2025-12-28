@@ -33,7 +33,8 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           routeBasePath: '/docs',
           editUrl: undefined,
-          remarkPlugins: [require('./plugins/anchor-auto'), require('./plugins/bible-embed')],
+          beforeDefaultRemarkPlugins: [require('./plugins/anchor-auto')],
+          remarkPlugins: [require('./plugins/bible-embed')],
         },
         blog: false,
         theme: {
