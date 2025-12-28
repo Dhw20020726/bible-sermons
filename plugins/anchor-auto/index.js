@@ -69,6 +69,26 @@ function containsAnchorJump(node) {
   return children.some((child) => containsAnchorJump(child));
 }
 
+function containsSkipAnchorAutoNode(node) {
+  if (!node || typeof node !== 'object') return false;
+  if (isSkipAnchorAutoNode(node)) return true;
+  const {children} = node;
+  if (!Array.isArray(children)) return false;
+  return children.some((child) => containsSkipAnchorAutoNode(child));
+}
+
+function stripSkipAnchorAutoNodes(node) {
+  if (!node || typeof node !== 'object') return;
+  if (Array.isArray(node.children)) {
+    node.children = node.children
+      .map((child) => {
+        stripSkipAnchorAutoNodes(child);
+        return child;
+      })
+      .filter((child) => !isSkipAnchorAutoNode(child));
+  }
+}
+
 function isSkipAnchorAutoNode(node) {
   const matchesCommentValue = (value) => {
     if (typeof value !== 'string') return false;
@@ -234,7 +254,8 @@ module.exports = function anchorAutoPlugin() {
             if (sibling.type === 'heading' && sibling.depth <= node.depth) {
               break;
             }
-            if (isSkipAnchorAutoNode(sibling)) {
+            if (isSkipAnchorAutoNode(sibling) || containsSkipAnchorAutoNode(sibling)) {
+              stripSkipAnchorAutoNodes(sibling);
               parent.children.splice(i, 1);
               skipAuto = true;
               break;
