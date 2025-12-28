@@ -77,7 +77,8 @@ const BOOK_ORDER = {
 const DOCS_DIR = path.join(__dirname, 'docs');
 const SORT_LOCALE = 'zh-Hans-CN';
 
-const sortByName = (a, b) => a.name.localeCompare(b.name, SORT_LOCALE);
+const sortByName = (a, b) =>
+  a.name.localeCompare(b.name, SORT_LOCALE, { numeric: true, sensitivity: 'base' });
 
 const isDocFile = (fileName) => {
   const ext = path.extname(fileName).toLowerCase();
