@@ -82,21 +82,25 @@ function createAnchorAutoNode({slug, mode, label}) {
   };
 }
 
-function toAnchorJump({node, mode, slug, label}) {
+function toAnchorJump({node, mode, slug, label, labelProvided, hadChildren}) {
   const idPrefix = mode === 'sermon' ? 'sermon' : 'excerpt';
   const toPrefix = mode === 'sermon' ? 'excerpt' : 'sermon';
   const targetSlug = slug || 'fallback';
+  const resolvedLabel = labelProvided ? label : hadChildren ? undefined : label;
 
   node.type = 'mdxJsxFlowElement';
   node.name = 'AnchorJump';
   setAttr(node, 'id', `${idPrefix}-${targetSlug}`);
   setAttr(node, 'to', `${toPrefix}-${targetSlug}`);
   setAttr(node, 'section', mode === 'sermon' ? '讲道正文' : '经文摘录');
-  setAttr(node, 'label', label);
+  if (resolvedLabel !== undefined) {
+    setAttr(node, 'label', resolvedLabel);
+  } else {
+    node.attributes = (node.attributes || []).filter((attr) => attr.name !== 'label');
+  }
   node.attributes = node.attributes.filter((attr) => attr.name !== 'mode' && attr.name !== 'slug');
-  const hasChildren = Array.isArray(node.children) && node.children.length > 0;
-  if (!hasChildren) {
-    node.children = label ? [{type: 'text', value: label}] : [];
+  if (!hadChildren && resolvedLabel) {
+    node.children = [{type: 'text', value: resolvedLabel}];
   }
 }
 
@@ -237,11 +241,16 @@ module.exports = function anchorAutoPlugin() {
 
       if (isAnchorNode(node)) {
         const props = {};
+        let labelProvided = false;
         (node.attributes || []).forEach((attr) => {
           if (attr && attr.name) {
             props[attr.name] = attr.value;
+            if (attr.name === 'label') {
+              labelProvided = true;
+            }
           }
         });
+        const hadChildren = Array.isArray(node.children) && node.children.length > 0;
 
         const sectionInfo = autoModeBySection[currentSection] || null;
         const mode = props.mode || (sectionInfo && sectionInfo.mode) || 'excerpt';
@@ -251,7 +260,7 @@ module.exports = function anchorAutoPlugin() {
           (mode === 'sermon' ? '→ 经文' : '→ 讲道');
         const slug = props.slug || currentSlug || 'fallback';
 
-        toAnchorJump({node, mode, slug, label});
+        toAnchorJump({node, mode, slug, label, labelProvided, hadChildren});
       }
     });
   };
