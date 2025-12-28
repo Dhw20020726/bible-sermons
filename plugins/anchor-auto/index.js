@@ -61,6 +61,14 @@ function isAnchorJumpNode(node) {
   );
 }
 
+function containsAnchorJump(node) {
+  if (!node || typeof node !== 'object') return false;
+  if (isAnchorJumpNode(node)) return true;
+  const {children} = node;
+  if (!Array.isArray(children)) return false;
+  return children.some((child) => containsAnchorJump(child));
+}
+
 function isSkipAnchorAutoNode(node) {
   return (
     node &&
@@ -102,6 +110,30 @@ function toAnchorJump({node, mode, slug, label, labelProvided, hadChildren}) {
   if (!hadChildren && resolvedLabel) {
     node.children = [{type: 'text', value: resolvedLabel}];
   }
+}
+
+function normalizeAnchorJumpNode(node, {currentSection, currentSlug, autoModeBySection}) {
+  const props = {};
+  let labelProvided = false;
+  (node.attributes || []).forEach((attr) => {
+    if (attr && attr.name) {
+      props[attr.name] = attr.value;
+      if (attr.name === 'label') {
+        labelProvided = true;
+      }
+    }
+  });
+
+  const hadChildren = Array.isArray(node.children) && node.children.length > 0;
+  const sectionInfo = autoModeBySection[currentSection] || null;
+  const mode = props.mode || (sectionInfo && sectionInfo.mode) || 'excerpt';
+  const label =
+    props.label ||
+    (sectionInfo && sectionInfo.label) ||
+    (mode === 'sermon' ? '→ 经文' : '→ 讲道');
+  const slug = props.slug || currentSlug || 'fallback';
+
+  toAnchorJump({node, mode, slug, label, labelProvided, hadChildren});
 }
 
 function normalizeParagraphAnchors(root) {
@@ -190,7 +222,7 @@ module.exports = function anchorAutoPlugin() {
               skipAuto = true;
               break;
             }
-            if (isAnchorNode(sibling) || isAnchorJumpNode(sibling)) {
+            if (isAnchorNode(sibling) || isAnchorJumpNode(sibling) || containsAnchorJump(sibling)) {
               skipAuto = true;
               break;
             }
@@ -239,28 +271,8 @@ module.exports = function anchorAutoPlugin() {
         return;
       }
 
-      if (isAnchorNode(node)) {
-        const props = {};
-        let labelProvided = false;
-        (node.attributes || []).forEach((attr) => {
-          if (attr && attr.name) {
-            props[attr.name] = attr.value;
-            if (attr.name === 'label') {
-              labelProvided = true;
-            }
-          }
-        });
-        const hadChildren = Array.isArray(node.children) && node.children.length > 0;
-
-        const sectionInfo = autoModeBySection[currentSection] || null;
-        const mode = props.mode || (sectionInfo && sectionInfo.mode) || 'excerpt';
-        const label =
-          props.label ||
-          (sectionInfo && sectionInfo.label) ||
-          (mode === 'sermon' ? '→ 经文' : '→ 讲道');
-        const slug = props.slug || currentSlug || 'fallback';
-
-        toAnchorJump({node, mode, slug, label, labelProvided, hadChildren});
+      if (isAnchorNode(node) || isAnchorJumpNode(node)) {
+        normalizeAnchorJumpNode(node, {currentSection, currentSlug, autoModeBySection});
       }
     });
   };
