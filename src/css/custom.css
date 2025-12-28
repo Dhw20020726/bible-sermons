@@ -11,6 +11,13 @@
 
 html {
   scroll-padding-top: calc(var(--ifm-navbar-height, 0px) + 1rem);
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 .markdown :is(h1, h2, h3, h4, h5, h6),
@@ -38,12 +45,15 @@ main {
 }
 
 .anchor-target-highlight {
-  animation: anchor-target-flash 600ms ease;
+  animation: anchor-target-flash 900ms ease;
 }
 
 @keyframes anchor-target-flash {
   0% {
-    background-color: rgba(217, 249, 157, 0.8);
+    background-color: rgba(217, 249, 157, 0.6);
+  }
+  50% {
+    background-color: rgba(180, 220, 255, 0.3);
   }
   100% {
     background-color: transparent;
