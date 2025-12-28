@@ -70,11 +70,16 @@ function containsAnchorJump(node) {
 }
 
 function isSkipAnchorAutoNode(node) {
-  return (
-    node &&
+  if (!node) return false;
+  if (
     (node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') &&
     (node.name || '') === 'AnchorAutoSkip'
-  );
+  ) {
+    return true;
+  }
+  return node.type === 'html' && typeof node.value === 'string'
+    ? /^<!--\s*AnchorAutoSkip\s*-->$/.test(node.value.trim())
+    : false;
 }
 
 function createAnchorAutoNode({slug, mode, label}) {

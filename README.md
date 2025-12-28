@@ -49,9 +49,11 @@ npm run deploy
 
 2) **禁止自动插入**  
    在该三级标题下一行写 `<AnchorAutoSkip />`，插件会移除此标记并跳过自动生成。  
+   如果不想写 JSX，也可以用 HTML 注释 `<!--AnchorAutoSkip -->` 达到相同效果。  
    ```markdown
    ### 创世记 2:7
    <AnchorAutoSkip />
+   <!--AnchorAutoSkip -->
    [[bible passage="创世记 2:7"]]
    ```
 
