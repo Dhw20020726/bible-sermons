@@ -80,9 +80,9 @@ function isSkipAnchorAutoNode(node) {
   }
 
   if (
-    node.type === 'html' &&
+    (node.type === 'html' || node.type === 'mdxFlowExpression' || node.type === 'mdxTextExpression') &&
     typeof node.value === 'string' &&
-    /^<!--\s*AnchorAutoSkip\s*-->$/.test(node.value.trim())
+    /AnchorAutoSkip/.test(node.value)
   ) {
     return true;
   }
