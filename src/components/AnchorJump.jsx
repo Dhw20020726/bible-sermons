@@ -16,17 +16,19 @@ export default function AnchorJump({id, to, children, className, label, section}
   const highlightTarget = useCallback(() => {
     const targetAnchor = document.getElementById(to);
     if (!targetAnchor) return;
-    // 优先高亮当前标题（本页总览 TOC 跳转），否则高亮标题后的内容块
+
+    // 本页总览（TOC）跳转：高亮标题本身
     let target = targetAnchor;
-    if (target && target.nextElementSibling) {
-      let candidate = target.nextElementSibling;
-      while (candidate && candidate.classList && candidate.classList.contains('anchor-jump')) {
-        candidate = candidate.nextElementSibling;
-      }
-      if (candidate && candidate.classList) {
-        target = candidate;
-      }
+
+    // 若需要高亮标题下的正文，则选择标题后的第一个非 anchor-jump 节点
+    let contentCandidate = targetAnchor.nextElementSibling;
+    while (contentCandidate && contentCandidate.classList && contentCandidate.classList.contains('anchor-jump')) {
+      contentCandidate = contentCandidate.nextElementSibling;
     }
+    if (contentCandidate && contentCandidate.classList) {
+      target = contentCandidate;
+    }
+
     if (!target || !target.classList) return;
 
     target.classList.remove('anchor-target-highlight');

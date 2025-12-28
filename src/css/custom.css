@@ -11,13 +11,6 @@
 
 html {
   scroll-padding-top: calc(var(--ifm-navbar-height, 0px) + 1rem);
-  scroll-behavior: smooth;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
 }
 
 .markdown :is(h1, h2, h3, h4, h5, h6),
