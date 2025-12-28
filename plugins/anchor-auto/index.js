@@ -77,6 +77,14 @@ function isSkipAnchorAutoNode(node) {
   );
 }
 
+function isSkipAnchorAutoComment(node) {
+  if (!node) return false;
+  if ((node.type === 'html' || node.type === 'comment') && typeof node.value === 'string') {
+    return /<!--\s*AnchorAutoSkip\s*-->/.test(node.value);
+  }
+  return false;
+}
+
 function createAnchorAutoNode({slug, mode, label}) {
   return {
     type: 'mdxJsxFlowElement',
@@ -217,7 +225,7 @@ module.exports = function anchorAutoPlugin() {
             if (sibling.type === 'heading' && sibling.depth <= node.depth) {
               break;
             }
-            if (isSkipAnchorAutoNode(sibling)) {
+            if (isSkipAnchorAutoNode(sibling) || isSkipAnchorAutoComment(sibling)) {
               parent.children.splice(i, 1);
               skipAuto = true;
               break;
