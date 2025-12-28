@@ -38,7 +38,7 @@ export default function AnchorJump({id, to, children, className, label, section}
     target.classList.add('anchor-target-highlight');
     setTimeout(() => {
       target.classList.remove('anchor-target-highlight');
-    }, 1000);
+    }, 2200);
   }, [to]);
 
   return (

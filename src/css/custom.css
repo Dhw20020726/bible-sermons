@@ -7,6 +7,7 @@
   --ifm-color-primary-lighter: #708170;
   --ifm-color-primary-lightest: #8c9c8b;
   --ifm-font-family-base: "Noto Serif SC", "Source Han Serif SC", "PingFang SC", "Microsoft YaHei", serif;
+  --anchor-highlight-bg: rgba(255, 230, 120, 0.35);
 }
 
 html {
@@ -38,15 +39,18 @@ main {
 }
 
 .anchor-target-highlight {
-  animation: anchor-target-flash 900ms ease;
+  animation: anchor-target-flash 2200ms ease;
 }
 
 @keyframes anchor-target-flash {
   0% {
-    background-color: rgba(217, 249, 157, 0.6);
+    background-color: transparent;
   }
-  50% {
-    background-color: rgba(180, 220, 255, 0.3);
+  10% {
+    background-color: var(--anchor-highlight-bg);
+  }
+  65% {
+    background-color: var(--anchor-highlight-bg);
   }
   100% {
     background-color: transparent;
@@ -186,6 +190,10 @@ html[data-theme='dark'] main,
 html[data-theme='dark'] .homeLayout {
   background: #0b0f1a;
   color: #e5e7eb;
+}
+
+html[data-theme='dark'] {
+  --anchor-highlight-bg: rgba(255, 200, 80, 0.18);
 }
 
 html[data-theme='dark'] .homeHero {
