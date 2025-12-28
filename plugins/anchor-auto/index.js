@@ -139,6 +139,7 @@ module.exports = function anchorAutoPlugin() {
         node.data = node.data || {};
         node.data.hProperties = node.data.hProperties || {};
         node.data.hProperties.id = slug;
+        node.data.id = slug;
 
         if (node.depth === 2) {
           currentSection = text;
