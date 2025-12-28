@@ -174,7 +174,7 @@ module.exports = function anchorAutoPlugin() {
         if (node.depth === 3 && parent && Array.isArray(parent.children)) {
           const sectionInfo = autoModeBySection[currentSection] || {mode: 'excerpt', label: '→ 讲道'};
           let skipAuto = false;
-          let insertionIndex = index + 1;
+          const insertionIndex = index + 1;
           for (let i = index + 1; i < parent.children.length; i += 1) {
             const sibling = parent.children[i];
             if (sibling.type === 'heading' && sibling.depth <= node.depth) {
@@ -189,8 +189,6 @@ module.exports = function anchorAutoPlugin() {
               skipAuto = true;
               break;
             }
-            insertionIndex = i;
-            break;
           }
 
           if (!skipAuto) {
