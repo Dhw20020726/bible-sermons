@@ -53,6 +53,22 @@ function isAnchorNode(node) {
   );
 }
 
+function isAnchorJumpNode(node) {
+  return (
+    node &&
+    (node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') &&
+    (node.name || '') === 'AnchorJump'
+  );
+}
+
+function isSkipAnchorAutoNode(node) {
+  return (
+    node &&
+    (node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') &&
+    (node.name || '') === 'AnchorAutoSkip'
+  );
+}
+
 function createAnchorAutoNode({slug, mode, label}) {
   return {
     type: 'mdxJsxFlowElement',
@@ -158,7 +174,12 @@ module.exports = function anchorAutoPlugin() {
         if (node.depth === 3 && parent && Array.isArray(parent.children)) {
           const sectionInfo = autoModeBySection[currentSection] || {mode: 'excerpt', label: '→ 讲道'};
           const next = parent.children[index + 1];
-          if (!isAnchorNode(next)) {
+          if (isSkipAnchorAutoNode(next)) {
+            parent.children.splice(index + 1, 1);
+            currentSlug = slug;
+            return;
+          }
+          if (!isAnchorNode(next) && !isAnchorJumpNode(next)) {
             parent.children.splice(
               index + 1,
               0,
