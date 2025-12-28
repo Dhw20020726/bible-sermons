@@ -17,8 +17,18 @@ export default function AnchorJump({id, to, children, className, label, section}
     const targetAnchor = document.getElementById(to);
     if (!targetAnchor) return;
 
-    // 高亮锚点本身（用于 TOC / 自动跳转）
-    const target = targetAnchor;
+    // 本页总览（TOC）跳转：高亮标题本身
+    let target = targetAnchor;
+
+    // 若需要高亮标题下的正文，则选择标题后的第一个非 anchor-jump 节点
+    let contentCandidate = targetAnchor.nextElementSibling;
+    while (contentCandidate && contentCandidate.classList && contentCandidate.classList.contains('anchor-jump')) {
+      contentCandidate = contentCandidate.nextElementSibling;
+    }
+    if (contentCandidate && contentCandidate.classList) {
+      target = contentCandidate;
+    }
+
     if (!target || !target.classList) return;
 
     target.classList.remove('anchor-target-highlight');
@@ -28,7 +38,7 @@ export default function AnchorJump({id, to, children, className, label, section}
     target.classList.add('anchor-target-highlight');
     setTimeout(() => {
       target.classList.remove('anchor-target-highlight');
-    }, 900);
+    }, 1000);
   }, [to]);
 
   return (
