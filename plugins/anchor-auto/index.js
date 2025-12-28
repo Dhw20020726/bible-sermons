@@ -93,9 +93,7 @@ function toAnchorJump({node, mode, slug, label}) {
   setAttr(node, 'to', `${toPrefix}-${targetSlug}`);
   setAttr(node, 'section', mode === 'sermon' ? '讲道正文' : '经文摘录');
   setAttr(node, 'label', label);
-  node.attributes = node.attributes.filter(
-    (attr) => attr.name !== 'mode' && attr.name !== 'slug' && attr.name !== 'label',
-  );
+  node.attributes = node.attributes.filter((attr) => attr.name !== 'mode' && attr.name !== 'slug');
   node.children = [{type: 'text', value: label}];
 }
 
