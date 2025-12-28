@@ -69,16 +69,6 @@ function isSkipAnchorAutoNode(node) {
   );
 }
 
-function isHtmlSkipNode(node) {
-  if (!node || node.type !== 'html' || typeof node.value !== 'string') return false;
-  const value = node.value.trim();
-  return (
-    /^<!--\s*AnchorAutoSkip\s*-->$/i.test(value) ||
-    /^<AnchorAutoSkip\s*\/?>$/i.test(value) ||
-    /^<AnchorAutoSkip><\/AnchorAutoSkip>$/i.test(value)
-  );
-}
-
 function createAnchorAutoNode({slug, mode, label}) {
   return {
     type: 'mdxJsxFlowElement',
@@ -190,7 +180,7 @@ module.exports = function anchorAutoPlugin() {
             if (sibling.type === 'heading' && sibling.depth <= node.depth) {
               break;
             }
-            if (isSkipAnchorAutoNode(sibling) || isHtmlSkipNode(sibling)) {
+            if (isSkipAnchorAutoNode(sibling)) {
               parent.children.splice(i, 1);
               skipAuto = true;
               break;
@@ -199,7 +189,8 @@ module.exports = function anchorAutoPlugin() {
               skipAuto = true;
               break;
             }
-            insertionIndex = i + 1;
+            insertionIndex = i;
+            break;
           }
 
           if (!skipAuto) {
