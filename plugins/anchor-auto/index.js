@@ -45,6 +45,30 @@ function createSlugger() {
   };
 }
 
+function createSlugManager() {
+  const slugger = createSlugger();
+  const slugCountBySection = new Map();
+
+  function getSectionKey(section) {
+    return section || '__global__';
+  }
+
+  function getUniqueSlug(section, text) {
+    const baseSlug = slugger(text);
+    const sectionKey = getSectionKey(section);
+    if (!slugCountBySection.has(sectionKey)) {
+      slugCountBySection.set(sectionKey, new Map());
+    }
+    const sectionMap = slugCountBySection.get(sectionKey);
+    const currentCount = sectionMap.get(baseSlug) || 0;
+    sectionMap.set(baseSlug, currentCount + 1);
+    if (currentCount === 0) return baseSlug;
+    return `${baseSlug}-${currentCount}`;
+  }
+
+  return {getUniqueSlug};
+}
+
 function isAnchorNode(node) {
   return (
     node &&
@@ -213,7 +237,7 @@ function normalizeParagraphAnchors(root) {
 
 module.exports = function anchorAutoPlugin() {
   return (tree) => {
-    const slugger = createSlugger();
+    const {getUniqueSlug} = createSlugManager();
     const autoModeBySection = {
       经文摘录: {mode: 'excerpt', label: '→ 讲道'},
       讲道正文: {mode: 'sermon', label: '→ 经文'},
@@ -225,26 +249,26 @@ module.exports = function anchorAutoPlugin() {
     walk(tree, (node, index, parent) => {
       if (node.type === 'heading') {
         const text = getText(node).trim();
-        const slug = slugger(text);
+        let slug = getUniqueSlug(currentSection, text);
 
         node.data = node.data || {};
         node.data.hProperties = node.data.hProperties || {};
-        node.data.hProperties.id = slug;
-        node.data.id = slug;
-
+        let resolvedSlug = slug;
         if (node.depth === 2) {
           currentSection = text;
           if (text === '经文摘录') {
-            node.data.hProperties.id = 'excerpt-fallback';
-            currentSlug = 'fallback';
-            return;
+            resolvedSlug = 'excerpt-fallback';
+            slug = 'fallback';
           }
           if (text === '讲道正文') {
-            node.data.hProperties.id = 'sermon-fallback';
-            currentSlug = 'fallback';
-            return;
+            resolvedSlug = 'sermon-fallback';
+            slug = 'fallback';
           }
         }
+
+        node.data.hProperties.id = resolvedSlug;
+        node.data.id = resolvedSlug;
+        node.anchorAutoSlug = slug;
 
         if (node.depth === 3 && parent && Array.isArray(parent.children)) {
           const sectionInfo = autoModeBySection[currentSection] || {mode: 'excerpt', label: '→ 讲道'};
@@ -292,7 +316,7 @@ module.exports = function anchorAutoPlugin() {
     walk(tree, (node) => {
       if (node.type === 'heading') {
         const text = getText(node).trim();
-        const slug = slugger(text);
+        const slug = node.anchorAutoSlug || getUniqueSlug(currentSection, text);
 
         if (node.depth === 2) {
           currentSection = text;
