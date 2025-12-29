@@ -56,7 +56,7 @@ npm run deploy
    ```
 
 3) **手动放置跳转（需要自定义文案/位置时）**  
-   - 用 `<AnchorJump>` 直接写入，需提供 `id` 与 `to`（指向对端锚点），可自定义 `label`。  
+   - 用 `<AnchorJump>` 直接写入，需提供 `id` 与 `to`（指向对端锚点），可自定义 `label`。若你手写了 `id`/`to`，插件会完全尊重，不会覆盖。  
      ```markdown
      ### 创世记 2:7
      <AnchorJump id="sermon-创世记-2-7" to="excerpt-创世记-2-7" label="返回经文" />
@@ -75,7 +75,7 @@ npm run deploy
 
 **提示**  
 - 若你已手写 `<AnchorJump>` 或 `<AnchorAuto>`，同一三级标题下的自动插入会被跳过，使用你的标签。  
-- 默认生成的 `id`/`to` 形如 `sermon-创世记-2-7` 与 `excerpt-创世记-2-7`，可按需手写覆盖。  
+- 默认生成的 `id`/`to` 形如 `sermon-创世记-2-7` 与 `excerpt-创世记-2-7`，可按需手写覆盖；未填写时才会回退到自动生成，已手写的值不会被替换。  
 
 ## 圣经经文资源
 

@@ -90,16 +90,33 @@ function createAnchorAutoNode({slug, mode, label}) {
   };
 }
 
-function toAnchorJump({node, mode, slug, label, labelProvided, hadChildren}) {
+function toAnchorJump({
+  node,
+  mode,
+  slug,
+  label,
+  labelProvided,
+  hadChildren,
+  id,
+  to,
+  idProvided,
+  toProvided,
+}) {
   const idPrefix = mode === 'sermon' ? 'sermon' : 'excerpt';
   const toPrefix = mode === 'sermon' ? 'excerpt' : 'sermon';
   const targetSlug = slug || 'fallback';
   const resolvedLabel = labelProvided ? label : hadChildren ? undefined : label;
+  const resolvedId = idProvided ? id : `${idPrefix}-${targetSlug}`;
+  const resolvedTo = toProvided ? to : `${toPrefix}-${targetSlug}`;
 
   node.type = 'mdxJsxFlowElement';
   node.name = 'AnchorJump';
-  setAttr(node, 'id', `${idPrefix}-${targetSlug}`);
-  setAttr(node, 'to', `${toPrefix}-${targetSlug}`);
+  if (!idProvided) {
+    setAttr(node, 'id', resolvedId);
+  }
+  if (!toProvided) {
+    setAttr(node, 'to', resolvedTo);
+  }
   setAttr(node, 'section', mode === 'sermon' ? '讲道正文' : '经文摘录');
   if (resolvedLabel !== undefined) {
     setAttr(node, 'label', resolvedLabel);
@@ -115,11 +132,19 @@ function toAnchorJump({node, mode, slug, label, labelProvided, hadChildren}) {
 function normalizeAnchorJumpNode(node, {currentSection, currentSlug, autoModeBySection}) {
   const props = {};
   let labelProvided = false;
+  let idProvided = false;
+  let toProvided = false;
   (node.attributes || []).forEach((attr) => {
     if (attr && attr.name) {
       props[attr.name] = attr.value;
       if (attr.name === 'label') {
         labelProvided = true;
+      }
+      if (attr.name === 'id') {
+        idProvided = true;
+      }
+      if (attr.name === 'to') {
+        toProvided = true;
       }
     }
   });
@@ -132,8 +157,21 @@ function normalizeAnchorJumpNode(node, {currentSection, currentSlug, autoModeByS
     (sectionInfo && sectionInfo.label) ||
     (mode === 'sermon' ? '→ 经文' : '→ 讲道');
   const slug = props.slug || currentSlug || 'fallback';
+  const id = props.id;
+  const to = props.to;
 
-  toAnchorJump({node, mode, slug, label, labelProvided, hadChildren});
+  toAnchorJump({
+    node,
+    mode,
+    slug,
+    label,
+    labelProvided,
+    hadChildren,
+    id,
+    to,
+    idProvided,
+    toProvided,
+  });
 }
 
 function normalizeParagraphAnchors(root) {

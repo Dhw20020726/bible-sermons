@@ -1,0 +1,22 @@
+---
+title: 锚点跳转手写示例
+sermonTitle: 锚点跳转手写示例
+scripture: 马可福音 1:1
+summary: 演示手写 id/to 时保持原样并触发高亮
+updated: 2025.01.01
+---
+*演示手写 `id`/`to` 的锚点跳转，验证 `highlightAnchorTarget` 效果。*
+
+## 经文摘录
+
+### 手写锚点（经文）
+<AnchorJump id="excerpt-manual-demo" to="sermon-manual-demo" label="→ 讲道（手写）" />
+这里是经文摘录示例段落，点击上方跳转会高亮目标段落。
+
+---
+
+## 讲道正文
+
+### 手写锚点（讲道）
+<AnchorJump id="sermon-manual-demo" to="excerpt-manual-demo">返回经文（手写 children 文案）</AnchorJump>
+这里是讲道正文示例段落，点击上方跳转会高亮经文摘录的内容。
