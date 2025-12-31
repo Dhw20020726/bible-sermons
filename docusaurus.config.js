@@ -24,6 +24,8 @@ const config = {
     locales: ['zh-Hans'],
   },
 
+  themes: ['@docusaurus/theme-search-algolia'],
+
   presets: [
     [
       'classic',
@@ -52,6 +54,7 @@ const config = {
         items: [
           {to: '/', label: '首页', position: 'left'},
           {to: '/docs', label: '目录', position: 'left'},
+          {type: 'search', position: 'right'},
         ],
       },
       docs: {
@@ -59,6 +62,13 @@ const config = {
           hideable: true,
           autoCollapseCategories: true,
         },
+      },
+      algolia: {
+        appId: process.env.ALGOLIA_APP_ID,
+        apiKey: process.env.ALGOLIA_API_KEY,
+        indexName: process.env.ALGOLIA_INDEX_NAME,
+        contextualSearch: true,
+        searchPagePath: 'search',
       },
       footer: {
         style: 'dark',
