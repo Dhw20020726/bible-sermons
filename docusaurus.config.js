@@ -67,7 +67,7 @@ const config = {
         apiKey: '66b5902b2bede0c671fb5b2343a7cebc',
         indexName: 'bible-sermons',
         contextualSearch: false,
-        searchPagePath: 'search',
+        searchPagePath: undefined,
       },
       footer: {
         style: 'dark',
