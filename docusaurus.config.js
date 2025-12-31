@@ -64,9 +64,10 @@ const config = {
         },
       },
       algolia: {
-        appId: process.env.ALGOLIA_APP_ID,
-        apiKey: process.env.ALGOLIA_API_KEY,
-        indexName: process.env.ALGOLIA_INDEX_NAME,
+        // 使用环境变量优先；若未设置，用占位符保证构建阶段通过校验（部署时请提供真实值）
+        appId: process.env.ALGOLIA_APP_ID || 'ALGOLIA_APP_ID_PLACEHOLDER',
+        apiKey: process.env.ALGOLIA_API_KEY || 'ALGOLIA_API_KEY_PLACEHOLDER',
+        indexName: process.env.ALGOLIA_INDEX_NAME || 'ALGOLIA_INDEX_PLACEHOLDER',
         contextualSearch: true,
         searchPagePath: 'search',
       },
