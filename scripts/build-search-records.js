@@ -15,6 +15,9 @@ const siteUrl = siteConfig.url?.replace(/\/$/, '') ?? '';
 const baseUrl = siteConfig.baseUrl ?? '/';
 const docsRouteBasePath =
   (siteConfig.presets?.[0]?.[1]?.docs?.routeBasePath ?? 'docs').replace(/^\//, '').replace(/\/$/, '');
+const defaultLocale = siteConfig.i18n?.defaultLocale ?? 'en';
+const docsPluginId = siteConfig.presets?.[0]?.[1]?.docs?.id ?? 'default';
+const searchTags = ['default', `docs-${docsPluginId}-current`];
 
 function encodePathSegment(segment) {
   return encodeURI(segment).replace(/#/g, '%23');
@@ -98,6 +101,8 @@ function buildDocRecords() {
         summary: data.summary || '',
         heading: currentHeading,
         content: text,
+        language: defaultLocale,
+        docusaurus_tag: searchTags,
         url: buildDocUrl(relativePath, currentHeading),
       });
       buffer = [];
@@ -145,6 +150,8 @@ function parseBibleFile(filePath) {
       chapter,
       verse,
       content: stripMarkdown(line),
+      language: defaultLocale,
+      docusaurus_tag: searchTags,
       url,
     };
   });
@@ -161,7 +168,7 @@ function main() {
   const records = [...sermonRecords, ...bibleRecords];
 
   const settings = {
-    attributesForFaceting: ['type', 'book', 'chapter'],
+    attributesForFaceting: ['type', 'book', 'chapter', 'language', 'docusaurus_tag'],
     searchableAttributes: ['title', 'scripture', 'summary', 'heading', 'content'],
   };
 
