@@ -4,6 +4,7 @@ const path = require('path');
 const matter = require('gray-matter');
 const GithubSlugger = require('github-slugger').default || require('github-slugger');
 
+const MAX_RECORD_BYTES = 9000;
 const rootDir = path.join(__dirname, '..');
 const docsDir = path.join(rootDir, 'docs');
 const bibleDir = path.join(rootDir, 'static', 'bible', 'cmn-cu89s_readaloud');
@@ -67,6 +68,104 @@ function stripMarkdown(text) {
     .trim();
 }
 
+function chunkTextByBytes(text, maxBytes) {
+  const chunks = [];
+  const paragraphs = text
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
+  function pushChunk(value) {
+    const trimmed = value.trim();
+    if (trimmed) {
+      chunks.push(trimmed);
+    }
+  }
+
+  function splitLongParagraph(paragraph) {
+    const sentences = paragraph
+      .split(/(?<=[。！？!?\.])\s*/g)
+      .map((sentence) => sentence.trim())
+      .filter(Boolean);
+
+    function chunkOversizeSentence(sentence) {
+      if (Buffer.byteLength(sentence, 'utf8') <= maxBytes) {
+        return [sentence];
+      }
+      const parts = [];
+      let current = '';
+      for (const char of sentence) {
+        const candidate = current + char;
+        if (Buffer.byteLength(candidate, 'utf8') > maxBytes) {
+          if (current) {
+            parts.push(current);
+          }
+          current = char;
+        } else {
+          current = candidate;
+        }
+      }
+      if (current) {
+        parts.push(current);
+      }
+      return parts;
+    }
+
+    let current = '';
+    sentences.forEach((sentence) => {
+      const fragments = chunkOversizeSentence(sentence);
+      fragments.forEach((fragment) => {
+        if (!current) {
+          current = fragment;
+          return;
+        }
+        const next = `${current} ${fragment}`;
+        if (Buffer.byteLength(next, 'utf8') > maxBytes) {
+          pushChunk(current);
+          current = fragment;
+        } else {
+          current = next;
+        }
+      });
+    });
+    pushChunk(current);
+  }
+
+  let buffer = '';
+  paragraphs.forEach((paragraph) => {
+    const paragraphBytes = Buffer.byteLength(paragraph, 'utf8');
+    if (paragraphBytes > maxBytes) {
+      if (buffer) {
+        pushChunk(buffer);
+        buffer = '';
+      }
+      splitLongParagraph(paragraph);
+      return;
+    }
+
+    if (!buffer) {
+      buffer = paragraph;
+      return;
+    }
+
+    const combined = `${buffer}\n\n${paragraph}`;
+    if (Buffer.byteLength(combined, 'utf8') > maxBytes) {
+      pushChunk(buffer);
+      buffer = paragraph;
+    } else {
+      buffer = combined;
+    }
+  });
+
+  pushChunk(buffer);
+
+  if (!chunks.length && text.trim()) {
+    chunks.push(text.trim());
+  }
+
+  return chunks;
+}
+
 function buildDocRecords() {
   const files = walkFiles(docsDir, ['.md', '.mdx']);
   const records = [];
@@ -84,21 +183,24 @@ function buildDocRecords() {
 
     function flushBuffer() {
       if (!buffer.length) return;
-      const text = stripMarkdown(buffer.join('\n'));
-      if (!text) {
-        buffer = [];
-        return;
-      }
-      const objectID = `${relativePath}#${currentHeading || 'intro'}#${records.length}`;
-      records.push({
-        objectID,
-        type: 'sermon',
-        title: data.title || data.sermonTitle || '',
-        scripture: data.scripture || '',
-        summary: data.summary || '',
-        heading: currentHeading,
-        content: text,
-        url: buildDocUrl(relativePath, currentHeading),
+      const rawBlock = buffer.join('\n');
+      const segments = chunkTextByBytes(rawBlock, MAX_RECORD_BYTES);
+      segments.forEach((segment) => {
+        const text = stripMarkdown(segment);
+        if (!text) {
+          return;
+        }
+        const objectID = `${relativePath}#${currentHeading || 'intro'}#${records.length}`;
+        records.push({
+          objectID,
+          type: 'sermon',
+          title: data.title || data.sermonTitle || '',
+          scripture: data.scripture || '',
+          summary: data.summary || '',
+          heading: currentHeading,
+          content: text,
+          url: buildDocUrl(relativePath, currentHeading),
+        });
       });
       buffer = [];
     }
