@@ -63,9 +63,9 @@ const config = {
       },
       algolia: {
         // 使用环境变量优先；若未设置，用占位符保证构建阶段通过校验（部署时请提供真实值）
-        appId: process.env.ALGOLIA_APP_ID || 'ALGOLIA_APP_ID_PLACEHOLDER',
-        apiKey: process.env.ALGOLIA_API_KEY || 'ALGOLIA_API_KEY_PLACEHOLDER',
-        indexName: process.env.ALGOLIA_INDEX_NAME || 'ALGOLIA_INDEX_PLACEHOLDER',
+        appId: 'IP0MLC3H7D',
+        apiKey: '66b5902b2bede0c671fb5b2343a7cebc',
+        indexName: 'bible-sermons',
         contextualSearch: true,
         searchPagePath: 'search',
       },
@@ -79,5 +79,6 @@ const config = {
       },
     }),
 };
+console.log('ALGOLIA_APP_ID:', process.env.ALGOLIA_APP_ID);
 
 module.exports = config;
