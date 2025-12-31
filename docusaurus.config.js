@@ -24,8 +24,6 @@ const config = {
     locales: ['zh-Hans'],
   },
 
-  themes: ['@docusaurus/theme-search-algolia'],
-
   presets: [
     [
       'classic',
