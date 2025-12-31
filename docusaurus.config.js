@@ -43,9 +43,6 @@ const config = {
       }),
     ],
   ],
-  plugins: [
-    require.resolve('./plugins/bilingual-search'),
-  ],
 
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
@@ -55,7 +52,6 @@ const config = {
         items: [
           {to: '/', label: '首页', position: 'left'},
           {to: '/docs', label: '目录', position: 'left'},
-          {type: 'search', position: 'right'},
         ],
       },
       docs: {
