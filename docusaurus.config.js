@@ -79,6 +79,5 @@ const config = {
       },
     }),
 };
-console.log('ALGOLIA_APP_ID:', process.env.ALGOLIA_APP_ID);
 
 module.exports = config;

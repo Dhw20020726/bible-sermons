@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const matter = require('gray-matter');
-const GithubSlugger = require('github-slugger');
+const GithubSlugger = require('github-slugger').default || require('github-slugger');
 
 const rootDir = path.join(__dirname, '..');
 const docsDir = path.join(rootDir, 'docs');
