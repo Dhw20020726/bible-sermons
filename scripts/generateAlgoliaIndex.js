@@ -5,6 +5,7 @@ const fg = require('fast-glob');
 const matter = require('gray-matter');
 const removeMd = require('remove-markdown');
 const {hydrateAlgoliaEnv, resolveAlgoliaEnv} = require('./utils/env');
+const {createSectionSlugger, resolveHeadingAnchor} = require('./utils/slug');
 
 hydrateAlgoliaEnv();
 
@@ -41,17 +42,6 @@ function normalizeSlug(rawSlug, relativePath) {
   return slug.replace(/index$/i, '').replace(/\.mdx?$/, '').replace(/\/+$/, '').replace(/^\//, '');
 }
 
-function slugify(text) {
-  return text
-    .toString()
-    .trim()
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}\s-]/gu, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
 function extractTitle(content, frontmatterTitle, fallback) {
   if (frontmatterTitle) {
     return frontmatterTitle;
@@ -70,12 +60,57 @@ function chunkPlainText(lines) {
   return {plain, truncated, summary: truncated.slice(0, 500)};
 }
 
+function buildDocBreadcrumb(relativePath, docTitle) {
+  const parts = relativePath.split('/');
+  const testament = parts[0] === 'old-testament' ? '旧约' : parts[0] === 'new-testament' ? '新约' : parts[0];
+  const book = parts[1] || '';
+  return [testament, book, docTitle].filter(Boolean).join(' > ');
+}
+
+function createHierarchyState(docBreadcrumb, docTitle) {
+  const levels = {
+    0: docBreadcrumb,
+    1: null,
+    2: null,
+    3: null,
+    4: null,
+    5: null,
+    6: null,
+  };
+
+  return {
+    update(level, text) {
+      levels[level] = text;
+      for (let i = level + 1; i <= 6; i += 1) {
+        levels[i] = null;
+      }
+    },
+    getNormalized() {
+      return {
+        lvl0: levels[0] || docBreadcrumb,
+        lvl1: levels[1] || docTitle,
+        lvl2: levels[2],
+        lvl3: levels[3],
+        lvl4: levels[4],
+        lvl5: levels[5],
+        lvl6: levels[6],
+      };
+    },
+    getHeadingList() {
+      return [levels[1] || docTitle, levels[2], levels[3], levels[4], levels[5], levels[6]].filter(Boolean);
+    },
+  };
+}
+
 function splitIntoChunks(parsed, options) {
   const {slug, relativePath, docTitle, url} = options;
+  const docBreadcrumb = buildDocBreadcrumb(relativePath, docTitle);
   const lines = parsed.content.split(/\r?\n/);
-  const headingRegex = /^(#{1,3})\s+(.+)$/;
-  const hierarchy = {1: null, 2: null, 3: null};
-  const anchorByLevel = {1: null, 2: null, 3: null};
+  const headingRegex = /^(#{1,6})\s+(.+)$/;
+  const hierarchyState = createHierarchyState(docBreadcrumb, docTitle);
+  const anchorByLevel = {1: null, 2: null, 3: null, 4: null, 5: null, 6: null};
+  const slugger = createSectionSlugger();
+  let currentSection = '';
 
   const records = [];
   let chunkLines = [];
@@ -90,25 +125,26 @@ function splitIntoChunks(parsed, options) {
       chunkLines = [];
       return;
     }
+    const normalizedHierarchy = hierarchyState.getNormalized();
     records.push({
       objectID: `${slug || relativePath}#${chunkIndex}`,
       title: chunkTitle,
       url: chunkAnchor ? `${url}#${chunkAnchor}` : url,
+      url_without_anchor: url,
+      anchor: chunkAnchor,
+      type: 'content',
       summary,
-      content: truncated,
-      hierarchy: {
-        lvl0: docTitle,
-        lvl1: hierarchy[1],
-        lvl2: hierarchy[2],
-        lvl3: hierarchy[3],
-      },
+      content: truncated || null,
+      hierarchy: normalizedHierarchy,
+      hierarchy_camel: normalizedHierarchy,
       parent: chunkParent,
       tags: parsed.data.tags || [],
       category: parsed.data.sidebar_label || parsed.data.category || undefined,
       source: relativePath,
       language: DEFAULT_LANGUAGE,
       docusaurus_tag: DEFAULT_DOCUSUARUS_TAGS,
-      headings: [hierarchy[1], hierarchy[2], hierarchy[3]].filter(Boolean),
+      headings: hierarchyState.getHeadingList(),
+      doc_breadcrumb: docBreadcrumb,
     });
     chunkLines = [];
     chunkIndex += 1;
@@ -121,24 +157,30 @@ function splitIntoChunks(parsed, options) {
 
       const level = match[1].length;
       const headingText = match[2].trim();
-      const anchor = slugify(headingText);
+      const {anchor, sectionLabel} = resolveHeadingAnchor({
+        level,
+        text: headingText,
+        currentSection,
+        slugger,
+      });
 
-      hierarchy[level] = headingText;
+      hierarchyState.update(level, headingText);
       anchorByLevel[level] = anchor;
-      if (level < 3) {
-        hierarchy[level + 1] = null;
-        anchorByLevel[level + 1] = null;
+      if (level === 2) {
+        currentSection = sectionLabel;
+      } else if (level < 2) {
+        currentSection = '';
       }
-      if (level < 2) {
-        hierarchy[level + 2] = null;
-        anchorByLevel[level + 2] = null;
+      for (let i = level + 1; i <= 6; i += 1) {
+        anchorByLevel[i] = null;
       }
 
       let parentAnchor = null;
-      if (level === 2) {
-        parentAnchor = anchorByLevel[1];
-      } else if (level === 3) {
-        parentAnchor = anchorByLevel[2] || anchorByLevel[1];
+      for (let i = level - 1; i >= 1; i -= 1) {
+        if (anchorByLevel[i]) {
+          parentAnchor = anchorByLevel[i];
+          break;
+        }
       }
 
       chunkAnchor = anchor;
