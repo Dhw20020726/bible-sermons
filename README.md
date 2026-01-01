@@ -42,11 +42,14 @@ npm run deploy
 - 生成/上传索引用到的命令：
 
 ```bash
-npm run index:generate   # 根据 docs 内容生成 build/algolia-index.json
-npm run index:upload     # 将索引上传/覆盖到 Algolia（需 Write/Admin Key）
+npm run index:generate   # 仅生成 build/algolia-index.json
+npm run index:upload     # 仅上传/覆盖到 Algolia（需 Write/Admin/Admin Key）
+npm run index:all        # 一次性生成并上传
 ```
 
-GitHub Actions 的 `deploy.yml` 已在构建后自动生成索引并上传到 Algolia，记得在仓库 Secret 中配置上述变量。
+索引生成/上传现已合并在 `scripts/algoliaIndex.js` 中，会在生成阶段展开 Markdown 中的 `[[bible ...]]` 占位符，把静态经文文本写入索引，便于搜索。
+
+GitHub Actions 的 `deploy.yml` 已在构建后自动执行 `npm run index:all`，记得在仓库 Secret 中配置上述变量。
 
 ## 讲道文档中的锚点跳转写法（最佳实践）
 
