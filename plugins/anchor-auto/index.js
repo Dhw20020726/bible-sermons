@@ -246,35 +246,22 @@ module.exports = function anchorAutoPlugin() {
     let currentSection = '';
     let currentSlug = '';
 
-    walk(tree, (node, index, parent) => {
-      if (node.type === 'heading') {
-        const text = getText(node).trim();
-        let slug = getUniqueSlug(currentSection, text);
+      walk(tree, (node, index, parent) => {
+        if (node.type === 'heading') {
+          const text = getText(node).trim();
+          let slug = getUniqueSlug(currentSection, text);
 
-        node.data = node.data || {};
-        node.data.hProperties = node.data.hProperties || {};
-        let resolvedSlug = slug;
-        if (node.depth === 2) {
-          currentSection = text;
-          if (text === '经文摘录') {
-            resolvedSlug = 'excerpt-fallback';
-            slug = 'fallback';
+          if (node.depth === 2) {
+            currentSection = text;
           }
-          if (text === '讲道正文') {
-            resolvedSlug = 'sermon-fallback';
-            slug = 'fallback';
-          }
-        }
 
-        node.data.hProperties.id = resolvedSlug;
-        node.data.id = resolvedSlug;
-        node.anchorAutoSlug = slug;
+          node.anchorAutoSlug = slug;
 
-        if (node.depth === 3 && parent && Array.isArray(parent.children)) {
-          const sectionInfo = autoModeBySection[currentSection] || {mode: 'excerpt', label: '→ 讲道'};
-          let skipAuto = false;
-          const insertionIndex = index + 1;
-          for (let i = index + 1; i < parent.children.length; i += 1) {
+          if (node.depth === 3 && parent && Array.isArray(parent.children)) {
+            const sectionInfo = autoModeBySection[currentSection] || {mode: 'excerpt', label: '→ 讲道'};
+            let skipAuto = false;
+            const insertionIndex = index + 1;
+            for (let i = index + 1; i < parent.children.length; i += 1) {
             const sibling = parent.children[i];
             if (sibling.type === 'heading' && sibling.depth <= node.depth) {
               break;
@@ -313,25 +300,17 @@ module.exports = function anchorAutoPlugin() {
     currentSection = '';
     currentSlug = '';
 
-    walk(tree, (node) => {
-      if (node.type === 'heading') {
-        const text = getText(node).trim();
-        const slug = node.anchorAutoSlug || getUniqueSlug(currentSection, text);
+      walk(tree, (node) => {
+        if (node.type === 'heading') {
+          const text = getText(node).trim();
+          const slug = node.anchorAutoSlug || getUniqueSlug(currentSection, text);
 
-        if (node.depth === 2) {
-          currentSection = text;
-          if (text === '经文摘录') {
-            currentSlug = 'fallback';
-            return;
+          if (node.depth === 2) {
+            currentSection = text;
           }
-          if (text === '讲道正文') {
-            currentSlug = 'fallback';
-            return;
-          }
+          currentSlug = slug;
+          return;
         }
-        currentSlug = slug;
-        return;
-      }
 
       if (isAnchorNode(node) || isAnchorJumpNode(node)) {
         normalizeAnchorJumpNode(node, {currentSection, currentSlug, autoModeBySection});
