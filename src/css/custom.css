@@ -54,31 +54,6 @@ html {
   }
 }
 
-.searchResultItem_Tv2o {
-  background: var(--ifm-card-background-color);
-  border: 1px solid var(--ifm-color-emphasis-200);
-  border-radius: 12px;
-  padding: 1rem 1.25rem;
-  box-shadow: var(--ifm-global-shadow-lw);
-  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
-}
-
-.searchResultItem_Tv2o:hover,
-.searchResultItem_Tv2o:focus-within {
-  background: var(--ifm-hover-overlay);
-  border-color: var(--ifm-color-primary);
-  box-shadow: var(--ifm-global-shadow-md);
-}
-
-.searchResultItemHeading_KbCB {
-  margin: 0 0 0.35rem;
-}
-
-.searchResultItemSummary_AEaO {
-  color: var(--ifm-font-color-secondary);
-  margin: 0.25rem 0 0;
-}
-
 .bible-text {
   padding: 0;
   margin: 0.5rem 0;
@@ -206,12 +181,6 @@ html {
   background: rgba(248, 250, 252, 0.22);
   color: #f8fafc;
   border: 1px solid rgba(248, 250, 252, 0.4);
-}
-
-html[data-theme='dark'] main,
-html[data-theme='dark'] .homeLayout {
-  background: #0b0f1a;
-  color: #e5e7eb;
 }
 
 html[data-theme='dark'] {
