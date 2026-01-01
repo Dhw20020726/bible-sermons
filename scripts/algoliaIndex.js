@@ -30,17 +30,15 @@ const docsRouteBasePath = (() => {
 })();
 
 function joinUrl(...parts) {
-  return (
-    parts
-      .filter(Boolean)
-      .map((part, index) => {
-        if (index === 0) {
-          return part.replace(/\/$/, '');
-        }
-        return part.replace(/^\/+/, '').replace(/\/$/, '');
-      })
-      .join('/') + '/'
-  );
+  return parts
+    .filter(Boolean)
+    .map((part, index) => {
+      if (index === 0) {
+        return part.replace(/\/$/, '');
+      }
+      return part.replace(/^\/+/, '').replace(/\/$/, '');
+    })
+    .join('/');
 }
 
 function normalizeSlug(rawSlug, relativePath) {
