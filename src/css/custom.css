@@ -48,6 +48,11 @@ main {
   color: inherit;
 }
 
+.DocSearch-Page .DocSearch-Hit--active {
+  background: transparent;
+  box-shadow: none;
+}
+
 @keyframes anchor-target-flash {
   0% {
     background-color: transparent;
