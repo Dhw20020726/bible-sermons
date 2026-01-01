@@ -3,6 +3,7 @@ const {hydrateAlgoliaEnv, resolveAlgoliaEnv} = require('./scripts/utils/env');
 
 hydrateAlgoliaEnv();
 const algoliaEnv = resolveAlgoliaEnv();
+const isAlgoliaReady = Boolean(algoliaEnv.appId && algoliaEnv.searchApiKey && algoliaEnv.indexName);
 
 const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.dracula;
@@ -53,7 +54,7 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      algolia: algoliaEnv.appId && algoliaEnv.searchApiKey ? {
+      algolia: isAlgoliaReady ? {
         appId: algoliaEnv.appId,
         apiKey: algoliaEnv.searchApiKey,
         indexName: algoliaEnv.indexName,

@@ -9,6 +9,7 @@ const ALGOLIA_FRIENDLY_KEYS = {
   'Admin API Key': 'ALGOLIA_ADMIN_API_KEY',
   'Usage API Key': 'ALGOLIA_USAGE_API_KEY',
   'Monitoring API Key': 'ALGOLIA_MONITORING_API_KEY',
+  'Index Name': 'ALGOLIA_INDEX_NAME',
 };
 
 function hydrateAlgoliaEnv(customEnvPath) {
@@ -42,12 +43,15 @@ function resolveAlgoliaEnv(options = {}) {
   hydrateAlgoliaEnv(options.envPath);
 
   const appId = process.env.ALGOLIA_APP_ID;
-  const indexName = process.env.ALGOLIA_INDEX_NAME || 'bible-sermons';
+  const indexName = (process.env.ALGOLIA_INDEX_NAME || '').trim() || 'bible-sermons';
   const searchApiKey = process.env.ALGOLIA_SEARCH_API_KEY || process.env.ALGOLIA_WRITE_API_KEY;
   const adminApiKey = process.env.ALGOLIA_ADMIN_API_KEY || process.env.ALGOLIA_WRITE_API_KEY;
 
   if (options.requireAdmin && (!appId || !adminApiKey)) {
     throw new Error('缺少 Algolia Admin/Write 权限的凭证，无法上传索引。');
+  }
+  if (options.requireSearch && (!appId || !searchApiKey || !indexName)) {
+    throw new Error('缺少 Algolia 搜索所需的 appId、apiKey 或 indexName。');
   }
 
   return {appId, indexName, searchApiKey, adminApiKey};
