@@ -15,6 +15,8 @@ const DOCS_DIR = path.join(ROOT, 'docs');
 const OUTPUT_DIR = path.join(ROOT, 'build');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'algolia-index.json');
 const MAX_CHUNK_LENGTH = 8000; // 单块内容长度上限，防止超出 Algolia 单记录限制
+const DEFAULT_LANGUAGE = siteConfig.i18n?.defaultLocale || 'en';
+const DEFAULT_DOCUSUARUS_TAGS = ['default', 'docs-default-current'];
 
 const docsRouteBasePath = (() => {
   const presets = siteConfig.presets || [];
@@ -104,6 +106,8 @@ function splitIntoChunks(parsed, options) {
       tags: parsed.data.tags || [],
       category: parsed.data.sidebar_label || parsed.data.category || undefined,
       source: relativePath,
+      language: DEFAULT_LANGUAGE,
+      docusaurus_tag: DEFAULT_DOCUSUARUS_TAGS,
       headings: [hierarchy[1], hierarchy[2], hierarchy[3]].filter(Boolean),
     });
     chunkLines = [];

@@ -26,7 +26,7 @@ async function uploadIndex() {
   await index.setSettings({
     searchableAttributes: ['hierarchy.lvl0', 'hierarchy.lvl1', 'title', 'headings', 'summary', 'content'],
     attributesToSnippet: ['summary:50', 'content:25'],
-    attributesForFaceting: ['filterOnly(tags)', 'filterOnly(category)'],
+    attributesForFaceting: ['filterOnly(tags)', 'filterOnly(category)', 'filterOnly(language)', 'filterOnly(docusaurus_tag)'],
   });
 
   console.log('索引上传完成');
