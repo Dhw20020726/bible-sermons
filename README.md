@@ -36,6 +36,18 @@ npm run build
 npm run deploy
 ```
 
+## Algolia 搜索索引
+
+- `.env` 支持冒号分隔的键名（例如 `Application ID:xxx`）；在 CI/生产环境可直接提供下列环境变量：`ALGOLIA_APP_ID`、`ALGOLIA_SEARCH_API_KEY`、`ALGOLIA_WRITE_API_KEY`/`ALGOLIA_ADMIN_API_KEY`、`ALGOLIA_INDEX_NAME`。
+- 生成/上传索引用到的命令：
+
+```bash
+npm run index:generate   # 根据 docs 内容生成 build/algolia-index.json
+npm run index:upload     # 将索引上传/覆盖到 Algolia（需 Write/Admin Key）
+```
+
+GitHub Actions 的 `deploy.yml` 已在构建后自动生成索引并上传到 Algolia，记得在仓库 Secret 中配置上述变量。
+
 ## 讲道文档中的锚点跳转写法（最佳实践）
 
 `anchor-auto` 插件会为“经文摘录 / 讲道正文”两栏生成互跳链接。常用场景与写法如下：
