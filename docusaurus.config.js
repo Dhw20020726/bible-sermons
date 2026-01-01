@@ -39,7 +39,7 @@ const config = {
           routeBasePath: '/docs',
           editUrl: undefined,
           beforeDefaultRemarkPlugins: [require('./plugins/anchor-auto')],
-          remarkPlugins: [require('./plugins/bible-embed')],
+          remarkPlugins: [require('./plugins/bible-embed'), require('./plugins/slug-normalize')],
         },
         blog: false,
         theme: {
