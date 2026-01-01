@@ -4,6 +4,7 @@ const path = require('path');
 const fg = require('fast-glob');
 const matter = require('gray-matter');
 const removeMd = require('remove-markdown');
+const {buildBookIndex, loadChapterLines} = require('../plugins/bible-embed');
 const {hydrateAlgoliaEnv, resolveAlgoliaEnv} = require('./utils/env');
 const {createSectionSlugger, resolveHeadingAnchor} = require('./utils/slug');
 
@@ -13,11 +14,13 @@ const siteConfig = require('../docusaurus.config');
 
 const ROOT = path.join(__dirname, '..');
 const DOCS_DIR = path.join(ROOT, 'docs');
+const BIBLE_BASE_DIR = path.join(ROOT, 'static', 'bible');
 const OUTPUT_DIR = path.join(ROOT, 'build');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'algolia-index.json');
 const MAX_CHUNK_LENGTH = 8000; // 单块内容长度上限，防止超出 Algolia 单记录限制
 const DEFAULT_LANGUAGE = siteConfig.i18n?.defaultLocale || 'en';
 const DEFAULT_DOCUSUARUS_TAGS = ['default', 'docs-default-current'];
+const DEFAULT_BIBLE_VERSION = 'cmn-cu89s_readaloud';
 
 const docsRouteBasePath = (() => {
   const presets = siteConfig.presets || [];
@@ -51,6 +54,146 @@ function extractTitle(content, frontmatterTitle, fallback) {
     return match[1].trim();
   }
   return fallback;
+}
+
+function parseAttributes(raw) {
+  const attrs = {};
+  const regex = /(\w+)\s*=\s*"([^"]*)"|(\w+)\s*=\s*'([^']*)'/g;
+  let match;
+  // eslint-disable-next-line no-cond-assign
+  while ((match = regex.exec(raw))) {
+    const key = match[1] || match[3];
+    const value = match[2] || match[4] || '';
+    attrs[key] = value;
+  }
+  return attrs;
+}
+
+function normalizeBookName(name) {
+  if (!name) return '';
+  return String(name)
+    .replace(/^\uFEFF/, '')
+    .replace(/[．。.]*$/g, '')
+    .trim();
+}
+
+function parseSegment(rawSegment, fallbackBook) {
+  const segment = rawSegment.trim();
+  if (!segment) return null;
+
+  const bookMatch = segment.match(/^(?<book>[\u4e00-\u9fffA-Za-z0-9]+)\s+(?<rest>.+)$/);
+  const book = bookMatch ? normalizeBookName(bookMatch.groups.book) : fallbackBook;
+  const versePart = bookMatch ? bookMatch.groups.rest : segment;
+  const match = versePart.match(/^(?<chapter>\d+)\s*:\s*(?<verses>.+)$/);
+  if (!match || !book) return null;
+
+  const chapter = Number.parseInt(match.groups.chapter, 10);
+  const ranges = match.groups.verses
+    .split(/[;,，；]/)
+    .map((piece) => piece.trim())
+    .filter(Boolean)
+    .map((piece) => {
+      const [startRaw, endRaw] = piece.split('-').map((p) => p && p.trim());
+      const start = Number.parseInt(startRaw, 10);
+      const end = endRaw ? Number.parseInt(endRaw, 10) : start;
+      if (Number.isNaN(start) || Number.isNaN(end)) return null;
+      return {start, end: Math.max(start, end)};
+    })
+    .filter(Boolean);
+
+  if (Number.isNaN(chapter) || ranges.length === 0) return null;
+  return {book, chapter, ranges};
+}
+
+function parsePassage(passage) {
+  const trimmed = (passage || '').trim();
+  if (!trimmed) {
+    throw new Error('passage 不能为空');
+  }
+  const [bookPart, ...restParts] = trimmed.split(/\s+/);
+  const fallbackBook = normalizeBookName(bookPart);
+  const rest = restParts.join(' ');
+  if (!fallbackBook || !rest) {
+    throw new Error('passage 需要包含卷书名和节段，例如 “创世记 2:7-9”');
+  }
+  const segments = rest
+    .split(/[;；]/)
+    .map((segment) => parseSegment(segment, fallbackBook))
+    .filter(Boolean);
+  if (segments.length === 0) {
+    throw new Error('未能解析有效的章节或节段');
+  }
+  return segments;
+}
+
+const bibleMappingCache = new Map();
+const bibleChapterCache = new Map();
+
+function getBibleMapping(version) {
+  const key = `${BIBLE_BASE_DIR}::${version}`;
+  if (bibleMappingCache.has(key)) {
+    return bibleMappingCache.get(key);
+  }
+  const mapping = buildBookIndex(BIBLE_BASE_DIR, version);
+  bibleMappingCache.set(key, mapping);
+  return mapping;
+}
+
+function getChapterLines(version, book, chapter) {
+  const cacheKey = `${version}::${book}::${chapter}`;
+  if (bibleChapterCache.has(cacheKey)) {
+    return bibleChapterCache.get(cacheKey);
+  }
+  const mapping = getBibleMapping(version);
+  const lines = loadChapterLines(BIBLE_BASE_DIR, version, mapping, book, chapter);
+  bibleChapterCache.set(cacheKey, lines);
+  return lines;
+}
+
+function renderBiblePassageText(passage, version) {
+  const segments = parsePassage(passage);
+  const verseTexts = [];
+
+  for (const segment of segments) {
+    const lines = getChapterLines(version, segment.book, segment.chapter);
+    for (const range of segment.ranges) {
+      for (let v = range.start; v <= range.end; v += 1) {
+        const lineIndex = v + 1; // 0: 卷书名, 1: 章号, 2: 第1节
+        const text = (lines[lineIndex] || '').trim();
+        const verseText = text || `[${segment.book} ${segment.chapter}:${v} 未找到内容]`;
+        verseTexts.push(`${segment.book} ${segment.chapter}:${v} ${verseText}`);
+      }
+    }
+  }
+
+  return verseTexts.join('\n');
+}
+
+function expandBiblePlaceholders(content) {
+  if (!fs.existsSync(BIBLE_BASE_DIR)) {
+    return content;
+  }
+
+  const pattern = /\{\{\s*bible\s+([^}]+)\s*\}\}|\[\[\s*bible\s+([^\]]+)\s*\]\]/gi;
+
+  return content.replace(pattern, (fullMatch, group1, group2) => {
+    const attrText = group1 || group2 || '';
+    const attrs = parseAttributes(attrText);
+    const passage = attrs.passage || attrs.ref;
+    const version = attrs.version || DEFAULT_BIBLE_VERSION;
+
+    if (!passage) {
+      return fullMatch;
+    }
+
+    try {
+      const verses = renderBiblePassageText(passage, version);
+      return verses || fullMatch;
+    } catch (error) {
+      console.warn(`无法展开经文占位符（${passage}）：${error.message}`);
+      return fullMatch;
+    }
+  });
 }
 
 function chunkPlainText(lines) {
@@ -189,11 +332,12 @@ function buildDocRecords(filePath) {
   const relativePath = path.relative(DOCS_DIR, filePath).replace(/\\/g, '/');
   const raw = fs.readFileSync(filePath, 'utf8');
   const parsed = matter(raw);
+  const contentWithBibleText = expandBiblePlaceholders(parsed.content);
   const slug = normalizeSlug(parsed.data.slug, relativePath.replace(/\/index\.mdx?$/, '/').replace(/\.mdx?$/, ''));
   const docTitle = extractTitle(parsed.content, parsed.data.title, path.parse(relativePath).name);
   const url = joinUrl(siteConfig.url, siteConfig.baseUrl, docsRouteBasePath, slug);
 
-  return splitIntoChunks(parsed, {slug, relativePath, docTitle, url});
+  return splitIntoChunks({...parsed, content: contentWithBibleText}, {slug, relativePath, docTitle, url});
 }
 
 function generateIndex() {
