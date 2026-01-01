@@ -24,7 +24,7 @@ async function uploadIndex() {
 
   await index.replaceAllObjects(records, {safe: true});
   await index.setSettings({
-    searchableAttributes: ['title', 'headings', 'summary', 'content'],
+    searchableAttributes: ['hierarchy.lvl0', 'hierarchy.lvl1', 'title', 'headings', 'summary', 'content'],
     attributesToSnippet: ['summary:50', 'content:25'],
     attributesForFaceting: ['filterOnly(tags)', 'filterOnly(category)'],
   });
