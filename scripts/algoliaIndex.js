@@ -4,6 +4,7 @@ const path = require('path');
 const fg = require('fast-glob');
 const matter = require('gray-matter');
 const removeMd = require('remove-markdown');
+const algoliasearch = require('algoliasearch');
 const {buildBookIndex, loadChapterLines} = require('../plugins/bible-embed');
 const {hydrateAlgoliaEnv, resolveAlgoliaEnv} = require('./utils/env');
 const {createSectionSlugger, resolveHeadingAnchor} = require('./utils/slug');
@@ -29,15 +30,17 @@ const docsRouteBasePath = (() => {
 })();
 
 function joinUrl(...parts) {
-  return parts
-    .filter(Boolean)
-    .map((part, index) => {
-      if (index === 0) {
-        return part.replace(/\/$/, '');
-      }
-      return part.replace(/^\/+/, '').replace(/\/$/, '');
-    })
-    .join('/') + '/';
+  return (
+    parts
+      .filter(Boolean)
+      .map((part, index) => {
+        if (index === 0) {
+          return part.replace(/\/$/, '');
+        }
+        return part.replace(/^\/+/, '').replace(/\/$/, '');
+      })
+      .join('/') + '/'
+  );
 }
 
 function normalizeSlug(rawSlug, relativePath) {
@@ -353,11 +356,84 @@ function generateIndex() {
 
   const {indexName} = resolveAlgoliaEnv();
   console.log(`已生成 ${records.length} 条记录至 ${OUTPUT_FILE}，索引名：${indexName}`);
+
+  return records;
 }
 
-try {
-  generateIndex();
-} catch (error) {
-  console.error('生成 Algolia 索引失败：', error.message);
+function readIndexFile() {
+  if (!fs.existsSync(OUTPUT_FILE)) {
+    throw new Error('未找到 build/algolia-index.json，请先运行 npm run index:generate');
+  }
+  const raw = fs.readFileSync(OUTPUT_FILE, 'utf8');
+  return JSON.parse(raw);
+}
+
+async function uploadIndex(recordsFromCaller) {
+  const {appId, adminApiKey, indexName} = resolveAlgoliaEnv({requireAdmin: true, requireSearch: true});
+  const records = recordsFromCaller || readIndexFile();
+
+  const client = algoliasearch(appId, adminApiKey);
+  const index = client.initIndex(indexName);
+
+  console.log(`准备上传 ${records.length} 条记录到 Algolia 索引 ${indexName} ...`);
+
+  await index.replaceAllObjects(records, {safe: true});
+  await index.setSettings({
+    searchableAttributes: [
+      'hierarchy.lvl0',
+      'hierarchy.lvl1',
+      'hierarchy.lvl2',
+      'hierarchy.lvl3',
+      'hierarchy.lvl4',
+      'hierarchy.lvl5',
+      'hierarchy.lvl6',
+      'title',
+      'headings',
+      'summary',
+      'content',
+    ],
+    attributesToSnippet: ['summary:50', 'content:25'],
+    attributesToHighlight: [
+      'hierarchy.lvl0',
+      'hierarchy.lvl1',
+      'hierarchy.lvl2',
+      'hierarchy.lvl3',
+      'hierarchy.lvl4',
+      'hierarchy.lvl5',
+      'hierarchy.lvl6',
+      'summary',
+      'content',
+    ],
+    attributesForFaceting: ['filterOnly(tags)', 'filterOnly(category)', 'filterOnly(language)', 'filterOnly(docusaurus_tag)'],
+  });
+
+  console.log('索引上传完成');
+}
+
+async function main() {
+  const action = (process.argv[2] || 'generate').toLowerCase();
+
+  if (action === 'generate') {
+    generateIndex();
+    return;
+  }
+
+  if (action === 'upload') {
+    await uploadIndex();
+    return;
+  }
+
+  if (action === 'all' || action === 'generate-upload') {
+    const records = generateIndex();
+    await uploadIndex(records);
+    return;
+  }
+
+  console.error('未知指令，请使用：generate | upload | all');
   process.exit(1);
 }
+
+main().catch((error) => {
+  console.error('Algolia 索引任务失败：', error.message);
+  process.exit(1);
+});

@@ -9,8 +9,8 @@
     "build": "docusaurus build",
     "serve": "docusaurus serve",
     "deploy": "docusaurus deploy",
-    "index:generate": "node ./scripts/generateAlgoliaIndex.js",
-    "index:upload": "node ./scripts/uploadAlgoliaIndex.js"
+    "index:generate": "node ./scripts/algoliaIndex.js generate",
+    "index:upload": "node ./scripts/algoliaIndex.js upload"
   },
   "dependencies": {
     "@docusaurus/core": "^3.4.0",
