@@ -14,6 +14,7 @@ const ROOT = path.join(__dirname, '..');
 const DOCS_DIR = path.join(ROOT, 'docs');
 const OUTPUT_DIR = path.join(ROOT, 'build');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'algolia-index.json');
+const MAX_CONTENT_LENGTH = 8000; // Algolia 单条记录最大 10k 字节，预留元数据空间
 
 const docsRouteBasePath = (() => {
   const presets = siteConfig.presets || [];
@@ -66,7 +67,8 @@ function buildDocRecord(filePath) {
   const slug = normalizeSlug(parsed.data.slug, relativePath.replace(/\/index\.mdx?$/, '/').replace(/\.mdx?$/, ''));
   const title = extractTitle(parsed.content, parsed.data.title, path.parse(relativePath).name);
   const content = removeMd(parsed.content).replace(/\s+/g, ' ').trim();
-  const summary = content.slice(0, 500);
+  const truncatedContent = content.length > MAX_CONTENT_LENGTH ? content.slice(0, MAX_CONTENT_LENGTH) : content;
+  const summary = truncatedContent.slice(0, 500);
   const url = joinUrl(siteConfig.url, siteConfig.baseUrl, docsRouteBasePath, slug);
 
   return {
@@ -74,7 +76,7 @@ function buildDocRecord(filePath) {
     title,
     url,
     summary,
-    content,
+    content: truncatedContent,
     headings: extractHeadings(parsed.content),
     tags: parsed.data.tags || [],
     category: parsed.data.sidebar_label || parsed.data.category || undefined,
