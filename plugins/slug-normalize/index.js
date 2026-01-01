@@ -1,38 +1,70 @@
-const {slug: githubSlug} = require('github-slugger');
 const toString = require('mdast-util-to-string');
 const visit = require('unist-util-visit');
 
-function createSlugger() {
-  const seen = new Map();
+function normalizeText(value) {
+  return (
+    String(value || '')
+      .normalize('NFKC')
+      .replace(/(\d)\s+(\d)/g, '$1-$2')
+      .replace(/[:：]/g, '-')
+      .replace(/[\u201c\u201d\u2018\u2019]/g, '')
+      .replace(/[^a-z0-9\u4e00-\u9fff\s-]/giu, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .toLowerCase() || 'section'
+  );
+}
 
-  return (value) => {
-    const base = githubSlug(
-      String(value || '')
-        .normalize('NFKC')
-        .replace(/(\d)\s+(\d)/g, '$1-$2')
-        .replace(/[:：]/g, ' - ')
-        .trim(),
-    );
+function createSectionSlugger() {
+  const slugCountBySection = new Map();
 
-    const count = seen.get(base) || 0;
-    seen.set(base, count + 1);
-    if (count === 0) return base;
-    return `${base}-${count}`;
-  };
+  function getSectionKey(section) {
+    return section || '__global__';
+  }
+
+  function getUniqueSlug(section, text) {
+    const baseSlug = normalizeText(text);
+    const sectionKey = getSectionKey(section);
+    if (!slugCountBySection.has(sectionKey)) {
+      slugCountBySection.set(sectionKey, new Map());
+    }
+    const sectionMap = slugCountBySection.get(sectionKey);
+    const currentCount = sectionMap.get(baseSlug) || 0;
+    sectionMap.set(baseSlug, currentCount + 1);
+    if (currentCount === 0) return baseSlug;
+    return `${baseSlug}-${currentCount}`;
+  }
+
+  return {getUniqueSlug};
 }
 
 module.exports = function slugNormalizePlugin() {
   return (tree) => {
-    const slugger = createSlugger();
+    const {getUniqueSlug} = createSectionSlugger();
+    let currentSection = '';
 
     visit(tree, 'heading', (node) => {
-      const text = toString(node);
-      const slug = slugger(text);
+      const text = toString(node).trim();
+
+      if (node.depth === 2) {
+        const slug = normalizeText(text);
+        node.data = node.data || {};
+        node.data.id = slug;
+        node.data.hProperties = node.data.hProperties || {};
+        node.data.hProperties.id = slug;
+        currentSection = text;
+        return;
+      }
+
+      const slug = getUniqueSlug(currentSection, text);
+      const sectionSlug = currentSection ? normalizeText(currentSection) : '';
+      const resolvedId = sectionSlug ? `${sectionSlug}-${slug}` : slug;
 
       node.data = node.data || {};
-      node.data.id = slug;
+      node.data.id = resolvedId;
       node.data.hProperties = node.data.hProperties || {};
-      node.data.hProperties.id = slug;
+      node.data.hProperties.id = resolvedId;
     });
   };
 };
