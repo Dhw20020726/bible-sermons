@@ -155,7 +155,7 @@ function getChapterLines(version, book, chapter) {
 
 function renderBiblePassageText(passage, version) {
   const segments = parsePassage(passage);
-  const verseTexts = [];
+  const entries = [];
 
   for (const segment of segments) {
     const lines = getChapterLines(version, segment.book, segment.chapter);
@@ -164,10 +164,29 @@ function renderBiblePassageText(passage, version) {
         const lineIndex = v + 1; // 0: 卷书名, 1: 章号, 2: 第1节
         const text = (lines[lineIndex] || '').trim();
         const verseText = text || `[${segment.book} ${segment.chapter}:${v} 未找到内容]`;
-        verseTexts.push(`${segment.book} ${segment.chapter}:${v} ${verseText}`);
+        entries.push({book: segment.book, chapter: segment.chapter, verse: v, text: verseText});
       }
     }
   }
+
+  const bookCount = new Set(entries.map((item) => item.book)).size;
+  const chapterCount = new Set(entries.map((item) => `${item.book}-${item.chapter}`)).size;
+  const includeRef = entries.length > 1;
+  const includeBook = includeRef && bookCount > 1;
+  const includeChapter = includeRef && (includeBook || chapterCount > 1);
+
+  const verseTexts = entries.map((item) => {
+    if (!includeRef) {
+      return item.text;
+    }
+    if (includeBook) {
+      return `${item.book} ${item.chapter}:${item.verse} ${item.text}`;
+    }
+    if (includeChapter) {
+      return `${item.chapter}:${item.verse} ${item.text}`;
+    }
+    return `${item.verse} ${item.text}`;
+  });
 
   return verseTexts.join('\n');
 }
@@ -203,7 +222,8 @@ function chunkPlainText(lines) {
   const rawContent = lines.join('\n');
   const plain = removeMd(rawContent).replace(/\s+/g, ' ').trim();
   const truncated = plain.slice(0, MAX_CHUNK_LENGTH);
-  return {plain, truncated, summary: truncated.slice(0, 500)};
+  const summary = truncated.length > 500 ? truncated.slice(0, 500) : null;
+  return {plain, truncated, summary};
 }
 
 function buildDocBreadcrumb(relativePath, docTitle) {
