@@ -8,14 +8,21 @@
     "start": "docusaurus start",
     "build": "docusaurus build",
     "serve": "docusaurus serve",
-    "deploy": "docusaurus deploy"
+    "deploy": "docusaurus deploy",
+    "index:generate": "node ./scripts/generateAlgoliaIndex.js",
+    "index:upload": "node ./scripts/uploadAlgoliaIndex.js"
   },
   "dependencies": {
     "@docusaurus/core": "^3.4.0",
     "@docusaurus/preset-classic": "^3.4.0",
+    "algoliasearch": "^4.24.0",
     "clsx": "^2.1.1",
+    "dotenv": "^16.4.5",
+    "fast-glob": "^3.3.2",
+    "gray-matter": "^4.0.3",
     "prism-react-renderer": "^2.3.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "remove-markdown": "^0.5.0"
   }
 }

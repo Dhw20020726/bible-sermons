@@ -1,4 +1,8 @@
 const {themes} = require('prism-react-renderer');
+const {hydrateAlgoliaEnv, resolveAlgoliaEnv} = require('./scripts/utils/env');
+
+hydrateAlgoliaEnv();
+const algoliaEnv = resolveAlgoliaEnv();
 
 const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.dracula;
@@ -49,6 +53,13 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      algolia: algoliaEnv.appId && algoliaEnv.searchApiKey ? {
+        appId: algoliaEnv.appId,
+        apiKey: algoliaEnv.searchApiKey,
+        indexName: algoliaEnv.indexName,
+        contextualSearch: true,
+        searchParameters: {},
+      } : undefined,
       navbar: {
         title: '圣经讲道与灵修分享',
         items: [
