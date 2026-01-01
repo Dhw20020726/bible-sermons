@@ -10,7 +10,8 @@
     "serve": "docusaurus serve",
     "deploy": "docusaurus deploy",
     "index:generate": "node ./scripts/algoliaIndex.js generate",
-    "index:upload": "node ./scripts/algoliaIndex.js upload"
+    "index:upload": "node ./scripts/algoliaIndex.js upload",
+    "index:all": "node ./scripts/algoliaIndex.js all"
   },
   "dependencies": {
     "@docusaurus/core": "^3.4.0",
