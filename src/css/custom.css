@@ -8,6 +8,7 @@
   --ifm-color-primary-lightest: #8c9c8b;
   --ifm-font-family-base: "Noto Serif SC", "Source Han Serif SC", "PingFang SC", "Microsoft YaHei", serif;
   --anchor-highlight-bg: rgba(255, 230, 120, 0.35);
+  --docsearch-highlight-color: var(--anchor-highlight-bg);
 }
 
 html {
@@ -40,6 +41,11 @@ main {
 
 .anchor-target-highlight {
   animation: anchor-target-flash 2200ms ease;
+}
+
+.DocSearch-Hit mark {
+  background: var(--anchor-highlight-bg);
+  color: inherit;
 }
 
 @keyframes anchor-target-flash {

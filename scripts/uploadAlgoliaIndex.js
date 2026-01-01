@@ -24,8 +24,31 @@ async function uploadIndex() {
 
   await index.replaceAllObjects(records, {safe: true});
   await index.setSettings({
-    searchableAttributes: ['hierarchy.lvl0', 'hierarchy.lvl1', 'title', 'headings', 'summary', 'content'],
+    searchableAttributes: [
+      'hierarchy.lvl0',
+      'hierarchy.lvl1',
+      'hierarchy.lvl2',
+      'hierarchy.lvl3',
+      'hierarchy.lvl4',
+      'hierarchy.lvl5',
+      'hierarchy.lvl6',
+      'title',
+      'headings',
+      'summary',
+      'content',
+    ],
     attributesToSnippet: ['summary:50', 'content:25'],
+    attributesToHighlight: [
+      'hierarchy.lvl0',
+      'hierarchy.lvl1',
+      'hierarchy.lvl2',
+      'hierarchy.lvl3',
+      'hierarchy.lvl4',
+      'hierarchy.lvl5',
+      'hierarchy.lvl6',
+      'summary',
+      'content',
+    ],
     attributesForFaceting: ['filterOnly(tags)', 'filterOnly(category)', 'filterOnly(language)', 'filterOnly(docusaurus_tag)'],
   });
 
