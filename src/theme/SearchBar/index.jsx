@@ -60,19 +60,27 @@ function useTransformItems({transformItems}) {
           }));
 
       return processed.map((item) => {
-        const highlight = item._snippetResult?.content?.value || item.summary || item.content || item.title;
-        const heading =
-          item.hierarchy?.lvl1 ||
-          item.hierarchy?.lvl0 ||
+        const snippet =
+          item._snippetResult?.content?.value ||
+          item.summary ||
+          item.content ||
+          item.title;
+        const heading = item.hierarchy?.lvl1 || item.hierarchy?.lvl0 || item.title;
+        const plainSnippet =
+          (item._snippetResult?.content?.value &&
+            item._snippetResult.content.value.replace(/<\/?[^>]+(>|$)/g, '')) ||
+          item.summary ||
+          item.content ||
           item.title;
 
         if (item.type === 'content') {
           const recentObject = {
             ...item,
             objectID: `${item.objectID}__recent`,
+            title: plainSnippet,
+            label: plainSnippet,
             hierarchy: {
-              ...item.hierarchy,
-              lvl0: highlight,
+              lvl0: plainSnippet,
               lvl1: heading,
               lvl2: null,
               lvl3: null,
@@ -80,6 +88,7 @@ function useTransformItems({transformItems}) {
               lvl5: null,
               lvl6: null,
             },
+            subtitle: heading,
             _highlightResult: item._highlightResult,
             _snippetResult: item._snippetResult,
           };
