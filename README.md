@@ -34,6 +34,9 @@ npm install
 npm run start
 npm run build
 npm run deploy
+npm run algolia:generate   # 生成 Algolia 索引文件
+npm run algolia:upload     # 上传索引到 Algolia
+npm run algolia:index      # 先生成再上传
 ```
 
 ## 讲道文档中的锚点跳转写法（最佳实践）
@@ -76,6 +79,18 @@ npm run deploy
 **提示**  
 - 若你已手写 `<AnchorJump>` 或 `<AnchorAuto>`，同一三级标题下的自动插入会被跳过，使用你的标签。  
 - 默认生成的 `id`/`to` 形如 `sermon-创世记-2-7` 与 `excerpt-创世记-2-7`，可按需手写覆盖。  
+
+## Algolia 站内搜索
+
+本项目接入了 Algolia 搜索，在构建阶段自动重新生成索引并覆盖 Algolia 云端索引。
+
+1. 在 `.env` 中提供以下变量（支持 `KEY=VALUE` 或 `KEY: VALUE` 格式）：  
+   - `ALGOLIA_APP_ID`（或 `Application ID`）  
+   - `ALGOLIA_SEARCH_API_KEY`（或 `Search API Key`，用于前端检索）  
+   - `ALGOLIA_ADMIN_API_KEY` / `ALGOLIA_WRITE_API_KEY`（用于写入索引）  
+   - `ALGOLIA_INDEX_NAME`
+2. 本地运行 `npm run algolia:index` 可生成 `build/algolia/index.json` 并上传到 Algolia。
+3. GitHub Actions 部署流程会自动执行生成与上传步骤，请在仓库 Secrets 中配置以上四个变量。
 
 ## 圣经经文资源
 

@@ -1,7 +1,9 @@
 const {themes} = require('prism-react-renderer');
+const {resolveAlgoliaConfig} = require('./scripts/utils/env');
 
 const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.dracula;
+const algolia = resolveAlgoliaConfig();
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -70,6 +72,12 @@ const config = {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
       },
+      algolia: algolia.appId && algolia.searchKey && algolia.indexName ? {
+        appId: algolia.appId,
+        apiKey: algolia.searchKey,
+        indexName: algolia.indexName,
+        contextualSearch: true,
+      } : undefined,
     }),
 };
 
