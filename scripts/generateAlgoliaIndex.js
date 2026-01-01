@@ -63,43 +63,7 @@ function chunkPlainText(lines) {
 function buildDocBreadcrumb(relativePath, docTitle) {
   const parts = relativePath.split('/');
   const testament = parts[0] === 'old-testament' ? '旧约' : parts[0] === 'new-testament' ? '新约' : parts[0];
-  const book = parts[1] || '';
-  return [testament, book, docTitle].filter(Boolean).join(' > ');
-}
-
-function createHierarchyState(docBreadcrumb, docTitle) {
-  const levels = {
-    0: docBreadcrumb,
-    1: null,
-    2: null,
-    3: null,
-    4: null,
-    5: null,
-    6: null,
-  };
-
-  return {
-    update(level, text) {
-      levels[level] = text;
-      for (let i = level + 1; i <= 6; i += 1) {
-        levels[i] = null;
-      }
-    },
-    getNormalized() {
-      return {
-        lvl0: levels[0] || docBreadcrumb,
-        lvl1: levels[1] || docTitle,
-        lvl2: levels[2],
-        lvl3: levels[3],
-        lvl4: levels[4],
-        lvl5: levels[5],
-        lvl6: levels[6],
-      };
-    },
-    getHeadingList() {
-      return [levels[1] || docTitle, levels[2], levels[3], levels[4], levels[5], levels[6]].filter(Boolean);
-    },
-  };
+  return [testament, docTitle].filter(Boolean).join(' > ');
 }
 
 function splitIntoChunks(parsed, options) {
@@ -107,10 +71,11 @@ function splitIntoChunks(parsed, options) {
   const docBreadcrumb = buildDocBreadcrumb(relativePath, docTitle);
   const lines = parsed.content.split(/\r?\n/);
   const headingRegex = /^(#{1,6})\s+(.+)$/;
-  const hierarchyState = createHierarchyState(docBreadcrumb, docTitle);
   const anchorByLevel = {1: null, 2: null, 3: null, 4: null, 5: null, 6: null};
   const slugger = createSectionSlugger();
   let currentSection = '';
+  let activeSectionPath = docBreadcrumb;
+  let activeHeadingTitle = null;
 
   const records = [];
   let chunkLines = [];
@@ -125,7 +90,7 @@ function splitIntoChunks(parsed, options) {
       chunkLines = [];
       return;
     }
-    const normalizedHierarchy = hierarchyState.getNormalized();
+    const headingList = [currentSection || null, activeHeadingTitle].filter(Boolean);
     records.push({
       objectID: `${slug || relativePath}#${chunkIndex}`,
       title: chunkTitle,
@@ -135,16 +100,32 @@ function splitIntoChunks(parsed, options) {
       type: 'content',
       summary,
       content: truncated || null,
-      hierarchy: normalizedHierarchy,
-      hierarchy_camel: normalizedHierarchy,
+      hierarchy: {
+        lvl0: activeSectionPath,
+        lvl1: activeHeadingTitle,
+        lvl2: null,
+        lvl3: null,
+        lvl4: null,
+        lvl5: null,
+        lvl6: null,
+      },
+      hierarchy_camel: {
+        lvl0: activeSectionPath,
+        lvl1: activeHeadingTitle,
+        lvl2: null,
+        lvl3: null,
+        lvl4: null,
+        lvl5: null,
+        lvl6: null,
+      },
       parent: chunkParent,
       tags: parsed.data.tags || [],
       category: parsed.data.sidebar_label || parsed.data.category || undefined,
       source: relativePath,
       language: DEFAULT_LANGUAGE,
       docusaurus_tag: DEFAULT_DOCUSUARUS_TAGS,
-      headings: hierarchyState.getHeadingList(),
-      doc_breadcrumb: docBreadcrumb,
+      headings: headingList,
+      doc_breadcrumb: activeSectionPath,
     });
     chunkLines = [];
     chunkIndex += 1;
@@ -164,7 +145,6 @@ function splitIntoChunks(parsed, options) {
         slugger,
       });
 
-      hierarchyState.update(level, headingText);
       anchorByLevel[level] = anchor;
       if (level === 2) {
         currentSection = sectionLabel;
@@ -185,6 +165,8 @@ function splitIntoChunks(parsed, options) {
 
       chunkAnchor = anchor;
       chunkTitle = headingText;
+      activeSectionPath = currentSection ? `${docBreadcrumb} > ${currentSection}` : docBreadcrumb;
+      activeHeadingTitle = headingText === currentSection ? null : headingText;
       chunkParent = parentAnchor ? `${url}#${parentAnchor}` : url;
       chunkLines = [];
       return;
