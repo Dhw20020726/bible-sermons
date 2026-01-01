@@ -1,5 +1,5 @@
 const toString = require('mdast-util-to-string');
-const visit = require('unist-util-visit');
+const {visit} = require('unist-util-visit');
 
 function normalizeText(value) {
   return (
