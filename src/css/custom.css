@@ -1,14 +1,15 @@
 :root {
-  --ifm-color-primary: #5a6b5c;
-  --ifm-color-primary-dark: #4f5f51;
-  --ifm-color-primary-darker: #485748;
-  --ifm-color-primary-darkest: #3b463c;
-  --ifm-color-primary-light: #667566;
-  --ifm-color-primary-lighter: #708170;
-  --ifm-color-primary-lightest: #8c9c8b;
+  --ifm-color-primary: #25C2A0;
+  --ifm-color-primary-dark: #21AF90;
+  --ifm-color-primary-darker: #1FA588;
+  --ifm-color-primary-darkest: #1A8870;
+  --ifm-color-primary-light: #29D5B0;
+  --ifm-color-primary-lighter: #32D8B4;
+  --ifm-color-primary-lightest: #4FDDBF;
   --ifm-font-family-base: "Noto Serif SC", "Source Han Serif SC", "PingFang SC", "Microsoft YaHei", serif;
   --anchor-highlight-bg: rgba(255, 230, 120, 0.35);
-  --docsearch-highlight-color: var(--anchor-highlight-bg);
+  --docsearch-highlight-color: rgba(255, 230, 120, 0.6);
+  --docsearch-highlight-color-dark: rgba(255, 230, 120, 0.8);
 }
 
 html {
@@ -43,12 +44,15 @@ html {
   0% {
     background-color: transparent;
   }
+
   10% {
     background-color: var(--anchor-highlight-bg);
   }
+
   65% {
     background-color: var(--anchor-highlight-bg);
   }
+
   100% {
     background-color: transparent;
   }
@@ -272,4 +276,9 @@ html[data-theme='dark'] .homeSecondaryButton {
   height: 0.9rem;
   background-color: currentColor;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath d='M11 3a1 1 0 100 2h2.586l-4.95 4.95a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V3a1 1 0 00-1-1h-6z'/%3E%3Cpath d='M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 100-2H5z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.search-result-match {
+  color: inherit;
+  background-color: var(--docsearch-highlight-color);
 }
