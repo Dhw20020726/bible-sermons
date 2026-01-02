@@ -62,7 +62,11 @@ const config = {
         searchParameters: {},
       } : undefined,
       navbar: {
-        title: '主页->',
+        title: 'Bible Sermons',
+        logo: {
+          alt: 'Bible Sermons Logo',
+          src: 'img/logo.svg',
+        },
         hideOnScroll: true,
       },
       docs: {
