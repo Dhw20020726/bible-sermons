@@ -10,6 +10,7 @@
   --anchor-highlight-bg: rgba(255, 230, 120, 0.35);
   --docsearch-highlight-color: rgba(255, 230, 120, 0.6);
   --docsearch-highlight-color-dark: rgba(255, 230, 120, 0.8);
+  --navbar-logo-filter: none;
 }
 
 html {
@@ -189,6 +190,7 @@ html {
 
 html[data-theme='dark'] {
   --anchor-highlight-bg: rgba(255, 200, 80, 0.18);
+  --navbar-logo-filter: invert(1);
 }
 
 html[data-theme='dark'] .homeHero {
@@ -199,6 +201,11 @@ html[data-theme='dark'] .homeSecondaryButton {
   background: rgba(148, 163, 184, 0.12);
   border-color: rgba(148, 163, 184, 0.4);
   color: #e2e8f0;
+}
+
+.navbar__logo img {
+  filter: var(--navbar-logo-filter);
+  transition: filter 150ms ease;
 }
 
 .footer {
