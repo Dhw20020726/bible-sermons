@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+                       xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName>圣经讲道与灵修分享</ShortName>
+  <Description>Search 圣经讲道与灵修分享</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image width="16" height="16" type="image/x-icon">https://Dhw20020726.github.io/bible-sermons/img/favicon.ico</Image>
+  <Url type="text/html" method="get" template="https://Dhw20020726.github.io/bible-sermons/search?q={searchTerms}"/>
+  <Url type="application/opensearchdescription+xml" rel="self" template="https://Dhw20020726.github.io/bible-sermons/opensearch.xml" />
+  <moz:SearchForm>https://Dhw20020726.github.io/bible-sermons/</moz:SearchForm>
+</OpenSearchDescription>
