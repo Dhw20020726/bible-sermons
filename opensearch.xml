@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
                        xmlns:moz="http://www.mozilla.org/2006/browser/search/">
-  <ShortName>圣经讲道与灵修分享</ShortName>
-  <Description>Search 圣经讲道与灵修分享</Description>
+  <ShortName>Bible Sermons</ShortName>
+  <Description>Search Bible Sermons</Description>
   <InputEncoding>UTF-8</InputEncoding>
   <Url type="text/html" method="get" template="https://Dhw20020726.github.io/bible-sermons/search?q={searchTerms}"/>
   <Url type="application/opensearchdescription+xml" rel="self" template="https://Dhw20020726.github.io/bible-sermons/opensearch.xml" />
