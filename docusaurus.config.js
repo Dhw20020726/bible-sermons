@@ -20,7 +20,6 @@ const config = {
       onBrokenMarkdownLinks: 'warn',
     },
   },
-  favicon: 'img/favicon.ico',
   organizationName: 'Dhw20020726',
   projectName: 'bible-sermons',
 
@@ -48,6 +47,24 @@ const config = {
       }),
     ],
   ],
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'icon',
+        href: 'img/favicon.ico',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'icon',
+        href: 'img/favicon-dark.ico',
+        media: '(prefers-color-scheme: dark)',
+      },
+    },
+  ],
+
   plugins: [
   ],
 
