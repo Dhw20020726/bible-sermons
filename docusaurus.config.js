@@ -9,11 +9,13 @@ const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.dracula;
 
 /** @type {import('@docusaurus/types').Config} */
+const siteBaseUrl = '/bible-sermons/';
+
 const config = {
   title: '圣经讲道与灵修分享',
   tagline: '按卷书系统性分享神的话语与教会讲道',
   url: 'https://Dhw20020726.github.io',
-  baseUrl: '/bible-sermons/',
+  baseUrl: siteBaseUrl,
   onBrokenLinks: 'throw',
   markdown: {
     hooks: {
@@ -52,14 +54,14 @@ const config = {
       tagName: 'link',
       attributes: {
         rel: 'icon',
-        href: 'img/favicon.ico',
+        href: `${siteBaseUrl}img/favicon.ico`,
       },
     },
     {
       tagName: 'link',
       attributes: {
         rel: 'icon',
-        href: 'img/favicon-dark.ico',
+        href: `${siteBaseUrl}img/favicon-dark.ico`,
         media: '(prefers-color-scheme: dark)',
       },
     },
