@@ -12,8 +12,8 @@ const darkCodeTheme = themes.dracula;
 const siteBaseUrl = '/bible-sermons/';
 
 const config = {
-  title: '圣经讲道与灵修分享',
-  tagline: '按卷书系统性分享神的话语与教会讲道',
+  title: 'Bible Sermons',
+  tagline: '以圣经为中心分享神的话语与教会讲道',
   url: 'https://Dhw20020726.github.io',
   baseUrl: siteBaseUrl,
   onBrokenLinks: 'throw',
@@ -50,6 +50,14 @@ const config = {
     ],
   ],
   headTags: [
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        href: `${siteBaseUrl}img/apple-touch-icon.png`,
+      },
+    },
     {
       tagName: 'link',
       attributes: {

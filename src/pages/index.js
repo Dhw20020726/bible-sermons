@@ -89,8 +89,8 @@ export default function Home() {
 
   return (
     <Layout
-      title="圣经讲道与灵修分享"
-      description="按卷书系统性分享神的话语与教会讲道"
+      // title="主页"
+      description="以圣经为中心分享神的话语与教会讲道"
       wrapperClassName="navbar--home"
     >
       <main className="homeLayout">
