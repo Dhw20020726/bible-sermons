@@ -201,6 +201,10 @@ html[data-theme='dark'] .homeSecondaryButton {
   color: #e2e8f0;
 }
 
+html[data-theme='dark'] .navbar__logo img {
+  filter: invert(1);
+}
+
 .footer {
   background: #1f2937;
   color: #e5e7eb;
