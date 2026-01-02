@@ -54,14 +54,16 @@ const config = {
       tagName: 'link',
       attributes: {
         rel: 'icon',
-        href: `${siteBaseUrl}img/favicon.ico`,
+        type: 'image/svg+xml',
+        href: `${siteBaseUrl}img/logo-light.svg`,
       },
     },
     {
       tagName: 'link',
       attributes: {
         rel: 'icon',
-        href: `${siteBaseUrl}img/favicon-dark.ico`,
+        type: 'image/svg+xml',
+        href: `${siteBaseUrl}img/logo-dark.svg`,
         media: '(prefers-color-scheme: dark)',
       },
     },
