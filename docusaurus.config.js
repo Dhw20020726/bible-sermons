@@ -1,5 +1,5 @@
-const {themes} = require('prism-react-renderer');
-const {hydrateAlgoliaEnv, resolveAlgoliaEnv} = require('./scripts/utils/env');
+const { themes } = require('prism-react-renderer');
+const { hydrateAlgoliaEnv, resolveAlgoliaEnv } = require('./scripts/utils/env');
 
 hydrateAlgoliaEnv();
 const algoliaEnv = resolveAlgoliaEnv();
@@ -62,21 +62,14 @@ const config = {
         searchParameters: {},
       } : undefined,
       navbar: {
-        title: '圣经讲道与灵修分享',
-        items: [
-          {to: '/', label: '首页', position: 'left'},
-          {to: '/docs', label: '目录', position: 'left'},
-        ],
+        title: '主页->',
+        hideOnScroll: true,
       },
       docs: {
         sidebar: {
           hideable: true,
           autoCollapseCategories: true,
         },
-      },
-      footer: {
-        style: 'dark',
-        copyright: `© ${new Date().getFullYear()} 圣经讲道与灵修分享`,
       },
       prism: {
         theme: lightCodeTheme,
