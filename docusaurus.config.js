@@ -65,7 +65,8 @@ const config = {
         title: 'Bible Sermons',
         logo: {
           alt: 'Bible Sermons Logo',
-          src: 'img/logo.svg',
+          src: 'img/logo-light.svg',
+          srcDark: 'img/logo-dark.svg',
         },
         hideOnScroll: true,
       },
