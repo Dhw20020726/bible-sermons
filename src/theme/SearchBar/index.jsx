@@ -245,8 +245,5 @@ function DocSearch({externalUrlRegex, ...props}) {
 
 export default function SearchBar() {
   const {siteConfig} = useDocusaurusContext();
-  if (!siteConfig.themeConfig?.algolia) {
-    return null;
-  }
   return <DocSearch {...siteConfig.themeConfig.algolia} />;
 }
