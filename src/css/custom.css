@@ -378,6 +378,13 @@ label.inpt {
   color: #0f172a;
 }
 
+label.inpt-label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #0f172a;
+}
+
 .inpt {
   width: 100%;
   background: #f3f4f6;

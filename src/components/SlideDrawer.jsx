@@ -100,7 +100,7 @@ export default function SlideDrawer({open, onClose, title, children}) {
     return document.body;
   }, [isMounted]);
 
-  if (!portalTarget) {
+  if (!portalTarget || !open) {
     return null;
   }
 

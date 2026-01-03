@@ -20,9 +20,6 @@ export default function Footer() {
           <button type="button" className="btn" onClick={() => setOpen(true)}>
             Write message
           </button>
-          <Link className="btn primary" to="/docs">
-            浏览讲道
-          </Link>
         </div>
 
         <div className="footer__divider" />

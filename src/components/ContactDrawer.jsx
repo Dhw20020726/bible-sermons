@@ -80,7 +80,7 @@ function ContactForm({open, onClose}) {
         <fieldset>
           <div className="cols">
             <div>
-              <label className="inpt" htmlFor="contact-name">
+              <label className="inpt-label" htmlFor="contact-name">
                 Name &amp; Company
               </label>
               <input
@@ -94,7 +94,7 @@ function ContactForm({open, onClose}) {
               />
             </div>
             <div>
-              <label className="inpt" htmlFor="contact-email">
+              <label className="inpt-label" htmlFor="contact-email">
                 Your email address
               </label>
               <input
@@ -110,7 +110,7 @@ function ContactForm({open, onClose}) {
           </div>
 
           <div className="text">
-            <label className="inpt" htmlFor="contact-message">
+            <label className="inpt-label" htmlFor="contact-message">
               Your message
             </label>
             <textarea
