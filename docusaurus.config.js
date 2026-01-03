@@ -1,9 +1,11 @@
 const { themes } = require('prism-react-renderer');
-const { hydrateAlgoliaEnv, resolveAlgoliaEnv } = require('./scripts/utils/env');
-
-hydrateAlgoliaEnv();
-const algoliaEnv = resolveAlgoliaEnv();
-const isAlgoliaReady = Boolean(algoliaEnv.appId && algoliaEnv.searchApiKey && algoliaEnv.indexName);
+const algoliaConfig = {
+  appId: 'IP0MLC3H7D',
+  apiKey: '66b5902b2bede0c671fb5b2343a7cebc',
+  indexName: 'bible-sermons',
+  contextualSearch: true,
+  searchParameters: {},
+};
 
 const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.dracula;
@@ -83,13 +85,7 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      algolia: isAlgoliaReady ? {
-        appId: algoliaEnv.appId,
-        apiKey: algoliaEnv.searchApiKey,
-        indexName: algoliaEnv.indexName,
-        contextualSearch: true,
-        searchParameters: {},
-      } : undefined,
+      algolia: algoliaConfig,
       navbar: {
         title: 'Bible Sermons',
         logo: {
