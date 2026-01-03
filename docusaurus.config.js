@@ -1,12 +1,8 @@
 const { themes } = require('prism-react-renderer');
-const { hydrateAlgoliaEnv, resolveAlgoliaEnv } = require('./scripts/utils/env');
-
-hydrateAlgoliaEnv();
-const algoliaEnv = resolveAlgoliaEnv();
 const algoliaConfig = {
-  appId: algoliaEnv.appId || 'latency',
-  apiKey: algoliaEnv.searchApiKey || '6be0576ff61c053d5f9a3225e2a90f76',
-  indexName: algoliaEnv.indexName || 'instant_search',
+  appId: 'IP0MLC3H7D',
+  apiKey: '66b5902b2bede0c671fb5b2343a7cebc',
+  indexName: 'bible-sermons',
   contextualSearch: true,
   searchParameters: {},
 };
