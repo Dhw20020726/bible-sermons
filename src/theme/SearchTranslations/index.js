@@ -1,26 +1,15 @@
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import {translate} from '@docusaurus/Translate';
-// TODO Docusaurus v4: require DocSearch v4
-//  This needs to be cleaned after the upgrade
-//  Docusaurus v3 was made compatible with both DocSearch v3 and v4
-//  This implies that labels have been kept retro-compatible with v3
-//  Once we upgrade, we should be able to rely on v4 types only
-//  and remove v3 retro-compatibility labels that do not exist anymore in v4
+
 const translations = {
   button: {
     buttonText: translate({
       id: 'theme.SearchBar.label',
-      message: 'Search',
+      message: '搜索',
       description: 'The ARIA label and placeholder for search button',
     }),
     buttonAriaLabel: translate({
       id: 'theme.SearchBar.label',
-      message: 'Search',
+      message: '搜索',
       description: 'The ARIA label and placeholder for search button',
     }),
   },
@@ -28,295 +17,243 @@ const translations = {
     searchBox: {
       resetButtonTitle: translate({
         id: 'theme.SearchModal.searchBox.resetButtonTitle',
-        message: 'Clear the query',
+        message: '清除搜索词',
         description: 'The label and ARIA label for search box reset button',
       }),
       resetButtonAriaLabel: translate({
         id: 'theme.SearchModal.searchBox.resetButtonTitle',
-        message: 'Clear the query',
+        message: '清除搜索词',
         description: 'The label and ARIA label for search box reset button',
       }),
       cancelButtonText: translate({
         id: 'theme.SearchModal.searchBox.cancelButtonText',
-        message: 'Cancel',
+        message: '取消',
         description: 'The label and ARIA label for search box cancel button',
       }),
       cancelButtonAriaLabel: translate({
         id: 'theme.SearchModal.searchBox.cancelButtonText',
-        message: 'Cancel',
+        message: '取消',
         description: 'The label and ARIA label for search box cancel button',
       }),
-      // v4
       clearButtonTitle: translate({
         id: 'theme.SearchModal.searchBox.resetButtonTitle',
-        message: 'Clear the query',
+        message: '清除搜索词',
         description: 'The label and ARIA label for search box reset button',
       }),
       clearButtonAriaLabel: translate({
         id: 'theme.SearchModal.searchBox.resetButtonTitle',
-        message: 'Clear the query',
+        message: '清除搜索词',
         description: 'The label and ARIA label for search box reset button',
       }),
       closeButtonText: translate({
         id: 'theme.SearchModal.searchBox.cancelButtonText',
-        message: 'Cancel',
+        message: '取消',
         description: 'The label and ARIA label for search box cancel button',
       }),
       closeButtonAriaLabel: translate({
         id: 'theme.SearchModal.searchBox.cancelButtonText',
-        message: 'Cancel',
+        message: '取消',
         description: 'The label and ARIA label for search box cancel button',
       }),
       placeholderText: translate({
         id: 'theme.SearchModal.searchBox.placeholderText',
-        message: 'Search docs',
+        message: '搜索文档',
         description: 'The placeholder text for the main search input field',
       }),
       placeholderTextAskAi: translate({
         id: 'theme.SearchModal.searchBox.placeholderTextAskAi',
-        message: 'Ask another question...',
+        message: '继续向 AI 提问…',
         description: 'The placeholder text when in AI question mode',
       }),
       placeholderTextAskAiStreaming: translate({
         id: 'theme.SearchModal.searchBox.placeholderTextAskAiStreaming',
-        message: 'Answering...',
+        message: '正在回答…',
         description:
           'The placeholder text for search box when AI is streaming an answer',
       }),
       enterKeyHint: translate({
         id: 'theme.SearchModal.searchBox.enterKeyHint',
-        message: 'search',
+        message: '搜索',
         description: 'The hint for the search box enter key text',
       }),
       enterKeyHintAskAi: translate({
         id: 'theme.SearchModal.searchBox.enterKeyHintAskAi',
-        message: 'enter',
+        message: '回车',
         description: 'The hint for the Ask AI search box enter key text',
       }),
       searchInputLabel: translate({
         id: 'theme.SearchModal.searchBox.searchInputLabel',
-        message: 'Search',
+        message: '搜索',
         description: 'The ARIA label for search input',
       }),
       backToKeywordSearchButtonText: translate({
         id: 'theme.SearchModal.searchBox.backToKeywordSearchButtonText',
-        message: 'Back to keyword search',
+        message: '回到关键词搜索',
         description: 'The text for back to keyword search button',
       }),
       backToKeywordSearchButtonAriaLabel: translate({
         id: 'theme.SearchModal.searchBox.backToKeywordSearchButtonAriaLabel',
-        message: 'Back to keyword search',
+        message: '回到关键词搜索',
         description: 'The ARIA label for back to keyword search button',
       }),
     },
     startScreen: {
       recentSearchesTitle: translate({
         id: 'theme.SearchModal.startScreen.recentSearchesTitle',
-        message: 'Recent',
+        message: '最近搜索',
         description: 'The title for recent searches',
       }),
       noRecentSearchesText: translate({
         id: 'theme.SearchModal.startScreen.noRecentSearchesText',
-        message: 'No recent searches',
+        message: '暂无最近搜索',
         description: 'The text when there are no recent searches',
       }),
       saveRecentSearchButtonTitle: translate({
         id: 'theme.SearchModal.startScreen.saveRecentSearchButtonTitle',
-        message: 'Save this search',
+        message: '保存此搜索',
         description: 'The title for save recent search button',
       }),
       removeRecentSearchButtonTitle: translate({
         id: 'theme.SearchModal.startScreen.removeRecentSearchButtonTitle',
-        message: 'Remove this search from history',
+        message: '从历史中移除此搜索',
         description: 'The title for remove recent search button',
       }),
       favoriteSearchesTitle: translate({
         id: 'theme.SearchModal.startScreen.favoriteSearchesTitle',
-        message: 'Favorite',
+        message: '收藏',
         description: 'The title for favorite searches',
       }),
       removeFavoriteSearchButtonTitle: translate({
         id: 'theme.SearchModal.startScreen.removeFavoriteSearchButtonTitle',
-        message: 'Remove this search from favorites',
+        message: '从收藏中移除此搜索',
         description: 'The title for remove favorite search button',
       }),
       recentConversationsTitle: translate({
         id: 'theme.SearchModal.startScreen.recentConversationsTitle',
-        message: 'Recent conversations',
+        message: '最近会话',
         description: 'The title for recent conversations',
       }),
       removeRecentConversationButtonTitle: translate({
         id: 'theme.SearchModal.startScreen.removeRecentConversationButtonTitle',
-        message: 'Remove this conversation from history',
+        message: '从历史中移除此会话',
         description: 'The title for remove recent conversation button',
       }),
     },
     errorScreen: {
       titleText: translate({
         id: 'theme.SearchModal.errorScreen.titleText',
-        message: 'Unable to fetch results',
+        message: '无法获取结果',
         description: 'The title for error screen',
       }),
       helpText: translate({
         id: 'theme.SearchModal.errorScreen.helpText',
-        message: 'You might want to check your network connection.',
+        message: '请检查你的网络连接。',
         description: 'The help text for error screen',
       }),
     },
     resultsScreen: {
       askAiPlaceholder: translate({
         id: 'theme.SearchModal.resultsScreen.askAiPlaceholder',
-        message: 'Ask AI: ',
+        message: '向 AI 询问：',
         description: 'The placeholder text for Ask AI input',
       }),
     },
     askAiScreen: {
       disclaimerText: translate({
         id: 'theme.SearchModal.askAiScreen.disclaimerText',
-        message:
-          'Answers are generated with AI which can make mistakes. Verify responses.',
+        message: 'AI 生成的回答可能有误，请自行查证。',
         description: 'The disclaimer text for AI answers',
       }),
       relatedSourcesText: translate({
         id: 'theme.SearchModal.askAiScreen.relatedSourcesText',
-        message: 'Related sources',
+        message: '相关来源',
         description: 'The text for related sources',
       }),
       thinkingText: translate({
         id: 'theme.SearchModal.askAiScreen.thinkingText',
-        message: 'Thinking...',
+        message: '思考中…',
         description: 'The text when AI is thinking',
       }),
       copyButtonText: translate({
         id: 'theme.SearchModal.askAiScreen.copyButtonText',
-        message: 'Copy',
+        message: '复制',
         description: 'The text for copy button',
       }),
       copyButtonCopiedText: translate({
         id: 'theme.SearchModal.askAiScreen.copyButtonCopiedText',
-        message: 'Copied!',
+        message: '已复制！',
         description: 'The text for copy button when copied',
       }),
       copyButtonTitle: translate({
         id: 'theme.SearchModal.askAiScreen.copyButtonTitle',
-        message: 'Copy',
+        message: '复制回答',
         description: 'The title for copy button',
       }),
-      likeButtonTitle: translate({
-        id: 'theme.SearchModal.askAiScreen.likeButtonTitle',
-        message: 'Like',
-        description: 'The title for like button',
+      sourcesTitle: translate({
+        id: 'theme.SearchModal.askAiScreen.sourcesTitle',
+        message: '来源',
+        description: 'The title for sources section',
       }),
-      dislikeButtonTitle: translate({
-        id: 'theme.SearchModal.askAiScreen.dislikeButtonTitle',
-        message: 'Dislike',
-        description: 'The title for dislike button',
+      clearButtonText: translate({
+        id: 'theme.SearchModal.askAiScreen.clearButtonText',
+        message: '清除',
+        description: 'The text for clear button',
       }),
-      thanksForFeedbackText: translate({
-        id: 'theme.SearchModal.askAiScreen.thanksForFeedbackText',
-        message: 'Thanks for your feedback!',
-        description: 'The text for thanks for feedback',
+      clearButtonAriaLabel: translate({
+        id: 'theme.SearchModal.askAiScreen.clearButtonText',
+        message: '清除',
+        description: 'The aria-label for clear button',
       }),
-      preToolCallText: translate({
-        id: 'theme.SearchModal.askAiScreen.preToolCallText',
-        message: 'Searching...',
-        description: 'The text before tool call',
+      stopButtonText: translate({
+        id: 'theme.SearchModal.askAiScreen.stopButtonText',
+        message: '停止',
+        description: 'The text for stop button',
       }),
-      duringToolCallText: translate({
-        id: 'theme.SearchModal.askAiScreen.duringToolCallText',
-        message: 'Searching for ',
-        description: 'The text during tool call',
+      stopButtonAriaLabel: translate({
+        id: 'theme.SearchModal.askAiScreen.stopButtonText',
+        message: '停止',
+        description: 'The aria-label for stop button',
       }),
-      afterToolCallText: translate({
-        id: 'theme.SearchModal.askAiScreen.afterToolCallText',
-        message: 'Searched for',
-        description: 'The text after tool call',
+      continueButtonText: translate({
+        id: 'theme.SearchModal.askAiScreen.continueButtonText',
+        message: '继续',
+        description: 'The text for continue button',
       }),
-    },
-    footer: {
-      selectText: translate({
-        id: 'theme.SearchModal.footer.selectText',
-        message: 'Select',
-        description: 'The select text for footer',
+      continueButtonAriaLabel: translate({
+        id: 'theme.SearchModal.askAiScreen.continueButtonText',
+        message: '继续',
+        description: 'The aria-label for continue button',
       }),
-      submitQuestionText: translate({
-        id: 'theme.SearchModal.footer.submitQuestionText',
-        message: 'Submit question',
-        description: 'The submit question text for footer',
-      }),
-      selectKeyAriaLabel: translate({
-        id: 'theme.SearchModal.footer.selectKeyAriaLabel',
-        message: 'Enter key',
-        description: 'The ARIA label for select key in footer',
-      }),
-      navigateText: translate({
-        id: 'theme.SearchModal.footer.navigateText',
-        message: 'Navigate',
-        description: 'The navigate text for footer',
-      }),
-      navigateUpKeyAriaLabel: translate({
-        id: 'theme.SearchModal.footer.navigateUpKeyAriaLabel',
-        message: 'Arrow up',
-        description: 'The ARIA label for navigate up key in footer',
-      }),
-      navigateDownKeyAriaLabel: translate({
-        id: 'theme.SearchModal.footer.navigateDownKeyAriaLabel',
-        message: 'Arrow down',
-        description: 'The ARIA label for navigate down key in footer',
-      }),
-      closeText: translate({
-        id: 'theme.SearchModal.footer.closeText',
-        message: 'Close',
-        description: 'The close text for footer',
-      }),
-      closeKeyAriaLabel: translate({
-        id: 'theme.SearchModal.footer.closeKeyAriaLabel',
-        message: 'Escape key',
-        description: 'The ARIA label for close key in footer',
-      }),
-      poweredByText: translate({
-        id: 'theme.SearchModal.footer.searchByText',
-        message: 'Powered by',
-        description: "The 'Powered by' text for footer",
-      }),
-      searchByText: translate({
-        id: 'theme.SearchModal.footer.searchByText',
-        message: 'Powered by',
-        description: "The 'Powered by' text for footer",
-      }),
-      backToSearchText: translate({
-        id: 'theme.SearchModal.footer.backToSearchText',
-        message: 'Back to search',
-        description: 'The back to search text for footer',
+      responseLegitimacyExplanation: translate({
+        id: 'theme.SearchModal.askAiScreen.responseLegitimacyExplanation',
+        message: '回答由 AI 生成，仅供参考。',
+        description:
+          'Explain that the AI-generated responses may be of questionable legitimacy',
       }),
     },
     noResultsScreen: {
       noResultsText: translate({
         id: 'theme.SearchModal.noResultsScreen.noResultsText',
-        message: 'No results found for',
-        description: 'The text when there are no results',
+        message: '没有找到结果',
+        description: 'The text for no results screen',
       }),
       suggestedQueryText: translate({
         id: 'theme.SearchModal.noResultsScreen.suggestedQueryText',
-        message: 'Try searching for',
+        message: '试试搜索',
         description: 'The text for suggested query',
       }),
       reportMissingResultsText: translate({
         id: 'theme.SearchModal.noResultsScreen.reportMissingResultsText',
-        message: 'Believe this query should return results?',
+        message: '你认为应该有结果吗？',
         description: 'The text for reporting missing results',
       }),
       reportMissingResultsLinkText: translate({
         id: 'theme.SearchModal.noResultsScreen.reportMissingResultsLinkText',
-        message: 'Let us know.',
-        description: 'The link text for reporting missing results',
+        message: '向我们反馈',
+        description: 'The text for the feedback link',
       }),
     },
   },
-  placeholder: translate({
-    id: 'theme.SearchModal.placeholder',
-    message: 'Search docs',
-    description: 'The placeholder of the input of the DocSearch pop-up modal',
-  }),
 };
+
 export default translations;
