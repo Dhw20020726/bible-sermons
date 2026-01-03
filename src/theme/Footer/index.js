@@ -17,14 +17,12 @@ export default function Footer() {
             {siteConfig.tagline || '以圣经为中心分享神的话语与教会讲道。'}
             若有反馈、见证或祷告需求，欢迎随时留言。
           </p>
-          <div className="footer__actions">
-            <button type="button" className="footer__button" onClick={() => setOpen(true)}>
-              Write message
-            </button>
-            <Link className="linkButton" to="/docs">
-              浏览讲道
-            </Link>
-          </div>
+          <button type="button" className="btn" onClick={() => setOpen(true)}>
+            Write message
+          </button>
+          <Link className="btn primary" to="/docs">
+            浏览讲道
+          </Link>
         </div>
 
         <div className="footer__divider" />

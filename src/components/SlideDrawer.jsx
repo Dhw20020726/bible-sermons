@@ -1,7 +1,5 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {createPortal} from 'react-dom';
-import clsx from 'clsx';
-import styles from './SlideDrawer.module.css';
 
 const focusableSelectors = [
   'a[href]',
@@ -107,28 +105,9 @@ export default function SlideDrawer({open, onClose, title, children}) {
   }
 
   return createPortal(
-    <div
-      className={clsx(styles.root, open && styles.rootOpen)}
-      aria-hidden={!open}
-      ref={rootRef}>
-      <div className={styles.overlay} onClick={onClose} />
-      <div
-        className={styles.panel}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title || '侧滑窗'}>
-        <div className={styles.header}>
-          {title ? <h2 className={styles.title}>{title}</h2> : <span aria-hidden="true" />}
-          <button
-            type="button"
-            className={styles.closeButton}
-            aria-label="关闭"
-            onClick={onClose}>
-            ×
-          </button>
-        </div>
-        <div className={styles.content}>{children}</div>
-      </div>
+    <div className={`slidemodal${open ? ' open' : ''}`} aria-hidden={!open} ref={rootRef}>
+      <div className="overlay" onClick={onClose} />
+      {children}
     </div>,
     portalTarget,
   );

@@ -1,6 +1,5 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import SlideDrawer from './SlideDrawer';
-import styles from './ContactDrawer.module.css';
 
 const FORM_ENDPOINT = 'https://form.taxi/s/bible-sermons';
 
@@ -31,11 +30,6 @@ function ContactForm({open, onClose}) {
   }, [open]);
 
   const submitting = status === 'submitting';
-  const feedbackClass = useMemo(() => {
-    if (status === 'success') return styles.feedbackSuccess;
-    if (status === 'error') return styles.feedbackError;
-    return '';
-  }, [status]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -70,59 +64,77 @@ function ContactForm({open, onClose}) {
   };
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit} ref={formRef} noValidate>
-      <div className={styles.field}>
-        <label className={styles.label} htmlFor="contact-name">
-          姓名
-        </label>
-        <input
-          id="contact-name"
-          name="Name"
-          type="text"
-          className={styles.input}
-          required
-          autoComplete="name"
-          placeholder="你的名字"
-        />
+    <form className="window" onSubmit={handleSubmit} ref={formRef} noValidate>
+      <button type="button" className="close" aria-label="关闭" onClick={onClose}>
+        <svg fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+
+      <div className="cont">
+        <h2>
+          Hey! <br />
+          Tell us about your plans
+        </h2>
+
+        <fieldset>
+          <div className="cols">
+            <div>
+              <label className="inpt" htmlFor="contact-name">
+                Name &amp; Company
+              </label>
+              <input
+                className="inpt"
+                id="contact-name"
+                name="Name"
+                type="text"
+                required
+                maxLength={50}
+                autoComplete="name"
+              />
+            </div>
+            <div>
+              <label className="inpt" htmlFor="contact-email">
+                Your email address
+              </label>
+              <input
+                className="inpt"
+                id="contact-email"
+                name="Email"
+                type="email"
+                required
+                maxLength={250}
+                autoComplete="email"
+              />
+            </div>
+          </div>
+
+          <div className="text">
+            <label className="inpt" htmlFor="contact-message">
+              Your message
+            </label>
+            <textarea
+              className="inpt"
+              id="contact-message"
+              name="Message"
+              required
+              maxLength={1000}
+            />
+          </div>
+        </fieldset>
       </div>
 
-      <div className={styles.field}>
-        <label className={styles.label} htmlFor="contact-email">
-          邮箱
-        </label>
-        <input
-          id="contact-email"
-          name="Email"
-          type="email"
-          className={styles.input}
-          required
-          autoComplete="email"
-          placeholder="name@example.com"
-        />
-      </div>
-
-      <div className={styles.field}>
-        <label className={styles.label} htmlFor="contact-message">
-          留言
-        </label>
-        <textarea
-          id="contact-message"
-          name="Message"
-          className={styles.textarea}
-          required
-          placeholder="请写下你的问题、祷告需求或建议"
-        />
-      </div>
-
-      <div className={styles.actions}>
-        <button className={styles.submit} type="submit" disabled={submitting}>
-          {submitting ? '发送中…' : '提交留言'}
+      <div className="btnbar">
+        <p>
+          Our e-mail <a href="mailto:support@form.taxi">support@form.taxi</a>
+        </p>
+        <button className="btn primary" type="submit" disabled={submitting}>
+          {submitting ? 'Sending…' : 'Submit'}
         </button>
-        <p className={styles.helper}>我们会尽快回复，感谢你的联系。</p>
       </div>
 
-      <div role="status" aria-live="polite" className={`${styles.feedback} ${feedbackClass}`}>
-        {feedback}
+      <div role="status" aria-live="polite" className="inpt">
+        {feedback ? <strong>{feedback}</strong> : null}
       </div>
     </form>
   );
@@ -131,9 +143,6 @@ function ContactForm({open, onClose}) {
 export default function ContactDrawer({open, onClose}) {
   return (
     <SlideDrawer open={open} onClose={onClose} title="Write message">
-      <p className={styles.intro}>
-        欢迎留言交流，分享你的见证、祷告请求或改进建议。我们会在收到后尽快与您联系。
-      </p>
       <ContactForm open={open} onClose={onClose} />
     </SlideDrawer>
   );
