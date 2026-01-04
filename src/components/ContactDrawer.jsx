@@ -136,11 +136,10 @@ function ContactForm({open, onClose}) {
             <label className="inpt-label" htmlFor="contact-message">
               Your message
             </label>
-            <input
-              className="inpt"
+            <textarea
+              className="inpt inpt--msg"
               id="contact-message"
               name="Message"
-              type="text"
               required
               maxLength={1000}
               autoComplete="off"

@@ -359,10 +359,10 @@ html[data-theme='dark'] .homeSecondaryButton {
 }
 
 .slidemodal .cont {
-  padding: 2rem 2rem 0;
+  padding: 1.5rem 1.5rem 0;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
   overflow-y: auto;
   flex: 1 1 auto;
 }
@@ -413,30 +413,35 @@ label.inpt-label {
   padding: 0.9rem 1rem;
   line-height: 1.6;
   box-sizing: border-box;
-  outline-offset: 2px;
+  outline: none;
   -webkit-appearance: none;
   appearance: none;
 }
 
 .inpt:focus {
-  outline-style: solid;
-  outline-width: 2px;
-  outline-offset: 2px;
-  outline-color: #3f83f8;
-  box-shadow: none;
+  outline: none;
+  box-shadow: 0 0 0 2px #3f83f8;
 }
 
 .inpt:focus-visible {
-  outline-style: solid;
-  outline-width: 2px;
-  outline-offset: 2px;
-  outline-color: #3f83f8;
+  outline: none;
+  box-shadow: 0 0 0 2px #3f83f8;
+}
+
+.inpt:focus:not(:focus-visible) {
+  outline: none;
   box-shadow: none;
 }
 
 .inpt:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.inpt--msg {
+  min-height: 6rem;
+  min-height: clamp(5.5rem, 16vh, 8rem);
+  resize: vertical;
 }
 
 .btn {
