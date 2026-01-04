@@ -310,11 +310,21 @@ html[data-theme='dark'] .homeSecondaryButton {
   max-width: 42rem;
   min-width: 360px;
   background: #fff;
+  color: #0f172a;
+  color-scheme: light;
   transform: translateX(100%);
   transition: transform 0.15s ease;
   display: flex;
   flex-direction: column;
   position: relative;
+}
+
+.slidemodal .window * {
+  color: inherit;
+}
+
+.slidemodal h2 {
+  margin: 0;
 }
 
 .slidemodal.open .window {
@@ -365,10 +375,11 @@ html[data-theme='dark'] .homeSecondaryButton {
 
 .slidemodal .btnbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 1rem;
   padding: 2rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 label.inpt {
@@ -394,10 +405,20 @@ label.inpt-label {
   color: #0f172a;
   border: none;
   box-sizing: border-box;
+  outline-offset: 2px;
+}
+
+.inpt:focus {
+  outline: 2px solid #3f83f8;
 }
 
 .inpt:focus-visible {
   outline: 2px solid #3f83f8;
+}
+
+textarea.inpt {
+  resize: none;
+  min-height: clamp(8rem, 24vh, 14rem);
 }
 
 .btn {
@@ -405,12 +426,14 @@ label.inpt-label {
   align-items: center;
   justify-content: center;
   padding: 0.75rem 1.25rem;
+  min-height: 3rem;
   background: #e2e8f0;
   border-radius: 0.25rem;
   font-weight: 600;
   cursor: pointer;
-  border: none;
+  border: 1px solid transparent;
   color: #475569;
+  transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
 }
 
 .btn:hover {
@@ -424,4 +447,46 @@ label.inpt-label {
 
 .btn.primary:hover {
   background: #356dcf;
+}
+
+.btn.primary:disabled {
+  background: transparent;
+  color: rgba(63, 131, 248, 0.5);
+  border-color: rgba(63, 131, 248, 0.3);
+  cursor: not-allowed;
+}
+
+.btn[aria-busy='true'] {
+  cursor: progress;
+}
+
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 9999px;
+  margin-right: 0.5rem;
+  display: inline-block;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.slidemodal .btnbar p {
+  margin: 0;
+  flex: 1 1 auto;
+}
+
+.slidemodal .btnbar .btn {
+  margin-left: auto;
+}
+
+.slidemodal .btnbar a {
+  color: inherit;
+  font-weight: 700;
 }

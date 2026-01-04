@@ -6,6 +6,7 @@ const FORM_ENDPOINT = 'https://form.taxi/s/nazc3qhm';
 function ContactForm({open, onClose}) {
   const [status, setStatus] = useState('idle');
   const [feedback, setFeedback] = useState('');
+  const [canSubmit, setCanSubmit] = useState(false);
   const formRef = useRef(null);
 
   useEffect(() => {
@@ -26,7 +27,26 @@ function ContactForm({open, onClose}) {
     }
     setStatus('idle');
     setFeedback('');
+    setCanSubmit(false);
     formRef.current?.reset();
+  }, [open]);
+
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) {
+      return undefined;
+    }
+
+    const handleInput = () => {
+      setCanSubmit(form.checkValidity());
+    };
+
+    handleInput();
+    form.addEventListener('input', handleInput);
+
+    return () => {
+      form.removeEventListener('input', handleInput);
+    };
   }, [open]);
 
   const submitting = status === 'submitting';
@@ -56,12 +76,15 @@ function ContactForm({open, onClose}) {
       setStatus('success');
       setFeedback('发送成功！感谢你的留言。');
       form.reset();
+      setCanSubmit(false);
     } catch (error) {
       console.error('Submit failed', error);
       setStatus('error');
       setFeedback('发送失败，请稍后重试。');
     }
   };
+
+  const isDisabled = submitting || !canSubmit;
 
   return (
     <form className="window" onSubmit={handleSubmit} ref={formRef} noValidate>
@@ -128,8 +151,15 @@ function ContactForm({open, onClose}) {
         <p>
           Our e-mail <a href="mailto:support@form.taxi">support@form.taxi</a>
         </p>
-        <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Sending…' : 'Submit'}
+        <button className="btn primary" type="submit" disabled={isDisabled} aria-busy={submitting}>
+          {submitting ? (
+            <>
+              <span className="spinner" aria-hidden />
+              Sending…
+            </>
+          ) : (
+            'Submit'
+          )}
         </button>
       </div>
 
