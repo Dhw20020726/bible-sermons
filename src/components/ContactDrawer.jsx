@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import SlideDrawer from './SlideDrawer';
 
-const FORM_ENDPOINT = 'https://form.taxi/s/bible-sermons';
+const FORM_ENDPOINT = 'https://form.taxi/s/nazc3qhm';
 
 function ContactForm({open, onClose}) {
   const [status, setStatus] = useState('idle');
