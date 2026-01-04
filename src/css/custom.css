@@ -373,6 +373,12 @@ html[data-theme='dark'] .homeSecondaryButton {
   gap: 2rem;
 }
 
+.message-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 @media (min-width: 640px) {
   .slidemodal .cols {
     flex-direction: row;

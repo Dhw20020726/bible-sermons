@@ -7,6 +7,7 @@ function ContactForm({open, onClose}) {
   const [status, setStatus] = useState('idle');
   const [feedback, setFeedback] = useState('');
   const [canSubmit, setCanSubmit] = useState(false);
+  const [messageLines, setMessageLines] = useState(['', '', '']);
   const formRef = useRef(null);
 
   useEffect(() => {
@@ -28,6 +29,7 @@ function ContactForm({open, onClose}) {
     setStatus('idle');
     setFeedback('');
     setCanSubmit(false);
+    setMessageLines(['', '', '']);
     formRef.current?.reset();
   }, [open]);
 
@@ -54,8 +56,14 @@ function ContactForm({open, onClose}) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
+    const combinedMessage = messageLines.join('\n');
     if (!form.checkValidity()) {
       form.reportValidity();
+      return;
+    }
+    if (!combinedMessage.trim()) {
+      setFeedback('请填写留言。');
+      form.querySelector('[data-message-line="0"]')?.focus();
       return;
     }
     setStatus('submitting');
@@ -77,6 +85,7 @@ function ContactForm({open, onClose}) {
       setFeedback('发送成功！感谢你的留言。');
       form.reset();
       setCanSubmit(false);
+      setMessageLines(['', '', '']);
     } catch (error) {
       console.error('Submit failed', error);
       setStatus('error');
@@ -136,13 +145,28 @@ function ContactForm({open, onClose}) {
             <label className="inpt-label" htmlFor="contact-message">
               Your message
             </label>
-            <textarea
-              className="inpt"
-              id="contact-message"
-              name="Message"
-              required
-              maxLength={1000}
-            />
+            <div className="message-lines">
+              {messageLines.map((line, index) => (
+                <input
+                  key={index}
+                  className="inpt"
+                  id={index === 0 ? 'contact-message' : undefined}
+                  data-message-line={index}
+                  name={`Message line ${index + 1}`}
+                  type="text"
+                  required={index === 0}
+                  maxLength={1000}
+                  value={line}
+                  onChange={(e) => {
+                    const next = [...messageLines];
+                    next[index] = e.target.value;
+                    setMessageLines(next);
+                  }}
+                  autoComplete={index === 0 ? 'off' : 'off'}
+                />
+              ))}
+            </div>
+            <input type="hidden" name="Message" value={messageLines.join('\n')} />
           </div>
         </fieldset>
       </div>
