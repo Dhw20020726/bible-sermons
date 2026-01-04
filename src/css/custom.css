@@ -505,6 +505,10 @@ label.inpt-label {
   font-weight: 700;
 }
 
+body.contact-drawer-open .navbarHideable_m1mJ {
+  display: none;
+}
+
 @media (max-width: 480px) {
   .slidemodal .window {
     max-width: calc(100% - 1rem);

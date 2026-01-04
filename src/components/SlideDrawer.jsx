@@ -43,12 +43,26 @@ function useBodyScrollLock(open) {
   }, [open]);
 }
 
+function useNavbarVisibility(open) {
+  useEffect(() => {
+    const {classList} = document.body;
+    if (open) {
+      classList.add('contact-drawer-open');
+    } else {
+      classList.remove('contact-drawer-open');
+    }
+
+    return () => classList.remove('contact-drawer-open');
+  }, [open]);
+}
+
 export default function SlideDrawer({open, onClose, title, children}) {
   const isMounted = useIsMounted();
   const rootRef = useRef(null);
   const lastActiveRef = useRef(null);
 
   useBodyScrollLock(open);
+  useNavbarVisibility(open);
 
   useEffect(() => {
     if (!open) {
