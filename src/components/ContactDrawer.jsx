@@ -60,7 +60,6 @@ function ContactForm({open, onClose}) {
     }
     setStatus('submitting');
     setFeedback('');
-    const start = performance.now();
 
     const formData = new FormData(form);
     try {
@@ -74,21 +73,12 @@ function ContactForm({open, onClose}) {
         throw new Error('Submit failed');
       }
 
-      const elapsed = performance.now() - start;
-      if (elapsed < 600) {
-        await new Promise((resolve) => window.setTimeout(resolve, 600 - elapsed));
-      }
-
       setStatus('success');
       setFeedback('发送成功！感谢你的留言。');
       form.reset();
       setCanSubmit(false);
     } catch (error) {
       console.error('Submit failed', error);
-      const elapsed = performance.now() - start;
-      if (elapsed < 600) {
-        await new Promise((resolve) => window.setTimeout(resolve, 600 - elapsed));
-      }
       setStatus('error');
       setFeedback('发送失败，请稍后重试。');
     }
@@ -162,14 +152,7 @@ function ContactForm({open, onClose}) {
           Our e-mail <a href="mailto:support@form.taxi">support@form.taxi</a>
         </p>
         <button className="btn primary" type="submit" disabled={isDisabled} aria-busy={submitting}>
-          {submitting ? (
-            <>
-              <span className="spinner" aria-hidden />
-              Sending…
-            </>
-          ) : (
-            'Submit'
-          )}
+          {submitting ? 'Sending…' : 'Submit'}
         </button>
       </div>
 
