@@ -373,12 +373,6 @@ html[data-theme='dark'] .homeSecondaryButton {
   gap: 2rem;
 }
 
-.message-lines {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
 @media (min-width: 640px) {
   .slidemodal .cols {
     flex-direction: row;
@@ -411,21 +405,23 @@ label.inpt-label {
 
 .inpt {
   width: 100%;
-  background: #f3f4f6;
-  border-radius: 0.25rem;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  color: #0f172a;
-  border: none;
+  font: inherit;
+  color: inherit;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: transparent;
+  padding: 0.9rem 1rem;
+  line-height: 1.6;
   box-sizing: border-box;
-  outline-offset: 0;
-  box-shadow: none;
+  outline-offset: 2px;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .inpt:focus {
   outline-style: solid;
   outline-width: 2px;
-  outline-offset: 0;
+  outline-offset: 2px;
   outline-color: #3f83f8;
   box-shadow: none;
 }
@@ -433,40 +429,20 @@ label.inpt-label {
 .inpt:focus-visible {
   outline-style: solid;
   outline-width: 2px;
-  outline-offset: 0;
+  outline-offset: 2px;
   outline-color: #3f83f8;
   box-shadow: none;
 }
 
-[multiple].inpt:focus-visible,
-[type='date'].inpt:focus-visible,
-[type='datetime-local'].inpt:focus-visible,
-[type='email'].inpt:focus-visible,
-[type='month'].inpt:focus-visible,
-[type='number'].inpt:focus-visible,
-[type='password'].inpt:focus-visible,
-[type='search'].inpt:focus-visible,
-[type='tel'].inpt:focus-visible,
-[type='text'].inpt:focus-visible,
-[type='time'].inpt:focus-visible,
-[type='url'].inpt:focus-visible,
-[type='week'].inpt:focus-visible,
-select.inpt:focus-visible,
-textarea.inpt:focus-visible {
-  outline-style: solid;
-  outline-width: 2px;
-  outline-offset: 0;
-  outline-color: #3f83f8;
-  box-shadow: none;
+.inpt:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-textarea.inpt {
-  resize: none;
-  height: auto;
-  min-height: 5rem;
-  min-height: clamp(4.5rem, 16vh, 6.5rem);
-  line-height: 1.4;
-  transition: min-height 0.2s ease;
+.inpt--msg {
+  min-height: 6.5rem;
+  min-height: clamp(6rem, 18vh, 7.5rem);
+  resize: vertical;
 }
 
 .btn {
