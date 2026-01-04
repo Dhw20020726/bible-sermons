@@ -432,9 +432,31 @@ label.inpt-label {
   box-shadow: inset 0 0 0 1px #3f83f8;
 }
 
+[multiple].inpt:focus-visible,
+[type='date'].inpt:focus-visible,
+[type='datetime-local'].inpt:focus-visible,
+[type='email'].inpt:focus-visible,
+[type='month'].inpt:focus-visible,
+[type='number'].inpt:focus-visible,
+[type='password'].inpt:focus-visible,
+[type='search'].inpt:focus-visible,
+[type='tel'].inpt:focus-visible,
+[type='text'].inpt:focus-visible,
+[type='time'].inpt:focus-visible,
+[type='url'].inpt:focus-visible,
+[type='week'].inpt:focus-visible,
+select.inpt:focus-visible,
+textarea.inpt:focus-visible {
+  outline-style: solid;
+  outline-width: 2px;
+  outline-offset: 0;
+  outline-color: #3f83f8;
+  box-shadow: inset 0 0 0 1px #3f83f8;
+}
+
 textarea.inpt {
   resize: none;
-  min-height: clamp(6rem, 20vh, 12rem);
+  min-height: clamp(5rem, 18vh, 10rem);
   transition: min-height 0.2s ease;
 }
 
