@@ -439,12 +439,6 @@ label.inpt-label {
   cursor: not-allowed;
 }
 
-.inpt--msg {
-  min-height: 6.5rem;
-  min-height: clamp(6rem, 18vh, 7.5rem);
-  resize: vertical;
-}
-
 .btn {
   display: inline-flex;
   align-items: center;
