@@ -1,98 +1,38 @@
 # bible-sermons
 
-本项目用于“按圣经卷书系统性分享神的话语与教会讲道”，以 Docusaurus 构建静态站点，适合在 GitHub Pages 上部署与维护。
+本项目用 Docusaurus 构建圣经讲道站点，内容按旧约/新约与卷书目录组织，适合 GitHub Pages 部署。
 
-## 项目目的
+## 内容维护
 
-- 以中文卷书目录整理讲道与灵修内容
-- 按旧约与新约系统性阅读
-- 让经文、讲道与默想可以持续积累与分享
-
-## 如何维护讲道内容
-
-1. 在 `docs/` 中选择对应卷书文件夹，例如 `docs/old-testament/创世记/`。
-2. 新增 Markdown 文件，例如 `sermon-01.md`。
-3. 文件中需包含 YAML Front Matter，例如：
+在 `docs/` 中选择对应卷书目录（如 `docs/old-testament/创世记/`），新增 Markdown 文件并填写 Front Matter：
 
 ```markdown
 ---
 title: 讲道标题
 ---
-
-内容正文...
+正文内容...
 ```
 
-## 使用 Docusaurus + GitHub Pages 部署
+## 站点部署
 
-- 本站点使用 Docusaurus（JavaScript）构建
-- 部署路径：`https://Dhw20020726.github.io/bible-sermons`
+GitHub Pages 部署地址：`https://Dhw20020726.github.io/bible-sermons`。
 
-常用命令：
+## 经文占位符与多节标记
 
-```bash
-npm install
-npm run start
-npm run build
-npm run deploy
+在 Markdown 中使用 `[[bible passage="卷书 章:节"]]` 插入经文，例如：
+
+```markdown
+[[bible passage="创世记 2:7"]]
 ```
 
-## Algolia 搜索索引
+经文内容来自 `static/bible/<版本>/` 的章节文本文件，默认版本为 `cmn-cu89s_readaloud`。当某一行同时代表多节时，可在**行首**写入标记：
 
-- `.env` 支持冒号分隔的键名（例如 `Application ID:xxx`）；在 CI/生产环境可直接提供下列环境变量：`ALGOLIA_APP_ID`、`ALGOLIA_SEARCH_API_KEY`、`ALGOLIA_WRITE_API_KEY`/`ALGOLIA_ADMIN_API_KEY`、`ALGOLIA_INDEX_NAME`。
-- 生成/上传索引用到的命令：
-
-```bash
-npm run index:generate   # 仅生成 build/algolia-index.json
-npm run index:upload     # 仅上传/覆盖到 Algolia（需 Write/Admin/Admin Key）
-npm run index:all        # 一次性生成并上传
+```text
+[[verses=2]]这行文本代表连续两节，会同时映射到 27 与 28。
 ```
 
-索引生成/上传现已合并在 `scripts/algoliaIndex.js` 中，会在生成阶段展开 Markdown 中的 `[[bible ...]]` 占位符，把静态经文文本写入索引，便于搜索。
+也支持 `[[span=2]]`，含义相同。标记后的后续节号会按跨度递增。
 
-GitHub Actions 的 `deploy.yml` 已在构建后自动执行 `npm run index:all`，记得在仓库 Secret 中配置上述变量。
+## 索引与搜索
 
-## 讲道文档中的锚点跳转写法（最佳实践）
-
-`anchor-auto` 插件会为“经文摘录 / 讲道正文”两栏生成互跳链接。常用场景与写法如下：
-
-1) **默认自动插入（最简便）**  
-   只写三级标题，插件会在标题下方自动插入跳转按钮。无需额外标签。  
-   ```markdown
-   ### 创世记 2:7
-   [[bible passage="创世记 2:7"]]
-   ```
-
-2) **禁止自动插入**  
-   在该三级标题下一行写 `<AnchorAutoSkip />`，插件会移除此标记并跳过自动生成。  
-   ```markdown
-   ### 创世记 2:7
-   <AnchorAutoSkip />
-   [[bible passage="创世记 2:7"]]
-   ```
-
-3) **手动放置跳转（需要自定义文案/位置时）**  
-   - 用 `<AnchorJump>` 直接写入，需提供 `id` 与 `to`（指向对端锚点），可自定义 `label`。  
-     ```markdown
-     ### 创世记 2:7
-     <AnchorJump id="sermon-创世记-2-7" to="excerpt-创世记-2-7" label="返回经文" />
-     正文内容……
-     ```
-   - 如果只想写最少字段，可用 `<AnchorAuto>`（它会被转成 `<AnchorJump>`）：  
-     - `slug`：不写则自动用标题生成（如“创世记 2:7”→`创世记-2-7`）。  
-     - `mode`：`sermon` 表示当前在讲道正文，会跳到经文；`excerpt` 反之。默认根据二级标题自动推断。  
-     - `label`：自定义按钮文本；不写则用默认“→ 讲道 / → 经文”，若标签内写了子文本且没给 `label`，会保留子文本。  
-     示例：  
-     ```markdown
-     ### 创世记 2:7
-     <AnchorAuto mode="sermon" label="跳到经文" />
-     正文内容……
-     ```
-
-**提示**  
-- 若你已手写 `<AnchorJump>` 或 `<AnchorAuto>`，同一三级标题下的自动插入会被跳过，使用你的标签。  
-- 默认生成的 `id`/`to` 形如 `sermon-创世记-2-7` 与 `excerpt-创世记-2-7`，可按需手写覆盖。  
-
-## 圣经经文资源
-
-- 《圣经·新标点和合本（简体中文）》PDF 下载  
-  https://ebible.org/pdf/cmn-cu89s/
+Algolia 索引由 `scripts/algoliaIndex.js` 生成/上传，构建时会展开 `[[bible ...]]` 占位符以便搜索。
