@@ -136,6 +136,33 @@ function loadChapterLines(baseDir, version, mapping, book, chapter) {
   return lines;
 }
 
+function buildVerseMap(lines) {
+  const verseMap = new Map();
+  let verseNumber = 1;
+  const spanPattern = /^\[\[\s*(?:verses|span)\s*=\s*(\d+)\s*\]\]\s*/;
+
+  for (let i = 2; i < lines.length; i += 1) {
+    const rawLine = lines[i];
+    if (rawLine === undefined) continue;
+    let lineText = rawLine.trim();
+    let span = 1;
+    const spanMatch = lineText.match(spanPattern);
+    if (spanMatch) {
+      span = Number.parseInt(spanMatch[1], 10);
+      lineText = lineText.slice(spanMatch[0].length).trim();
+    }
+    if (Number.isNaN(span) || span < 1) {
+      span = 1;
+    }
+    for (let offset = 0; offset < span; offset += 1) {
+      verseMap.set(verseNumber + offset, lineText);
+    }
+    verseNumber += span;
+  }
+
+  return verseMap;
+}
+
 function renderPassage({baseDir, version, passage}) {
   try {
     const mapping = buildBookIndex(baseDir, version);
@@ -144,10 +171,10 @@ function renderPassage({baseDir, version, passage}) {
 
     for (const segment of segments) {
       const lines = loadChapterLines(baseDir, version, mapping, segment.book, segment.chapter);
+      const verseMap = buildVerseMap(lines);
       for (const range of segment.ranges) {
         for (let v = range.start; v <= range.end; v += 1) {
-          const lineIndex = v + 1; // 0: 卷书名, 1: 章号, 2: 第1节
-          const text = (lines[lineIndex] || '').trim();
+          const text = (verseMap.get(v) || '').trim();
           const verseText =
             text || `[${segment.book} ${segment.chapter}:${v} 未找到内容]`;
           verses.push({
