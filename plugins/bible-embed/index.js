@@ -154,10 +154,13 @@ function buildVerseMap(lines) {
     if (Number.isNaN(span) || span < 1) {
       span = 1;
     }
+    const start = verseNumber;
+    const end = verseNumber + span - 1;
+    const entry = {start, end, text: lineText};
     for (let offset = 0; offset < span; offset += 1) {
-      verseMap.set(verseNumber + offset, lineText);
+      verseMap.set(verseNumber + offset, entry);
     }
-    verseNumber += span;
+    verseNumber = end + 1;
   }
 
   return verseMap;
@@ -173,12 +176,23 @@ function renderPassage({baseDir, version, passage}) {
       const lines = loadChapterLines(baseDir, version, mapping, segment.book, segment.chapter);
       const verseMap = buildVerseMap(lines);
       for (const range of segment.ranges) {
+        let lastEntry = null;
         for (let v = range.start; v <= range.end; v += 1) {
-          const text = (verseMap.get(v) || '').trim();
+          const entry = verseMap.get(v);
+          if (entry && entry === lastEntry) {
+            continue;
+          }
+          lastEntry = entry;
+          const text = (entry && entry.text ? entry.text : '').trim();
+          const number = entry
+            ? entry.start === entry.end
+              ? String(entry.start)
+              : `${entry.start}-${entry.end}`
+            : String(v);
           const verseText =
-            text || `[${segment.book} ${segment.chapter}:${v} 未找到内容]`;
+            text || `[${segment.book} ${segment.chapter}:${number} 未找到内容]`;
           verses.push({
-            number: v,
+            number,
             text: verseText,
             missing: !text,
           });
