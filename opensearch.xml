@@ -4,7 +4,7 @@
   <ShortName>Bible Sermons</ShortName>
   <Description>Search Bible Sermons</Description>
   <InputEncoding>UTF-8</InputEncoding>
-  <Url type="text/html" method="get" template="https://Dhw20020726.github.io/bible-sermons/search?q={searchTerms}"/>
-  <Url type="application/opensearchdescription+xml" rel="self" template="https://Dhw20020726.github.io/bible-sermons/opensearch.xml" />
-  <moz:SearchForm>https://Dhw20020726.github.io/bible-sermons/</moz:SearchForm>
+  <Url type="text/html" method="get" template="https://dhw20020726.github.io/bible-sermons/search?q={searchTerms}"/>
+  <Url type="application/opensearchdescription+xml" rel="self" template="https://dhw20020726.github.io/bible-sermons/opensearch.xml" />
+  <moz:SearchForm>https://dhw20020726.github.io/bible-sermons/</moz:SearchForm>
 </OpenSearchDescription>
