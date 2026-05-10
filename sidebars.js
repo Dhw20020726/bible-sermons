@@ -1,6 +1,13 @@
+/**
+ * @fileoverview Docusaurus 侧边栏配置。
+ * 自动扫描 docs/ 下的旧约/新约目录，按圣经卷书顺序生成可折叠的侧边栏导航。
+ * 每卷书作为一个 category，其中的 .md 文件作为条目，按中文拼音排序。
+ */
+
 const fs = require('fs');
 const path = require('path');
 
+/** 圣经卷书顺序：旧约 39 卷 + 新约 27 卷，按正典顺序排列 */
 const BOOK_ORDER = {
   'old-testament': [
     '创世记',
@@ -77,14 +84,21 @@ const BOOK_ORDER = {
 const DOCS_DIR = path.join(__dirname, 'docs');
 const SORT_LOCALE = 'zh-Hans-CN';
 
+/** 按中文拼音排序目录条目 */
 const sortByName = (a, b) =>
   a.name.localeCompare(b.name, SORT_LOCALE, { numeric: true, sensitivity: 'base' });
 
+/** 判断文件名是否为文档文件（.md 或 .mdx） */
 const isDocFile = (fileName) => {
   const ext = path.extname(fileName).toLowerCase();
   return ext === '.md' || ext === '.mdx';
 };
 
+/**
+ * 递归收集指定目录下所有文档的 Docusaurus ID。
+ * @param {string} relativeDir - 相对于 docs/ 的目录路径
+ * @returns {string[]} ID 数组，格式为 "old-testament/创世记/讲道标题"
+ */
 const getDocIdsForDir = (relativeDir) => {
   const absoluteDir = path.join(DOCS_DIR, relativeDir);
   if (!fs.existsSync(absoluteDir)) {
@@ -123,6 +137,11 @@ const formatTestamentDescription = (testamentLabel, bookCount, docCount) => {
   return `${testamentLabel} 共 ${bookCount} 卷书，${docCount} 篇讲道`;
 };
 
+/**
+ * 为某个约书（old-testament/new-testament）构建侧边栏 category 列表。
+ * @param {string} testamentDir - 约书目录名
+ * @returns {Array<{type: 'category', label: string, collapsed: boolean, items: string[]}>}
+ */
 const buildTestamentItems = (testamentDir) => {
   const bookOrder = BOOK_ORDER[testamentDir] || [];
   return bookOrder
@@ -145,6 +164,12 @@ const buildTestamentItems = (testamentDir) => {
     });
 };
 
+/**
+ * 统计某个约书的卷书数量和讲道篇数，生成描述文本。
+ * @param {string} testamentDir - 约书目录名
+ * @param {string} label - 显示标签（"旧约"/"新约"）
+ * @returns {{books: string[], docCount: number, description: string}}
+ */
 const buildTestamentMeta = (testamentDir, label) => {
   const bookOrder = BOOK_ORDER[testamentDir] || [];
   const books = bookOrder.filter((book) =>

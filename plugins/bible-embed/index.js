@@ -1,5 +1,29 @@
+/**
+ * @fileoverview Docusaurus remark 插件 —— 圣经经文嵌入。
+ *
+ * 在 Markdown 解析阶段，扫描文本中的 [[bible passage="创世记 2:7"]] 占位符，
+ * 从 static/bible/<版本>/ 的 .txt 文件中读取真实经文内容，
+ * 替换为 <blockquote class="bible-text"> 的 HTML AST 节点。
+ *
+ * 数据来源：static/bible/cmn-cu89s_readaloud/ 下的 .txt 文件，
+ * 格式为每行一节经文。特殊标记 [[verses=N]] 表示一行覆盖连续 N 节。
+ *
+ * 对外导出 buildBookIndex 和 loadChapterLines 供 scripts/ 复用。
+ *
+ * 核心流程：
+ *   Markdown 文本 → 正则匹配占位符 → parsePassage() 解析引用
+ *   → buildBookIndex() 定位文件 → loadChapterLines() 读取章节
+ *   → buildVerseMap() 构建经文映射 → renderPassage() 生成 AST
+ */
+
 const fs = require('fs');
 const path = require('path');
+const {normalizeBookName, parseAttributes, parseSegment, parsePassage} = require('../../lib/bible-parser');
+
+/**
+ * 深度优先遍历 MDAST 语法树，对匹配类型的节点执行回调。
+ * 返回值为数字时跳过该节点的子节点（优化遍历）。
+ */
 function visit(node, type, callback, index = null, parent = null) {
   if (!node) return;
   if (node.type === type) {
@@ -16,30 +40,22 @@ function visit(node, type, callback, index = null, parent = null) {
   }
 }
 
+/** 默认圣经版本目录名 */
 const DEFAULT_VERSION = 'cmn-cu89s_readaloud';
+
+/** 缓存已构建的书名索引，避免重复扫描文件系统 */
 const CACHE = new Map();
 
-function normalizeBookName(name) {
-  if (!name) return '';
-  return String(name)
-    .replace(/^\uFEFF/, '')
-    .replace(/[．。.]$/g, '')
-    .trim();
-}
-
-function parseAttributes(raw) {
-  const attrs = {};
-  const regex = /(\w+)\s*=\s*"([^"]*)"|(\w+)\s*=\s*'([^']*)'/g;
-  let match;
-  // eslint-disable-next-line no-cond-assign
-  while ((match = regex.exec(raw))) {
-    const key = match[1] || match[3];
-    const value = match[2] || match[4] || '';
-    attrs[key] = value;
-  }
-  return attrs;
-}
-
+/**
+ * 构建"书名 → 文件信息"索引。
+ * 扫描 static/bible/<version>/ 下所有 _read.txt 文件，
+ * 读取每文件第一行（书名），建立映射。
+ *
+ * 文件名格式：<prefix>_<seq>_<abbr>_<chapter>_read.txt
+ * 例如：cmn-cu89s_001_GEN_001_read.txt
+ *
+ * @returns {Map<string, {seq: string, abbr: string, prefix: string, chapterDigits: number}>}
+ */
 function buildBookIndex(baseDir, version) {
   const cacheKey = `${baseDir}::${version}`;
   if (CACHE.has(cacheKey)) {
@@ -58,7 +74,7 @@ function buildBookIndex(baseDir, version) {
     );
     if (!match) continue;
     const {prefix, seq, abbr, chapter} = match.groups;
-    if (seq === '000' && abbr === '000') continue;
+    if (seq === '000' && abbr === '000') continue; // 跳过索引文件
     const fullPath = path.join(versionDir, file);
     const firstLine = fs.readFileSync(fullPath, 'utf8').split(/\r?\n/)[0];
     const bookName = normalizeBookName(firstLine);
@@ -72,59 +88,16 @@ function buildBookIndex(baseDir, version) {
   return byBook;
 }
 
-function parseSegment(rawSegment, fallbackBook) {
-  const segment = rawSegment.trim();
-  if (!segment) return null;
-
-  const bookMatch = segment.match(/^(?<book>[\u4e00-\u9fffA-Za-z0-9]+)\s+(?<rest>.+)$/);
-  const book = bookMatch ? normalizeBookName(bookMatch.groups.book) : fallbackBook;
-  const versePart = bookMatch ? bookMatch.groups.rest : segment;
-  const match = versePart.match(/^(?<chapter>\d+)\s*:\s*(?<verses>.+)$/);
-  if (!match || !book) return null;
-
-  const chapter = Number.parseInt(match.groups.chapter, 10);
-  const ranges = match.groups.verses
-    .split(/[;,，；]/)
-    .map((piece) => piece.trim())
-    .filter(Boolean)
-    .map((piece) => {
-      const [startRaw, endRaw] = piece.split('-').map((p) => p && p.trim());
-      const start = Number.parseInt(startRaw, 10);
-      const end = endRaw ? Number.parseInt(endRaw, 10) : start;
-      if (Number.isNaN(start) || Number.isNaN(end)) return null;
-      return {start, end: Math.max(start, end)};
-    })
-    .filter(Boolean);
-
-  if (Number.isNaN(chapter) || ranges.length === 0) return null;
-  return {book, chapter, ranges};
-}
-
-function parsePassage(passage) {
-  const trimmed = (passage || '').trim();
-  if (!trimmed) {
-    throw new Error('passage 不能为空');
-  }
-  const [bookPart, ...restParts] = trimmed.split(/\s+/);
-  const fallbackBook = normalizeBookName(bookPart);
-  const rest = restParts.join(' ');
-  if (!fallbackBook || !rest) {
-    throw new Error('passage 需要包含卷书名和节段，例如 “创世记 2:7-9”');
-  }
-  const segments = rest
-    .split(/[;；]/)
-    .map((segment) => parseSegment(segment, fallbackBook))
-    .filter(Boolean);
-  if (segments.length === 0) {
-    throw new Error('未能解析有效的章节或节段');
-  }
-  return segments;
-}
-
+/**
+ * 读取指定书卷章节的全部行（含标题行和经文行）。
+ * chapterDigits 用于补零格式化章节号（如 "001" vs "01"）。
+ *
+ * @returns {string[]} 文本行数组，第 0 行是书名，第 1 行是章号，第 2 行起是经文
+ */
 function loadChapterLines(baseDir, version, mapping, book, chapter) {
   const info = mapping.get(book);
   if (!info) {
-    throw new Error(`未找到卷书 “${book}” 的映射`);
+    throw new Error(`未找到卷书 "${book}" 的映射`);
   }
   const chapterStr = String(chapter).padStart(info.chapterDigits || 2, '0');
   const filename = `${info.prefix}_${info.seq}_${info.abbr}_${chapterStr}_read.txt`;
@@ -136,6 +109,13 @@ function loadChapterLines(baseDir, version, mapping, book, chapter) {
   return lines;
 }
 
+/**
+ * 将章节文本行构建为 "节号 → 经文条目" 的映射。
+ * 支持 [[verses=N]] / [[span=N]] 多节标记：
+ * 一行文本可以覆盖连续多个节号（例如诗歌段落），后续节号会自动递增。
+ *
+ * @returns {Map<number, {start: number, end: number, text: string}>}
+ */
 function buildVerseMap(lines) {
   const verseMap = new Map();
   let verseNumber = 1;
@@ -166,10 +146,18 @@ function buildVerseMap(lines) {
   return verseMap;
 }
 
+/**
+ * 将解析后的经文引用渲染为 remark AST 节点。
+ * 生成 <blockquote class="bible-text"> 块，内含多条 <p class="verse"> 段落，
+ * 每段包含 <strong class="verse-number"> 节号 和经文文本。
+ *
+ * @param {{baseDir: string, version: string, passage: string}} params
+ * @returns {object} remark AST 节点（blockquote 或 error paragraph）
+ */
 function renderPassage({baseDir, version, passage}) {
   try {
     const mapping = buildBookIndex(baseDir, version);
-    const segments = parsePassage(passage);
+    const segments = parsePassage(passage);           // 来自 lib/bible-parser.js
     const verses = [];
 
     for (const segment of segments) {
@@ -180,7 +168,7 @@ function renderPassage({baseDir, version, passage}) {
         for (let v = range.start; v <= range.end; v += 1) {
           const entry = verseMap.get(v);
           if (entry && entry === lastEntry) {
-            continue;
+            continue; // 多节共享同一行文本时，跳过重复的 entry
           }
           lastEntry = entry;
           const text = (entry && entry.text ? entry.text : '').trim();
@@ -200,6 +188,7 @@ function renderPassage({baseDir, version, passage}) {
       }
     }
 
+    // 构造 remark AST 节点（不是 HTML 字符串，而是被 rehype 处理的中间表示）
     return {
       type: 'blockquote',
       data: {
@@ -232,6 +221,7 @@ function renderPassage({baseDir, version, passage}) {
       })),
     };
   } catch (error) {
+    // 解析失败时不打断构建，而是渲染一个红色错误提示段落
     return {
       type: 'paragraph',
       data: {
@@ -249,6 +239,11 @@ function renderPassage({baseDir, version, passage}) {
   }
 }
 
+/**
+ * Docusaurus remark 插件入口。
+ * 在 Markdown 解析为 MDAST 后、转为 HTML 前执行。
+ * 扫描所有 text 节点，将 [[bible ...]] / {{bible ...}} 占位符替换为经文 AST。
+ */
 module.exports = function bibleEmbedPlugin(userOptions = {}) {
   const baseDir = userOptions.baseDir || path.join(process.cwd(), 'static', 'bible');
   const defaultVersion = userOptions.version || DEFAULT_VERSION;
@@ -266,12 +261,13 @@ module.exports = function bibleEmbedPlugin(userOptions = {}) {
       let match;
       // eslint-disable-next-line no-cond-assign
       while ((match = pattern.exec(node.value))) {
+        // 占位符前的普通文本保持不变
         const before = node.value.slice(lastIndex, match.index);
         if (before) {
           newNodes.push({type: 'text', value: before});
         }
         const attrText = match[1] || match[2] || '';
-        const attrs = parseAttributes(attrText);
+        const attrs = parseAttributes(attrText);       // 来自 lib/bible-parser.js
         const version = attrs.version || defaultVersion;
         const passage = attrs.passage || attrs.ref || '';
         const rendered = renderPassage({baseDir, version, passage});
@@ -291,5 +287,6 @@ module.exports = function bibleEmbedPlugin(userOptions = {}) {
   };
 };
 
+// 导出工具函数给 scripts/algoliaIndex.js 等复用
 module.exports.buildBookIndex = buildBookIndex;
 module.exports.loadChapterLines = loadChapterLines;

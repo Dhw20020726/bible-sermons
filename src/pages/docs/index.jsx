@@ -1,3 +1,10 @@
+/**
+ * @fileoverview /docs 路由的重定向页面。
+ * 访问 /docs 时，优先跳转到用户上次阅读的文档（localStorage），
+ * 否则跳转到默认起始位置（创世记分类页）。
+ * 渲染一个短暂的"正在跳转"提示后立即 replace 到目标 URL。
+ */
+
 import React, {useEffect} from 'react';
 import Layout from '@theme/Layout';
 import useBaseUrl from '@docusaurus/useBaseUrl';

@@ -1,8 +1,19 @@
+/**
+ * @fileoverview 站点首页组件。
+ * 渲染 hero 区域（大图背景 + 经文金句）、"从创世记开始阅读"按钮、
+ * 以及"继续上次阅读"按钮（从 localStorage 读取上次访问的文档路径）。
+ * 背景图懒加载：用 IntersectionObserver 监听 hero 区域进入视口后才加载图片。
+ */
+
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 
+/**
+ * 首页组件：Hero 背景图懒加载 + 经文展示 + "从创世记开始阅读" + "继续上次阅读"。
+ * 背景图使用 IntersectionObserver 延迟加载，避免阻塞首屏渲染。
+ */
 export default function Home() {
   const [lastReadPath, setLastReadPath] = useState('/docs');
   const [lastReadTitle, setLastReadTitle] = useState('继续上次阅读');
@@ -89,7 +100,6 @@ export default function Home() {
 
   return (
     <Layout
-      // title="主页"
       description="以圣经为中心分享神的话语与教会讲道"
       wrapperClassName="navbar--home"
     >

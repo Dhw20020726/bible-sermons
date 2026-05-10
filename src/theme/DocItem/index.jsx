@@ -1,3 +1,10 @@
+/**
+ * @fileoverview 文档详情页 wrapper。
+ * 包装 Docusaurus 默认的 DocItem，在每次文档页面加载时
+ * 将当前文档的 permalink 和 title 存入 localStorage，
+ * 供首页"继续上次阅读"按钮使用。
+ */
+
 import React, {useEffect} from 'react';
 import DocItem from '@theme-original/DocItem';
 import {useLocation} from '@docusaurus/router';

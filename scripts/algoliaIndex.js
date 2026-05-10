@@ -1,4 +1,20 @@
 #!/usr/bin/env node
+/**
+ * @fileoverview Algolia 搜索索引生成与上传脚本。
+ *
+ * 运行方式：npm run index:generate | index:upload | index:all
+ *
+ * 核心流程：
+ *   1. 扫描 docs/ 下所有 .md 文件
+ *   2. 解析 frontmatter 和正文
+ *   3. 展开 [[bible ...]] 占位符为纯文本经文（Algolia 不支持 HTML AST）
+ *   4. 按标题将文档切分为 chunks
+ *   5. 生成/上传到 Algolia 索引
+ *
+ * 与 bible-embed 插件共享 parsePassage/parseAttributes（来自 lib/bible-parser.js），
+ * 但经文渲染走自己的纯文本路径 renderBiblePassageText()（插件渲染的是 remark AST）。
+ */
+
 const fs = require('fs');
 const path = require('path');
 const fg = require('fast-glob');
@@ -6,8 +22,9 @@ const matter = require('gray-matter');
 const removeMd = require('remove-markdown');
 const algoliasearch = require('algoliasearch');
 const {buildBookIndex, loadChapterLines} = require('../plugins/bible-embed');
+const {parseAttributes, parsePassage} = require('../lib/bible-parser');
 const {hydrateAlgoliaEnv, resolveAlgoliaEnv} = require('./utils/env');
-const {createSectionSlugger, resolveHeadingAnchor} = require('./utils/slug');
+const {createSectionSlugger, resolveHeadingAnchor} = require('../lib/slug');
 
 hydrateAlgoliaEnv();
 
@@ -19,6 +36,7 @@ const BIBLE_BASE_DIR = path.join(ROOT, 'static', 'bible');
 const OUTPUT_DIR = path.join(ROOT, 'build');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'algolia-index.json');
 const MAX_CHUNK_LENGTH = 8000; // 单块内容长度上限，防止超出 Algolia 单记录限制
+const SUMMARY_LENGTH = 500;    // Algolia 搜索摘要截取长度
 const DEFAULT_LANGUAGE = siteConfig.i18n?.defaultLocale || 'en';
 const DEFAULT_DOCUSUARUS_TAGS = ['default', 'docs-default-current'];
 const DEFAULT_BIBLE_VERSION = 'cmn-cu89s_readaloud';
@@ -29,6 +47,7 @@ const docsRouteBasePath = (() => {
   return classicPreset?.[1]?.docs?.routeBasePath?.replace(/^\//, '') || 'docs';
 })();
 
+/** 拼接 URL 路径段，智能处理首尾斜杠 */
 function joinUrl(...parts) {
   return parts
     .filter(Boolean)
@@ -41,11 +60,13 @@ function joinUrl(...parts) {
     .join('/');
 }
 
+/** 规范化 Docusaurus slug：去掉 /index 后缀、去掉扩展名、去掉首尾斜杠 */
 function normalizeSlug(rawSlug, relativePath) {
   const slug = rawSlug || relativePath;
   return slug.replace(/index$/i, '').replace(/\.mdx?$/, '').replace(/\/+$/, '').replace(/^\//, '');
 }
 
+/** 提取文档标题：优先 frontmatter title → 正文第一个 H1 → 文件名 fallback */
 function extractTitle(content, frontmatterTitle, fallback) {
   if (frontmatterTitle) {
     return frontmatterTitle;
@@ -57,79 +78,10 @@ function extractTitle(content, frontmatterTitle, fallback) {
   return fallback;
 }
 
-function parseAttributes(raw) {
-  const attrs = {};
-  const regex = /(\w+)\s*=\s*"([^"]*)"|(\w+)\s*=\s*'([^']*)'/g;
-  let match;
-  // eslint-disable-next-line no-cond-assign
-  while ((match = regex.exec(raw))) {
-    const key = match[1] || match[3];
-    const value = match[2] || match[4] || '';
-    attrs[key] = value;
-  }
-  return attrs;
-}
-
-function normalizeBookName(name) {
-  if (!name) return '';
-  return String(name)
-    .replace(/^\uFEFF/, '')
-    .replace(/[．。.]*$/g, '')
-    .trim();
-}
-
-function parseSegment(rawSegment, fallbackBook) {
-  const segment = rawSegment.trim();
-  if (!segment) return null;
-
-  const bookMatch = segment.match(/^(?<book>[\u4e00-\u9fffA-Za-z0-9]+)\s+(?<rest>.+)$/);
-  const book = bookMatch ? normalizeBookName(bookMatch.groups.book) : fallbackBook;
-  const versePart = bookMatch ? bookMatch.groups.rest : segment;
-  const match = versePart.match(/^(?<chapter>\d+)\s*:\s*(?<verses>.+)$/);
-  if (!match || !book) return null;
-
-  const chapter = Number.parseInt(match.groups.chapter, 10);
-  const ranges = match.groups.verses
-    .split(/[;,，；]/)
-    .map((piece) => piece.trim())
-    .filter(Boolean)
-    .map((piece) => {
-      const [startRaw, endRaw] = piece.split('-').map((p) => p && p.trim());
-      const start = Number.parseInt(startRaw, 10);
-      const end = endRaw ? Number.parseInt(endRaw, 10) : start;
-      if (Number.isNaN(start) || Number.isNaN(end)) return null;
-      return {start, end: Math.max(start, end)};
-    })
-    .filter(Boolean);
-
-  if (Number.isNaN(chapter) || ranges.length === 0) return null;
-  return {book, chapter, ranges};
-}
-
-function parsePassage(passage) {
-  const trimmed = (passage || '').trim();
-  if (!trimmed) {
-    throw new Error('passage 不能为空');
-  }
-  const [bookPart, ...restParts] = trimmed.split(/\s+/);
-  const fallbackBook = normalizeBookName(bookPart);
-  const rest = restParts.join(' ');
-  if (!fallbackBook || !rest) {
-    throw new Error('passage 需要包含卷书名和节段，例如 “创世记 2:7-9”');
-  }
-  const segments = rest
-    .split(/[;；]/)
-    .map((segment) => parseSegment(segment, fallbackBook))
-    .filter(Boolean);
-  if (segments.length === 0) {
-    throw new Error('未能解析有效的章节或节段');
-  }
-  return segments;
-}
-
 const bibleMappingCache = new Map();
 const bibleChapterCache = new Map();
 
+/** 带缓存的圣经书卷索引获取，复用 bible-embed 的 buildBookIndex 并缓存结果 */
 function getBibleMapping(version) {
   const key = `${BIBLE_BASE_DIR}::${version}`;
   if (bibleMappingCache.has(key)) {
@@ -151,6 +103,10 @@ function getChapterLines(version, book, chapter) {
   return lines;
 }
 
+/**
+ * 将圣经经文引用渲染为纯文本（区别于插件的 remark AST 渲染）。
+ * 包含智能引用前缀：多卷书时加书名，多章时加章号。
+ */
 function renderBiblePassageText(passage, version) {
   const segments = parsePassage(passage);
   const entries = [];
@@ -159,7 +115,9 @@ function renderBiblePassageText(passage, version) {
     const lines = getChapterLines(version, segment.book, segment.chapter);
     for (const range of segment.ranges) {
       for (let v = range.start; v <= range.end; v += 1) {
-        const lineIndex = v + 1; // 0: 卷书名, 1: 章号, 2: 第1节
+        // 经文文件行布局：[0]书名 [1]章号 [2]第1节 → 节号+1=行索引，跳过文件头2行
+        const VERSE_HEADER_LINES = 2;
+        const lineIndex = v + VERSE_HEADER_LINES;
         const text = (lines[lineIndex] || '').trim();
         const verseText = text || `[${segment.book} ${segment.chapter}:${v} 未找到内容]`;
         entries.push({book: segment.book, chapter: segment.chapter, verse: v, text: verseText});
@@ -189,6 +147,7 @@ function renderBiblePassageText(passage, version) {
   return verseTexts.join('\n');
 }
 
+/** 将 Markdown 中的 [[bible ...]] 占位符替换为纯文本经文，供 Algolia 索引使用 */
 function expandBiblePlaceholders(content) {
   if (!fs.existsSync(BIBLE_BASE_DIR)) {
     return content;
@@ -220,16 +179,22 @@ function chunkPlainText(lines) {
   const rawContent = lines.join('\n');
   const plain = removeMd(rawContent).replace(/\s+/g, ' ').trim();
   const truncated = plain.slice(0, MAX_CHUNK_LENGTH);
-  const summary = truncated.length > 500 ? truncated.slice(0, 500) : null;
+  const summary = truncated.length > SUMMARY_LENGTH ? truncated.slice(0, SUMMARY_LENGTH) : null;
   return {plain, truncated, summary};
 }
 
+/** 根据文档路径构建 breadcrumb（旧约/新约 > 文档标题） */
 function buildDocBreadcrumb(relativePath, docTitle) {
   const parts = relativePath.split('/');
   const testament = parts[0] === 'old-testament' ? '旧约' : parts[0] === 'new-testament' ? '新约' : parts[0];
   return [testament, docTitle].filter(Boolean).join(' > ');
 }
 
+/**
+ * 按标题将一篇文档切分为多个 Algolia 记录 chunk。
+ * 每个 chunk 对应一个标题段落的纯文本内容，上限 MAX_CHUNK_LENGTH 字符。
+ * 生成层级面包屑（lvl0/lvl1/...）用于 Algolia 搜索结果的层级展示。
+ */
 function splitIntoChunks(parsed, options) {
   const {slug, relativePath, docTitle, url} = options;
   const docBreadcrumb = buildDocBreadcrumb(relativePath, docTitle);
@@ -349,6 +314,7 @@ function splitIntoChunks(parsed, options) {
   return records;
 }
 
+/** 处理单个 .md 文件，解析 frontmatter + 展开经文占位符 + 切分为 Algolia 记录 */
 function buildDocRecords(filePath) {
   const relativePath = path.relative(DOCS_DIR, filePath).replace(/\\/g, '/');
   const raw = fs.readFileSync(filePath, 'utf8');
@@ -361,6 +327,7 @@ function buildDocRecords(filePath) {
   return splitIntoChunks({...parsed, content: contentWithBibleText}, {slug, relativePath, docTitle, url});
 }
 
+/** 扫描 docs/ 目录，生成完整的 Algolia 索引文件到 build/algolia-index.json */
 function generateIndex() {
   if (!fs.existsSync(DOCS_DIR)) {
     throw new Error('docs 目录不存在，无法生成 Algolia 索引');
@@ -378,6 +345,7 @@ function generateIndex() {
   return records;
 }
 
+/** 从 build/algolia-index.json 读取已生成的索引文件 */
 function readIndexFile() {
   if (!fs.existsSync(OUTPUT_FILE)) {
     throw new Error('未找到 build/algolia-index.json，请先运行 npm run index:generate');
@@ -386,6 +354,7 @@ function readIndexFile() {
   return JSON.parse(raw);
 }
 
+/** 上传索引记录到 Algolia（replaceAllObjects），并配置搜索排名和 facet 设置 */
 async function uploadIndex(recordsFromCaller) {
   const {appId, adminApiKey, indexName} = resolveAlgoliaEnv({requireAdmin: true, requireSearch: true});
   const records = recordsFromCaller || readIndexFile();
@@ -448,10 +417,11 @@ async function main() {
   }
 
   console.error('未知指令，请使用：generate | upload | all');
-  process.exit(1);
+  process.exitCode = 1;
+  return;
 }
 
 main().catch((error) => {
   console.error('Algolia 索引任务失败：', error.message);
-  process.exit(1);
+  process.exitCode = 1;
 });

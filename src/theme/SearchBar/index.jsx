@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Algolia DocSearch 搜索栏组件。
+ * 覆盖 Docusaurus 默认的 @theme/SearchBar，集成 Algolia DocSearch 弹窗搜索。
+ * 核心子组件 DocSearch 负责：导入 @docsearch/react/modal、管理开关状态、
+ * 连接 Algolia 搜索客户端、渲染搜索结果弹窗。
+ * 配置来自 themeConfig.algolia（在 docusaurus.config.js 中设置）。
+ */
+
 import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {createPortal} from 'react-dom';
 import {DocSearchButton} from '@docsearch/react';
@@ -19,6 +27,7 @@ import Translate from '@docusaurus/Translate';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import translations from '@theme/SearchTranslations';
 
+/** 根据 URL 是否匹配外部域名，决定用 history.push 还是 window.location.href 进行导航 */
 function useNavigator({externalUrlRegex}) {
   const history = useHistory();
   const [navigator] = useState(() => {
@@ -35,6 +44,7 @@ function useNavigator({externalUrlRegex}) {
   return navigator;
 }
 
+/** 为 Algolia 搜索客户端添加 Docusaurus 版本信息（用于分析统计） */
 function useTransformSearchClient() {
   const {
     siteMetadata: {docusaurusVersion},
@@ -48,6 +58,7 @@ function useTransformSearchClient() {
   );
 }
 
+/** 处理搜索结果项：转换 URL、提取摘要、为 lvl0/lvl1 类型项生成层级面包屑 */
 function useTransformItems({transformItems}) {
   const processSearchResultUrl = useSearchResultUrlProcessor();
   const [transform] = useState(() => {
@@ -105,6 +116,7 @@ function useTransformItems({transformItems}) {
   return transform;
 }
 
+/** 渲染搜索结果弹窗底部的"查看全部 N 条结果"链接 */
 function useResultsFooterComponent({closeModal}) {
   return useMemo(
     () =>
@@ -120,6 +132,7 @@ function useResultsFooterComponent({closeModal}) {
   );
 }
 
+/** 合并 contextual search facet filter 和用户配置的 searchParameters */
 function useSearchParameters({contextualSearch, ...props}) {
   const contextualSearchFacetFilters = useAlgoliaContextualFacetFilters();
   const configFacetFilters = props.searchParameters?.facetFilters ?? [];
@@ -133,6 +146,10 @@ function useSearchParameters({contextualSearch, ...props}) {
   };
 }
 
+/**
+ * DocSearch 弹窗容器组件。
+ * 管理弹窗开关状态、搜索容器 DOM 挂载、键盘快捷键绑定和 portal 渲染。
+ */
 function DocSearch({externalUrlRegex, ...props}) {
   const navigator = useNavigator({externalUrlRegex});
   const searchParameters = useSearchParameters({...props});
@@ -158,12 +175,14 @@ function DocSearch({externalUrlRegex, ...props}) {
 
   const openModal = useCallback(() => {
     prepareSearchContainer();
-    Promise.all([import('@docsearch/react/modal'), import('@docsearch/react/style')]).then(
-      ([{DocSearchModal: Modal}]) => {
+    Promise.all([import('@docsearch/react/modal'), import('@docsearch/react/style')])
+      .then(([{DocSearchModal: Modal}]) => {
         DocSearchModalComponent.current = Modal;
         setIsOpen(true);
-      },
-    );
+      })
+      .catch((err) => {
+        console.error('DocSearch 弹窗加载失败：', err);
+      });
   }, [prepareSearchContainer]);
 
   const closeModal = useCallback(() => {
@@ -243,6 +262,7 @@ function DocSearch({externalUrlRegex, ...props}) {
   );
 }
 
+/** 搜索栏入口组件，从 siteConfig.themeConfig.algolia 读取配置并传递给 DocSearch */
 export default function SearchBar() {
   const {siteConfig} = useDocusaurusContext();
   return <DocSearch {...siteConfig.themeConfig.algolia} />;

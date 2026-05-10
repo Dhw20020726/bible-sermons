@@ -1,7 +1,17 @@
+/**
+ * @fileoverview Algolia 环境变量加载工具。
+ *
+ * .env 文件使用可读键名（如 "Application ID: xxx"），
+ * 本模块将其映射为标准环境变量名（ALGOLIA_APP_ID 等）。
+ *
+ * hydrateAlgoliaEnv() 在 docusaurus.config.js 和 algoliaIndex.js 启动时调用。
+ */
+
 const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 
+/** 可读键名 → 标准环境变量名映射表 */
 const ALGOLIA_FRIENDLY_KEYS = {
   'Application ID': 'ALGOLIA_APP_ID',
   'Search API Key': 'ALGOLIA_SEARCH_API_KEY',
@@ -12,6 +22,10 @@ const ALGOLIA_FRIENDLY_KEYS = {
   'Index Name': 'ALGOLIA_INDEX_NAME',
 };
 
+/**
+ * 读取项目根目录的 .env 文件，将 Algolia 相关配置注入 process.env。
+ * 只在 process.env 中没有对应值时才设置（已设置的不覆盖）。
+ */
 function hydrateAlgoliaEnv(customEnvPath) {
   const rootPath = path.join(__dirname, '..', '..');
   const envPath = customEnvPath || path.join(rootPath, '.env');
@@ -39,6 +53,11 @@ function hydrateAlgoliaEnv(customEnvPath) {
   });
 }
 
+/**
+ * 从 process.env 解析 Algolia 配置。
+ * @param {{envPath?: string, requireAdmin?: boolean, requireSearch?: boolean}} options
+ * @returns {{appId: string, indexName: string, searchApiKey: string, adminApiKey: string}}
+ */
 function resolveAlgoliaEnv(options = {}) {
   hydrateAlgoliaEnv(options.envPath);
 
