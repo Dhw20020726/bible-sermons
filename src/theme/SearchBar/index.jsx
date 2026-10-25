@@ -26,6 +26,55 @@ import {
 import Translate from '@docusaurus/Translate';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import translations from '@theme/SearchTranslations';
+import {persistSearchQuery} from '../../utils/highlightKeywords';
+
+/** 找到 DocSearch 最近搜索记录的 localStorage 键（形如 __DOCSEARCH_RECENT_SEARCHES__<indexName>） */
+function findRecentSearchesKey() {
+  if (typeof window === 'undefined') return null;
+  for (let i = 0; i < window.localStorage.length; i += 1) {
+    const key = window.localStorage.key(i);
+    if (key && key.startsWith('__DOCSEARCH_RECENT_SEARCHES__')) {
+      return key;
+    }
+  }
+  return null;
+}
+
+/**
+ * 把带 <mark> 高亮的摘要片段写回最近搜索记录。
+ * DocSearch 内部 saveRecentSearch 会把 content 项的 content 置空、type 改为 lvl1，
+ * 导致最近搜索只显示标题、没有内容。这里在跳转前（saveRecentSearch 之后）手动把
+ * type 改回 content 并填回摘要，让最近搜索像普通命中一样显示「摘要 + 标题」。
+ */
+function persistRecentSearchSnippet(item) {
+  if (typeof window === 'undefined' || !item || item.type !== 'content') return;
+
+  // 优先取 Algolia 的 _snippetResult（含 <mark>）；再次点击最近搜索时该项没有
+  // _snippetResult，则回退到已存的 content（即上次保存的摘要）。
+  const snippet = item._snippetResult?.content?.value || item.content;
+  if (!snippet) return;
+
+  const key = findRecentSearchesKey();
+  if (!key) return;
+
+  let stored;
+  try {
+    stored = JSON.parse(window.localStorage.getItem(key));
+  } catch (error) {
+    return;
+  }
+  if (!Array.isArray(stored)) return;
+
+  const idx = stored.findIndex((entry) => entry.objectID === item.objectID);
+  if (idx === -1) return;
+
+  stored[idx] = {
+    ...stored[idx],
+    type: 'content',
+    content: snippet,
+  };
+  window.localStorage.setItem(key, JSON.stringify(stored));
+}
 
 /** 根据 URL 是否匹配外部域名，决定用 history.push 还是 window.location.href 进行导航 */
 function useNavigator({externalUrlRegex}) {
@@ -33,6 +82,10 @@ function useNavigator({externalUrlRegex}) {
   const [navigator] = useState(() => {
     return {
       navigate(params) {
+        // 记录本次搜索关键词，供跳转后的页面高亮命中的关键字
+        persistSearchQuery(params.state?.query);
+        // 修正最近搜索记录：补回内容摘要，避免只显示标题
+        persistRecentSearchSnippet(params.item);
         if (isRegexpStringMatch(externalUrlRegex, params.itemUrl)) {
           window.location.href = params.itemUrl;
         } else {
@@ -58,7 +111,7 @@ function useTransformSearchClient() {
   );
 }
 
-/** 处理搜索结果项：转换 URL，并为 content 类型项注入「标题 + 摘要」结构供最近搜索记录使用 */
+/** 处理搜索结果项：把 URL 转换为 Docusaurus 站点内链接 */
 function useTransformItems({transformItems}) {
   const processSearchResultUrl = useSearchResultUrlProcessor();
   const [transform] = useState(() => {
@@ -69,42 +122,7 @@ function useTransformItems({transformItems}) {
             ...item,
             url: processSearchResultUrl(item.url),
           }));
-
-      return processed.map((item) => {
-        if (item.type !== 'content') {
-          return item;
-        }
-
-        const heading = item.hierarchy?.lvl1 || item.hierarchy?.lvl0 || item.title;
-        const plainSnippet =
-          (item._snippetResult?.content?.value &&
-            item._snippetResult.content.value.replace(/<\/?[^>]+(>|$)/g, '')) ||
-          item.content ||
-          item.title;
-
-        // DocSearch 内部 saveRecentSearch 对 content 类型会优先保存 __docsearch_parent，
-        // 这里借它注入「标题 + 摘要」结构，让最近搜索记录也能显示内容摘要（而非仅标题）。
-        const recentObject = {
-          ...item,
-          objectID: `${item.objectID}__recent`,
-          type: 'lvl1',
-          content: plainSnippet,
-          hierarchy: {
-            ...item.hierarchy,
-            lvl1: heading,
-            lvl2: null,
-            lvl3: null,
-            lvl4: null,
-            lvl5: null,
-            lvl6: null,
-          },
-        };
-
-        return {
-          ...item,
-          __docsearch_parent: recentObject,
-        };
-      });
+      return processed;
     };
   });
   return transform;

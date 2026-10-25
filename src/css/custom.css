@@ -207,7 +207,7 @@ html {
 .footer {
   background: #18181b;
   color: #e5e5e5;
-  padding-block: clamp(1.25rem, 2.6vh, 2rem);
+  padding-block: clamp(1.5rem, 3vh, 2.5rem);
   font-size: 0.95rem;
 }
 
@@ -215,36 +215,98 @@ html {
   max-width: 960px;
   margin: 0 auto;
   padding: 0 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
   text-align: left;
 }
 
-.footer__about {
+@media (min-width: 768px) {
+  .footer__inner {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.footer__about,
+.footer__contact {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.footer__about h2 {
+.footer__about h2,
+.footer__contact h2 {
   margin: 0;
   font-size: 1.15rem;
 }
 
-.footer__about p {
+.footer__about p,
+.footer__contact p {
   margin: 0;
   line-height: 1.7;
 }
 
+.footer__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.footer__form input,
+.footer__form textarea {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(229, 229, 229, 0.35);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #e5e5e5;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.footer__form input::placeholder,
+.footer__form textarea::placeholder {
+  color: rgba(229, 229, 229, 0.6);
+}
+
+.footer__form input:focus,
+.footer__form textarea:focus {
+  outline: none;
+  border-color: rgba(250, 250, 250, 0.7);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.footer__form textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.footer__form button {
+  align-self: flex-start;
+  padding: 0.55rem 1.25rem;
+  border: none;
+  border-radius: 4px;
+  background: #e5e5e5;
+  color: #18181b;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.footer__form button:hover {
+  background: #ffffff;
+}
+
 .footer__divider {
+  grid-column: 1 / -1;
   width: 100%;
   height: 1px;
   background: rgba(229, 229, 229, 0.35);
 }
 
 .footer__copyright {
+  grid-column: 1 / -1;
   font-size: 0.9rem;
   width: 100%;
   text-align: center;
@@ -284,4 +346,33 @@ html {
 .search-result-match {
   color: inherit;
   background-color: var(--docsearch-highlight-color);
+}
+
+/* 从搜索结果跳转后，正文中命中的关键词高亮 */
+mark.keyword-highlight {
+  background: #fde68a;
+  color: inherit;
+  padding: 0 0.1em;
+  border-radius: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/*
+ * 最近搜索中已显示内容摘要的条目（带 DocSearch-Hit-path）：
+ * 把时钟图标换成文档图标（三条横线），与普通搜索结果的内容项一致。
+ * 通过 :has() 定位含标题+路径的条目；不支持的浏览器会优雅降级为时钟图标。
+ */
+.DocSearch-Hit:has(.DocSearch-Hit-path) .DocSearch-Hit-icon svg {
+  display: none;
+}
+
+.DocSearch-Hit:has(.DocSearch-Hit-path) .DocSearch-Hit-icon::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-color: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M17 5H3h14zm0 5H3h14zm0 5H3h14z' stroke='black' fill='none' fill-rule='evenodd' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M17 5H3h14zm0 5H3h14zm0 5H3h14z' stroke='black' fill='none' fill-rule='evenodd' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
 }

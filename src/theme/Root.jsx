@@ -7,7 +7,8 @@
 
 import React, {useEffect} from 'react';
 import {useLocation} from '@docusaurus/router';
-import {highlightAnchorTarget} from '../utils/highlightAnchor';
+import {highlightAnchorTarget, waitForElement} from '../utils/highlightAnchor';
+import {highlightKeywordsFromQuery} from '../utils/highlightKeywords';
 
 export default function Root({children}) {
   const {hash} = useLocation();
@@ -15,9 +16,10 @@ export default function Root({children}) {
   useEffect(() => {
     if (!hash) return;
     const id = decodeURIComponent(hash.replace(/^#/, ''));
-    window.requestAnimationFrame(() => {
-      highlightAnchorTarget(id);
-    });
+    // 等正文渲染完成后再触发标题闪烁，避免 getElementById 取到 null
+    waitForElement(id, () => highlightAnchorTarget(id));
+    // 从搜索结果跳转而来时，在正文中高亮搜索关键词
+    highlightKeywordsFromQuery();
   }, [hash]);
 
   return <>{children}</>;

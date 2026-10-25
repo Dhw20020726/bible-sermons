@@ -26,3 +26,28 @@ export function highlightAnchorTarget(id) {
     target.classList.remove('anchor-target-highlight');
   }, ANCHOR_FLASH_DURATION_MS);
 }
+
+/**
+ * 等待指定 id 的元素出现在 DOM 中后执行回调。
+ * Docusaurus 客户端路由下，跳转后正文是异步渲染的，直接 getElementById 可能为 null，
+ * 因此轮询等待元素就绪，让标题高亮更可靠。
+ * @param {string} id - 目标元素 id
+ * @param {Function} callback - 元素就绪后的回调
+ * @param {number} [maxTries] - 最大轮询次数（默认 30 次）
+ * @param {number} [interval] - 轮询间隔毫秒（默认 100ms）
+ */
+export function waitForElement(id, callback, maxTries = 30, interval = 100) {
+  if (!id || typeof callback !== 'function') return;
+  let tries = 0;
+  const check = () => {
+    const el = document.getElementById(id);
+    if (el) {
+      callback(el);
+      return;
+    }
+    tries += 1;
+    if (tries >= maxTries) return;
+    setTimeout(check, interval);
+  };
+  check();
+}
