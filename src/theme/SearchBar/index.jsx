@@ -58,62 +58,19 @@ function useTransformSearchClient() {
   );
 }
 
-/** 处理搜索结果项：转换 URL、提取摘要、为 lvl0/lvl1 类型项生成层级面包屑 */
+/** 处理搜索结果项：转换 URL（标准 Docusaurus 行为，不额外改写层级或摘要） */
 function useTransformItems({transformItems}) {
   const processSearchResultUrl = useSearchResultUrlProcessor();
-  const [transform] = useState(() => {
-    return (items) => {
-      const processed = transformItems
-        ? transformItems(items)
-        : items.map((item) => ({
-            ...item,
-            url: processSearchResultUrl(item.url),
-          }));
-
-      return processed.map((item) => {
-        const snippet =
-          item._snippetResult?.content?.value ||
-          item.summary ||
-          item.content ||
-          item.title;
-        const heading = item.hierarchy?.lvl1 || item.hierarchy?.lvl0 || item.title;
-        const plainSnippet =
-          (item._snippetResult?.content?.value &&
-            item._snippetResult.content.value.replace(/<\/?[^>]+(>|$)/g, '')) ||
-          item.summary ||
-          item.content ||
-          item.title;
-
-        if (item.type === 'content') {
-          const recentObject = {
-            ...item,
-            objectID: `${item.objectID}__recent`,
-            title: plainSnippet,
-            label: plainSnippet,
-            hierarchy: {
-              lvl0: plainSnippet,
-              lvl1: heading,
-              lvl2: null,
-              lvl3: null,
-              lvl4: null,
-              lvl5: null,
-              lvl6: null,
-            },
-            subtitle: heading,
-            _highlightResult: item._highlightResult,
-            _snippetResult: item._snippetResult,
-          };
-          return {
-            ...item,
-            __docsearch_parent: recentObject,
-          };
+  return useCallback(
+    (items) =>
+      items.map((item) => {
+        if (transformItems) {
+          return transformItems(item);
         }
-
-        return item;
-      });
-    };
-  });
-  return transform;
+        return {...item, url: processSearchResultUrl(item.url)};
+      }),
+    [processSearchResultUrl, transformItems],
+  );
 }
 
 /** 渲染搜索结果弹窗底部的"查看全部 N 条结果"链接 */

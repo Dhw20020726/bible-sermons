@@ -379,7 +379,7 @@ async function uploadIndex(recordsFromCaller) {
       'summary',
       'content',
     ],
-    attributesToSnippet: ['summary:50', 'content:25'],
+    attributesToSnippet: ['summary:80', 'content:60'],
     attributesToHighlight: [
       'hierarchy.lvl0',
       'hierarchy.lvl1',

@@ -61,10 +61,10 @@ function hydrateAlgoliaEnv(customEnvPath) {
 function resolveAlgoliaEnv(options = {}) {
   hydrateAlgoliaEnv(options.envPath);
 
-  const appId = process.env.ALGOLIA_APP_ID;
+  const appId = (process.env.ALGOLIA_APP_ID || '').trim();
   const indexName = (process.env.ALGOLIA_INDEX_NAME || '').trim() || 'bible-sermons';
-  const searchApiKey = process.env.ALGOLIA_SEARCH_API_KEY || process.env.ALGOLIA_WRITE_API_KEY;
-  const adminApiKey = process.env.ALGOLIA_ADMIN_API_KEY || process.env.ALGOLIA_WRITE_API_KEY;
+  const searchApiKey = (process.env.ALGOLIA_SEARCH_API_KEY || process.env.ALGOLIA_WRITE_API_KEY || '').trim();
+  const adminApiKey = (process.env.ALGOLIA_ADMIN_API_KEY || process.env.ALGOLIA_WRITE_API_KEY || '').trim();
 
   if (options.requireAdmin && (!appId || !adminApiKey)) {
     throw new Error('缺少 Algolia Admin/Write 权限的凭证，无法上传索引。');
