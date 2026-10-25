@@ -56,7 +56,7 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           routeBasePath: '/docs',
           editUrl: undefined,
-          beforeDefaultRemarkPlugins: [require('./plugins/anchor-jump'), require('./plugins/heading-anchors')],
+          beforeDefaultRemarkPlugins: [require('./plugins/heading-anchors')],
           remarkPlugins: [require('./plugins/bible-embed')],
         },
         blog: false,

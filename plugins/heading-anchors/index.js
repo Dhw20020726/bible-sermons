@@ -24,9 +24,9 @@ module.exports = function slugNormalizePlugin() {
     visit(tree, 'heading', (node) => {
       const text = toString(node).trim();
 
-      // H2：重置 section 作用域，用自身文本作为 anchor
+      // H2：在文档全局作用域内去重，重置 section 作用域
       if (node.depth === 2) {
-        const slug = normalizeText(text);
+        const slug = getUniqueSlug('', text);
         node.data = node.data || {};
         node.data.id = slug;
         node.data.hProperties = node.data.hProperties || {};
