@@ -133,7 +133,8 @@ const config = {
           alt: 'Bible Sermons Logo',
           src: 'img/logo-light.svg',
         },
-        hideOnScroll: true,
+        // 不再随滚动隐藏导航栏，保持顶部横幅始终可见。
+        hideOnScroll: false,
       },
       docs: {
         sidebar: {

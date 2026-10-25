@@ -392,6 +392,8 @@ async function uploadIndex(recordsFromCaller) {
       'content',
     ],
     attributesForFaceting: ['filterOnly(tags)', 'filterOnly(category)', 'filterOnly(language)', 'filterOnly(docusaurus_tag)'],
+    // 中文（CJK）分词：让 Algolia 用 zh 词典切分中文，从而正确高亮命中的关键字。
+    queryLanguages: ['zh'],
   });
 
   console.log('索引上传完成');
