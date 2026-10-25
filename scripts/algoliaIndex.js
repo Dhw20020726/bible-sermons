@@ -219,7 +219,7 @@ function splitIntoChunks(parsed, options) {
       chunkLines = [];
       return;
     }
-    const headingList = [currentSection || null, activeHeadingTitle].filter(Boolean);
+    const headingList = [activeHeadingTitle].filter(Boolean);
     records.push({
       objectID: `${slug || relativePath}#${chunkIndex}`,
       title: chunkTitle,
@@ -294,8 +294,10 @@ function splitIntoChunks(parsed, options) {
 
       chunkAnchor = anchor;
       chunkTitle = headingText;
-      activeSectionPath = currentSection ? `${docBreadcrumb} > ${currentSection}` : docBreadcrumb;
-      activeHeadingTitle = headingText === currentSection ? null : headingText;
+      // 合并后的讲道全部是 H2（##）章节标题，这里让 lvl0 只放「约 > 文档标题」，
+      // lvl1 放章节标题，这样搜索结果能显示层级面包屑和章节路径。
+      activeSectionPath = docBreadcrumb;
+      activeHeadingTitle = headingText;
       chunkParent = parentAnchor ? `${url}#${parentAnchor}` : url;
       chunkLines = [];
       return;

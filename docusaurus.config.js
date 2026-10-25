@@ -117,8 +117,8 @@ const config = {
           // DocSearch 默认每次搜索请求用 snippetLength=15 截断摘要（覆盖索引设置），
           // 这里显式加大 content 摘要长度，让结果前后文更长。
           attributesToSnippet: [
-            'content:60',
-            'hierarchy.lvl1:40',
+            'content:30',
+            'hierarchy.lvl1:20',
             'hierarchy.lvl2:40',
             'hierarchy.lvl3:40',
             'hierarchy.lvl4:40',
