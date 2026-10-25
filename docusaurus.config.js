@@ -20,7 +20,6 @@ const algoliaEnv = resolveAlgoliaEnv();
 const isAlgoliaReady = Boolean(algoliaEnv.appId && algoliaEnv.searchApiKey && algoliaEnv.indexName);
 
 const lightCodeTheme = themes.github;
-const darkCodeTheme = themes.dracula;
 
 /** @type {import('@docusaurus/types').Config} */
 const siteBaseUrl = '/bible-sermons/';
@@ -57,7 +56,10 @@ const config = {
           routeBasePath: '/docs',
           editUrl: undefined,
           beforeDefaultRemarkPlugins: [require('./plugins/heading-anchors')],
-          remarkPlugins: [require('./plugins/bible-embed')],
+          remarkPlugins: [
+            require('./plugins/auto-bible'),
+            require('./plugins/bible-embed'),
+          ],
         },
         blog: false,
         theme: {
@@ -101,6 +103,11 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      colorMode: {
+        defaultMode: 'light',
+        disableSwitch: true,
+        respectPrefersColorScheme: false,
+      },
       algolia: isAlgoliaReady ? {
         appId: algoliaEnv.appId,
         apiKey: algoliaEnv.searchApiKey,
@@ -113,7 +120,6 @@ const config = {
         logo: {
           alt: 'Bible Sermons Logo',
           src: 'img/logo-light.svg',
-          srcDark: 'img/logo-dark.svg',
         },
         hideOnScroll: true,
       },
@@ -125,7 +131,6 @@ const config = {
       },
       prism: {
         theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
       },
     }),
 };

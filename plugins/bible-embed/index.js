@@ -287,6 +287,8 @@ module.exports = function bibleEmbedPlugin(userOptions = {}) {
   };
 };
 
-// 导出工具函数给 scripts/algoliaIndex.js 等复用
+// 导出工具函数给 scripts/algoliaIndex.js、plugins/auto-bible 等复用
 module.exports.buildBookIndex = buildBookIndex;
 module.exports.loadChapterLines = loadChapterLines;
+module.exports.renderPassage = renderPassage;
+module.exports.DEFAULT_VERSION = DEFAULT_VERSION;
