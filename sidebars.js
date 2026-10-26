@@ -185,6 +185,11 @@ const buildTestamentMeta = (testamentDir, label) => {
 
 const oldTestamentMeta = buildTestamentMeta('old-testament', '旧约');
 const newTestamentMeta = buildTestamentMeta('new-testament', '新约');
+const themeTalkDocCount = getDocIdsForDir('theme-talk').length;
+const themeTalkDescription =
+  themeTalkDocCount === 0
+    ? '主题讲论 暂无内容'
+    : `主题讲论 共 ${themeTalkDocCount} 篇`;
 
 module.exports = {
   docsSidebar: [
@@ -209,6 +214,17 @@ module.exports = {
         description: newTestamentMeta.description,
       },
       items: buildTestamentItems('new-testament'),
+    },
+    {
+      type: 'category',
+      label: '主题讲论',
+      collapsed: true,
+      link: {
+        type: 'generated-index',
+        title: '主题讲论',
+        description: themeTalkDescription,
+      },
+      items: getDocIdsForDir('theme-talk'),
     },
   ],
 };
