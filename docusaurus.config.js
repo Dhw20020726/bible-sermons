@@ -25,7 +25,7 @@ const lightCodeTheme = themes.github;
 const siteBaseUrl = '/bible-sermons/';
 
 const config = {
-  title: 'Bible Sermons',
+  title: '..',
   tagline: '以圣经为中心分享神的话语与教会讲道',
   url: 'https://dhw20020726.github.io',
   baseUrl: siteBaseUrl,
@@ -68,34 +68,6 @@ const config = {
       }),
     ],
   ],
-  headTags: [
-    {
-      tagName: 'link',
-      attributes: {
-        rel: 'apple-touch-icon',
-        sizes: '180x180',
-        href: `${siteBaseUrl}img/apple-touch-icon.png`,
-      },
-    },
-    {
-      tagName: 'link',
-      attributes: {
-        rel: 'icon',
-        type: 'image/svg+xml',
-        href: `${siteBaseUrl}img/logo-light.svg`,
-      },
-    },
-    {
-      tagName: 'link',
-      attributes: {
-        rel: 'icon',
-        type: 'image/svg+xml',
-        href: `${siteBaseUrl}img/logo-dark.svg`,
-        media: '(prefers-color-scheme: dark)',
-      },
-    },
-  ],
-
   plugins: [
   ],
 
@@ -128,11 +100,11 @@ const config = {
         },
       } : undefined,
       navbar: {
-        title: 'Bible Sermons',
-        logo: {
-          alt: 'Bible Sermons Logo',
-          src: 'img/logo-light.svg',
-        },
+        // title: '..',
+        // logo: {
+        //   alt: '..',
+        //   src: '..',
+        // },
         // 不再随滚动隐藏导航栏，保持顶部横幅始终可见。
         hideOnScroll: false,
       },
