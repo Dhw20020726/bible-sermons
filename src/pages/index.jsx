@@ -35,7 +35,7 @@ export default function Home() {
 
   return (
     <Layout
-      description="个人圣经讲道笔记"
+      description="我的圣经笔记"
       wrapperClassName="navbar--home"
     >
       <main className="homeLayout">
@@ -43,7 +43,6 @@ export default function Home() {
           <div className="homeHeroContent">
             <div className="homeHeroVerse">
               <div>
-                <h1>我的圣经笔记</h1>
                 <h2>约翰福音 1:18</h2>
                 <p>从来没有人看见　神，只有在父怀里的独生子将他表明出来。</p>
               </div>

@@ -25,8 +25,8 @@ const lightCodeTheme = themes.github;
 const siteBaseUrl = '/bible-sermons/';
 
 const config = {
-  title: '..',
-  tagline: '以圣经为中心分享神的话语与教会讲道',
+  title: '我的圣经笔记',
+  tagline: '',
   url: 'https://dhw20020726.github.io',
   baseUrl: siteBaseUrl,
   onBrokenLinks: 'throw',
@@ -100,7 +100,7 @@ const config = {
         },
       } : undefined,
       navbar: {
-        // title: '..',
+        title: '我的圣经笔记',
         // logo: {
         //   alt: '..',
         //   src: '..',
