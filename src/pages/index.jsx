@@ -41,6 +41,13 @@ export default function Home() {
       <main className="homeLayout">
         <section className="homeHero">
           <div className="homeHeroContent">
+            <div className="homeHeroVerse">
+              <div>
+                <h1>我的圣经笔记</h1>
+                <h2>约翰福音 1:18</h2>
+                <p>从来没有人看见　神，只有在父怀里的独生子将他表明出来。</p>
+              </div>
+            </div>
             <div className="homeHeroActions">
               <Link className="button homePrimaryButton" to="/docs/category/创世记">
                 从创世记开始阅读

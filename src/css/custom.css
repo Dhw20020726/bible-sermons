@@ -147,6 +147,29 @@ html {
   z-index: 1;
 }
 
+.homeHeroVerse {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 680px;
+  line-height: 1.8;
+}
+
+.homeHeroVerse h1 {
+  margin-bottom: 0.5rem;
+  color: #18181b;
+}
+
+.homeHeroVerse h2 {
+  margin-bottom: 0.5rem;
+  color: #3f3f46;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.homeHeroVerse p {
+  margin: 0;
+}
+
 .homeHeroActions {
   display: flex;
   flex-wrap: wrap;
