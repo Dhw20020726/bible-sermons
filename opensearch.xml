@@ -4,7 +4,7 @@
   <ShortName>我的圣经笔记</ShortName>
   <Description>Search 我的圣经笔记</Description>
   <InputEncoding>UTF-8</InputEncoding>
-  <Url type="text/html" method="get" template="https://dhw20020726.github.io/bible-sermons/search?q={searchTerms}"/>
-  <Url type="application/opensearchdescription+xml" rel="self" template="https://dhw20020726.github.io/bible-sermons/opensearch.xml" />
-  <moz:SearchForm>https://dhw20020726.github.io/bible-sermons/</moz:SearchForm>
+  <Url type="text/html" method="get" template="https://dhw20020726.github.io/my-bible-note/search?q={searchTerms}"/>
+  <Url type="application/opensearchdescription+xml" rel="self" template="https://dhw20020726.github.io/my-bible-note/opensearch.xml" />
+  <moz:SearchForm>https://dhw20020726.github.io/my-bible-note/</moz:SearchForm>
 </OpenSearchDescription>
