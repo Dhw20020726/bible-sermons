@@ -62,7 +62,7 @@ function resolveAlgoliaEnv(options = {}) {
   hydrateAlgoliaEnv(options.envPath);
 
   const appId = (process.env.ALGOLIA_APP_ID || '').trim();
-  const indexName = (process.env.ALGOLIA_INDEX_NAME || '').trim() || 'bible-sermons';
+  const indexName = (process.env.ALGOLIA_INDEX_NAME || '').trim() || 'my-bible-note';
   const searchApiKey = (process.env.ALGOLIA_SEARCH_API_KEY || process.env.ALGOLIA_WRITE_API_KEY || '').trim();
   const adminApiKey = (process.env.ALGOLIA_ADMIN_API_KEY || process.env.ALGOLIA_WRITE_API_KEY || '').trim();
 

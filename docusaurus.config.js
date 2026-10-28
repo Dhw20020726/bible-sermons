@@ -22,7 +22,7 @@ const isAlgoliaReady = Boolean(algoliaEnv.appId && algoliaEnv.searchApiKey && al
 const lightCodeTheme = themes.github;
 
 /** @type {import('@docusaurus/types').Config} */
-const siteBaseUrl = '/bible-sermons/';
+const siteBaseUrl = '/my-bible-note/';
 
 const config = {
   title: '我的圣经笔记',
@@ -36,7 +36,7 @@ const config = {
     },
   },
   organizationName: 'Dhw20020726',
-  projectName: 'bible-sermons',
+  projectName: 'my-bible-note',
 
   i18n: {
     defaultLocale: 'zh-Hans',

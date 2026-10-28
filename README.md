@@ -1,8 +1,8 @@
-# bible-sermons
+# my-bible-note
 
 基于 [Docusaurus 3.x](https://docusaurus.io/) 构建的圣经讲道站点，内容按旧约/新约与卷书目录组织，部署在 GitHub Pages。
 
-在线地址：`https://dhw20020726.github.io/bible-sermons`
+在线地址：`https://dhw20020726.github.io/my-bible-note`
 
 ---
 
@@ -44,7 +44,7 @@ npm run index:all        # 生成 + 上传
 ## 项目结构
 
 ```
-bible-sermons/
+my-bible-note/
 ├── lib/                    # 共享工具库（经文解析、slug 生成）
 │   ├── bible-parser.js     #   解析 "创世记 2:7-9" → 结构化对象
 │   └── slug.js             #   中文标题 → URL 友好 slug
