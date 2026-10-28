@@ -21,7 +21,7 @@ const fg = require('fast-glob');
 const matter = require('gray-matter');
 const removeMd = require('remove-markdown');
 const algoliasearch = require('algoliasearch');
-const {buildBookIndex, loadChapterLines} = require('../plugins/bible-embed');
+const {buildBookIndex, loadChapterLines, buildVerseMap, getLastVerseNumber} = require('../plugins/bible-embed');
 const {parseAttributes, parsePassage} = require('../lib/bible-parser');
 const {hydrateAlgoliaEnv, resolveAlgoliaEnv} = require('./utils/env');
 const {createSectionSlugger, resolveHeadingAnchor} = require('../lib/slug');
@@ -112,15 +112,24 @@ function renderBiblePassageText(passage, version) {
   const entries = [];
 
   for (const segment of segments) {
-    const lines = getChapterLines(version, segment.book, segment.chapter);
     for (const range of segment.ranges) {
-      for (let v = range.start; v <= range.end; v += 1) {
-        // 经文文件行布局：[0]书名 [1]章号 [2]第1节 → 节号+1=行索引，跳过文件头2行
-        const VERSE_HEADER_LINES = 2;
-        const lineIndex = v + VERSE_HEADER_LINES;
-        const text = (lines[lineIndex] || '').trim();
-        const verseText = text || `[${segment.book} ${segment.chapter}:${v} 未找到内容]`;
-        entries.push({book: segment.book, chapter: segment.chapter, verse: v, text: verseText});
+      const startChapter = segment.chapter;
+      const endChapter = range.endChapter || segment.chapter;
+      for (let chapter = startChapter; chapter <= endChapter; chapter += 1) {
+        const lines = getChapterLines(version, segment.book, chapter);
+        const verseMap = buildVerseMap(lines);
+        const lastVerse = getLastVerseNumber(verseMap);
+        const isFirst = chapter === startChapter;
+        const isLast = chapter === endChapter;
+        const startVerse = isFirst ? range.start : 1;
+        const endVerse = isLast ? range.end : lastVerse;
+
+        for (let v = startVerse; v <= endVerse; v += 1) {
+          const entry = verseMap.get(v);
+          const text = (entry && entry.text ? entry.text : '').trim();
+          const verseText = text || `[${segment.book} ${chapter}:${v} 未找到内容]`;
+          entries.push({book: segment.book, chapter, verse: v, text: verseText});
+        }
       }
     }
   }

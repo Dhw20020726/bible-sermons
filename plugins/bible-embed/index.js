@@ -124,6 +124,7 @@ function buildVerseMap(lines) {
   for (let i = 2; i < lines.length; i += 1) {
     const rawLine = lines[i];
     if (rawLine === undefined) continue;
+    if (!rawLine.trim()) continue; // 跳过空行（文件末尾换行产生的空白行）
     let lineText = rawLine.trim();
     let span = 1;
     const spanMatch = lineText.match(spanPattern);
@@ -147,6 +148,20 @@ function buildVerseMap(lines) {
 }
 
 /**
+ * 返回某章经文映射中的最后一节号。
+ * 用于跨章范围（如 "16:30-17:1"）确定中间/起始章的结尾位置。
+ * @param {Map<number, {start: number, end: number, text: string}>} verseMap
+ * @returns {number} 最后一节号；空章节返回 0
+ */
+function getLastVerseNumber(verseMap) {
+  let last = 0;
+  for (const key of verseMap.keys()) {
+    if (key > last) last = key;
+  }
+  return last;
+}
+
+/**
  * 将解析后的经文引用渲染为 remark AST 节点。
  * 生成 <blockquote class="bible-text"> 块，内含多条 <p class="verse"> 段落，
  * 每段包含 <strong class="verse-number"> 节号 和经文文本。
@@ -161,29 +176,40 @@ function renderPassage({baseDir, version, passage}) {
     const verses = [];
 
     for (const segment of segments) {
-      const lines = loadChapterLines(baseDir, version, mapping, segment.book, segment.chapter);
-      const verseMap = buildVerseMap(lines);
       for (const range of segment.ranges) {
-        let lastEntry = null;
-        for (let v = range.start; v <= range.end; v += 1) {
-          const entry = verseMap.get(v);
-          if (entry && entry === lastEntry) {
-            continue; // 多节共享同一行文本时，跳过重复的 entry
+        const startChapter = segment.chapter;
+        const endChapter = range.endChapter || segment.chapter;
+        for (let chapter = startChapter; chapter <= endChapter; chapter += 1) {
+          const lines = loadChapterLines(baseDir, version, mapping, segment.book, chapter);
+          const verseMap = buildVerseMap(lines);
+          const lastVerse = getLastVerseNumber(verseMap);
+          const isFirst = chapter === startChapter;
+          const isLast = chapter === endChapter;
+          // 首章从 range.start 起，末章到 range.end 止；中间的整章取 1..lastVerse
+          const startVerse = isFirst ? range.start : 1;
+          const endVerse = isLast ? range.end : lastVerse;
+
+          let lastEntry = null;
+          for (let v = startVerse; v <= endVerse; v += 1) {
+            const entry = verseMap.get(v);
+            if (entry && entry === lastEntry) {
+              continue; // 多节共享同一行文本时，跳过重复的 entry
+            }
+            lastEntry = entry;
+            const text = (entry && entry.text ? entry.text : '').trim();
+            const number = entry
+              ? entry.start === entry.end
+                ? String(entry.start)
+                : `${entry.start}-${entry.end}`
+              : String(v);
+            const verseText =
+              text || `[${segment.book} ${chapter}:${number} 未找到内容]`;
+            verses.push({
+              number,
+              text: verseText,
+              missing: !text,
+            });
           }
-          lastEntry = entry;
-          const text = (entry && entry.text ? entry.text : '').trim();
-          const number = entry
-            ? entry.start === entry.end
-              ? String(entry.start)
-              : `${entry.start}-${entry.end}`
-            : String(v);
-          const verseText =
-            text || `[${segment.book} ${segment.chapter}:${number} 未找到内容]`;
-          verses.push({
-            number,
-            text: verseText,
-            missing: !text,
-          });
         }
       }
     }
@@ -290,5 +316,7 @@ module.exports = function bibleEmbedPlugin(userOptions = {}) {
 // 导出工具函数给 scripts/algoliaIndex.js、plugins/auto-bible 等复用
 module.exports.buildBookIndex = buildBookIndex;
 module.exports.loadChapterLines = loadChapterLines;
+module.exports.buildVerseMap = buildVerseMap;
+module.exports.getLastVerseNumber = getLastVerseNumber;
 module.exports.renderPassage = renderPassage;
 module.exports.DEFAULT_VERSION = DEFAULT_VERSION;
